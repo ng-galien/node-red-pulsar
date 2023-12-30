@@ -1,0 +1,19 @@
+{
+  "env": {
+    "node": true,
+    "commonjs": true,
+    "es6": true,
+    "mocha": true
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-console": "error",
+    "indent": [
+      "error",
+      4
+    ]
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  }
+}

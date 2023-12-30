@@ -3,12 +3,12 @@ const Pulsar = require('pulsar-client');
 module.exports = function(RED) {
     function PulsarConsumer(config) {
         RED.nodes.createNode(this, config);
-        var node = this;
+        const node = this;
         // Retrieve the config node
         this.boker = RED.nodes.getNode(config.broker);
         node.on('close', function() {
             if (node.client) {
-                node.client.close().then(r => {
+                node.client.close().then(() => {
                     node.debug('Pulsar client closed');
                 }).catch(e => {
                     node.error('Error closing pulsar client: ' + e);
