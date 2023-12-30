@@ -1,0 +1,23 @@
+<script type="text/javascript">
+    RED.nodes.registerType('pulsar-config',{
+        category: 'config',
+        defaults: {
+            serviceUrl: {value:"pulsar://localhost:6650", required:true},
+            adminUrl: {value:"http://localhost:8080", required:false},
+        },
+        label: function() {
+            return this.serviceUrl || 'pulsar-config';
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="pulsar-config">
+    <div class="form-row">
+        <label for="node-config-input-serviceUrl"><i class="fa fa-bookmark"></i> Service URL</label>
+        <input type="url" id="node-config-input-serviceUrl" placeholder="pulsar://localhost:6650">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-adminUrl"><i class="fa fa-bookmark"></i> Admin URL</label>
+        <input type="url" id="node-config-input-adminUrl" placeholder="http://localhost:8080">
+    </div>
+</script>

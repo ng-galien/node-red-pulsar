@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    RED.nodes.registerType('pulsar-producer',{
+        category: 'pulsar',
+        color: '#a6bbcf',
+        defaults: {
+            broker: {value:"",type:"pulsar-config",required:true},
+            topic: {value:"",required:true},
+            subscription: {value:"",required:true},
+        },
+        inputs: 1,
+        outputs: 0,
+        icon: "font-awesome/fa-paper-plane",
+        label: function() {
+            return "Pulsar Producer" + (this.topic ? " (" + this.topic + ")" : "");
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="pulsar-producer">
+    <div class="form-row">
+        <label for="node-input-broker"><i class="fa fa-bookmark"></i> Broker</label>
+        <input type="text" id="node-input-broker">
+    </div>
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-bookmark"></i> Topic</label>
+        <input type="text" id="node-input-topic">
+    </div>
+    <div class="form-row">
+        <label for="node-input-subscription"><i class="fa fa-bookmark"></i> Subscription</label>
+        <input type="text" id="node-input-subscription">
+</script>
+
+<script type="text/html" data-help-name="pulsar-producer">
+    <p>
+        A pulsar-producer node that can be used to produce messages to a pulsar topic.
+    </p>
+</script>

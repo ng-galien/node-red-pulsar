@@ -1,0 +1,23 @@
+{
+  "name": "node-red-contrib-pulsar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install-nodes": "PROJECT_DIR=$(pwd) && cd ~/.node-red && npm install $PROJECT_DIR",
+    "node-red": "node-red -v ~/.node-red"
+  },
+  "node-red": {
+    "nodes": {
+      "pulsar-config": "src/pulsar-config.js",
+      "pulsar-consumer": "src/pulsar-consumer.js",
+      "pulsar-producer": "src/pulsar-producer.js"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pulsar-client": "^1.9.0"
+  }
+}
