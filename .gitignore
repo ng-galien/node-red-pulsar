@@ -1,0 +1,5 @@
+.idea/
+node_modules/
+rest/
+package-lock.json
+*.sh
