@@ -6,14 +6,9 @@ module.exports = function(RED) {
         const node = this;
         // Retrieve the config node
         this.boker = RED.nodes.getNode(config.broker);
-        node.on('close', function() {
-            if (node.client) {
-                node.client.close().then(() => {
-                    node.debug('Pulsar client closed');
-                }).catch(e => {
-                    node.error('Error closing pulsar client: ' + e);
-                })
-            }
+        node.on('close', async function() {
+            node.consumer && await node.consumer.close();
+            node.client && await node.client.close();
         });
         try {
             node.client = new Pulsar.Client({
@@ -43,14 +38,15 @@ module.exports = function(RED) {
                         node.send({payload: str});
                     }
                     msgConsumer.acknowledge(message).then(r => {
-                        node.debug('Message acknowledged');
+                        node.debug('Message acknowledged'+r);
                         node.status({fill: "green", shape: "dot", text: "connected"});
                     }).catch(e => {
                         node.error('Error acknowledging message: ' + e);
                         node.status({fill: "red", shape: "dot", text: "Ack error"});
                     });
                 }
-            }).then(r => {
+            }).then(consumer => {
+                node.consumer = consumer;
                 node.debug('Consumer created');
                 node.status({fill: "green", shape: "dot", text: "connected"});
 
