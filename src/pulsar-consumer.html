@@ -7,11 +7,12 @@
             topic: {value:"",required:true},
             subscription: {value:"",required:true},
         },
-        outputs: 1,
+        outputs: 2,
         icon: "font-awesome/fa-inbox",
         label: function() {
             return "Pulsar Consumer" + (this.topic ? " (" + this.topic + ")" : "");
-        }
+        },
+        outputLabels: ['msg', 'status']
     });
 </script>
 

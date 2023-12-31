@@ -1,59 +1,77 @@
 const Pulsar = require('pulsar-client');
+const uuid = require('uuid');
 
 module.exports = function (RED) {
     function PulsarProducer(config) {
         RED.nodes.createNode(this, config);
         const node = this;
+        node.status({fill: "red", shape: "dot", text: "disconnected"});
+        node.topic = config.topic;
+        node.producerName = config.name || 'producer-'+uuid.v4();
         // Retrieve the config node
         this.boker = RED.nodes.getNode(config.broker);
-
-        node.client = new Pulsar.Client({
-            serviceUrl: node.boker.serviceUrl,
+        node.on('close', async function() {
+            const self = this;
+            self.producer && await self.producer.close();
+            self.client && await self.client.close();
         });
-
+        try {
+            node.client = new Pulsar.Client({
+                serviceUrl: node.boker.serviceUrl,
+            });
+        } catch (e) {
+            node.error('Error creating pulsar client: ' + e);
+            node.status({fill: "red", shape: "dot", text: "Connection error"});
+        }
+        node.status({fill: "yellow", shape: "dot", text: "connecting"});
         node.client.createProducer({
-            topic: config.topic, producerName: config.producerName
+            topic: node.topic,
+            producerName: node.producerName
         }).then(producer => {
             node.debug('Producer created');
             node.producer = producer;
             node.status({fill: "green", shape: "dot", text: "connected"});
+            const message = {
+                topic: 'pulsar',
+                payload: {
+                    type: 'producer',
+                    status: 'ready',
+                    topic: node.topic,
+                    producerName: node.producerName
+                }
+            };
+            node.send(message);
         }).catch(e => {
             node.debug('Error creating producer: ' + e);
             node.status({fill: "red", shape: "dot", text: "Connection error"});
         });
 
         node.on('input', function (msg, send, done) {
-            if (node.producer) {
-                node.status({fill: "orange", shape: "dot", text: "message received"});
-                node.debug('Message received');
+            const self = this;
+            if (self.producer) {
+                self.status({fill: "orange", shape: "dot", text: "message received"});
+                self.debug('Message received');
                 if (!msg.payload) {
-                    node.warn('Payload is empty');
-                    node.status({fill: "orange", shape: "dot", text: "Payload is empty"});
+                    self.warn('Payload is empty');
+                    self.status({fill: "orange", shape: "dot", text: "Payload is empty"});
                     return;
                 }
                 const str = JSON.stringify(msg.payload);
                 const buffer = Buffer.from(str);
-                node.producer.send({
+                self.producer.send({
                     data: buffer
                 }).then(r => {
-                    node.status({fill: "green", shape: "dot", text: "connected"});
+                    self.status({fill: "green", shape: "dot", text: "connected"});
                 }).catch(e => {
-                    node.error('Error sending message: ' + e);
-                    node.status({fill: "red", shape: "dot", text: "Send error"});
+                    self.error('Error sending message: ' + e);
+                    self.status({fill: "red", shape: "dot", text: "Send error"});
                 });
             } else {
-                node.error('Producer not created');
-                node.status({fill: "red", shape: "dot", text: "Producer not created"});
+                self.error('Producer not created');
+                self.status({fill: "red", shape: "dot", text: "Producer not created"});
             }
             if (done) {
                 done();
-            }
-        });
-        node.on('close', function () {
-            if (node.client) {
-                node.client.close().then(r => {
-                    node.debug('Pulsar client closed');
-                })
             }
         });
     }

@@ -1,5 +1,7 @@
+
 const helper = require("node-red-node-test-helper");
 const pulsarConsumerNode = require("../src/pulsar-consumer.js");
+const pulsarProducerNode = require("../src/pulsar-producer.js");
 const pulsarConfigNode = require("../src/pulsar-config.js");
 const Pulsar = require('pulsar-client');
 const { createPulsarContainer, createTopic } = require("./pulsar-container.js");
@@ -10,12 +12,13 @@ helper.init(require.resolve('node-red'), {
     functionGlobalContext: { os:require('os') }
 });
 
-describe('pulsar-consumer Node', function () {
-
+describe('Pulsar Nodes', function () {
 
     // let container;
     let pulsarPort = 6650;
-    let topic = "test"+Math.random();
+    const topic = "test"+Math.random();
+    const consumerSubscription = "test"+Math.random();
+    const producerName = "test"+Math.random();
     let container;
 
     before(function (done) {
@@ -47,39 +50,95 @@ describe('pulsar-consumer Node', function () {
         });
     });
 
-    it('should be loaded', async function () {
+    it('Consumer should be loaded',  function (done) {
         const flow = [
-            {id: "n1", type: "pulsar-consumer", broker: "n2", topic: "test", subscription: "test", wires: [["n3"]]},
-            {id: "n2", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort, wires: [["n1"]]}
+            { id: "consumer", type: "pulsar-consumer", broker: "config", topic: topic, subscription: consumerSubscription, wires: [[], ["status"]] },
+            { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "status", type: "helper" }
         ];
-        await helper.load([pulsarConfigNode, pulsarConsumerNode], flow);
-        const n1 = helper.getNode("n1");
-        try {
-            //Node should be loaded
-            n1.should.not.be.null;
-            //Client should be set
-            n1.should.have.property('client');
-            //Client should be a pulsar client
-            return Promise.resolve();
-        } catch (err) {
-            return Promise.reject(err);
-        }
+        helper.load([pulsarConfigNode, pulsarConsumerNode], flow, function () {
+            const consumer = helper.getNode("consumer");
+            try {
+                consumer.should.have.property('client');
+                //Wait for status message
+                const status = helper.getNode("status");
+                status.on("input", function (msg) {
+                    try {
+                        console.log("Message received", msg);
+                        msg.should.have.property('topic');
+                        msg.topic.should.be.equal('pulsar');
+                        msg.should.have.property('payload');
+                        msg.payload.should.have.property('type');
+                        msg.payload.type.should.be.equal('consumer');
+                        msg.payload.should.have.property('status');
+                        msg.payload.status.should.be.equal('ready');
+                        msg.payload.should.have.property('topic');
+                        msg.payload.topic.should.be.equal(topic);
+                        msg.payload.should.have.property('subscription');
+                        msg.payload.subscription.should.be.equal(consumerSubscription);
+                        done();
+                    } catch (err) {
+                        done(err);
+                    }
+                });
+            } catch (err) {
+                done(err);
+            }
+        });
     });
-    it('should receive a message',  function (done) {
+
+    it('Producer should be loaded',  function (done) {
         const flow = [
-            {id: "n1", type: "pulsar-consumer", broker: "n2", topic: topic, subscription: "test", wires: [["n3"]]},
-            {id: "n2", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort, wires: [["n1"]]},
-            {id: "n3", type: "helper"}
+            { id: "producer", type: "pulsar-producer", broker: "config", topic: topic, name: producerName, wires: [["status"]] },
+            { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "status", type: "helper"}
+        ];
+        helper.load([pulsarConfigNode, pulsarProducerNode], flow, function () {
+            const producer = helper.getNode("producer");
+            try {
+                producer.should.have.property('client');
+                //Wait for status message
+                const status = helper.getNode("status");
+                status.on("input", function (msg) {
+                    try {
+                        console.log("Message received", msg);
+                        msg.should.have.property('topic');
+                        msg.topic.should.be.equal('pulsar');
+                        msg.should.have.property('payload');
+                        msg.payload.should.have.property('type');
+                        msg.payload.type.should.be.equal('producer');
+                        msg.payload.should.have.property('status');
+                        msg.payload.status.should.be.equal('ready');
+                        msg.payload.should.have.property('topic');
+                        msg.payload.topic.should.be.equal(topic);
+                        msg.payload.should.have.property('producerName');
+                        msg.payload.producerName.should.be.equal(producerName);
+                        done();
+                    } catch (err) {
+                        done(err);
+                    }
+                });
+            } catch (err) {
+                done(err);
+            }
+        });
+    });
+
+    it('Consumer should receive a message',  function (done) {
+        const flow = [
+            { id: "consumer", type: "pulsar-consumer", broker: "config", topic: topic, subscription: consumerSubscription, wires: [["receiver"]] },
+            { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "receiver", type: "helper"}
         ];
         helper.load([pulsarConfigNode, pulsarConsumerNode], flow, function () {
             try {
-                const n1 = helper.getNode("n1");
+                const consumer = helper.getNode("consumer");
                 //Node should be loaded
-                n1.should.not.be.null;
+                consumer.should.not.be.null;
                 //Send a message
-                const n3 = helper.getNode("n3");
-                n3.should.not.be.null;
-                n3.on("input", function (msg) {
+                const receiver = helper.getNode("receiver");
+                receiver.should.not.be.null;
+                receiver.on("input", function (msg) {
                     try {
                         console.log("Message received", msg);
                         msg.should.have.property('payload');
@@ -96,6 +155,55 @@ describe('pulsar-consumer Node', function () {
             }
         });
         sendMsg(pulsarPort, topic, {payload: "test"}, done);
+    });
+
+    it('Producer should send a message',  function (done) {
+        const flow = [
+            {id: "producer", type: "pulsar-producer", broker: "config", topic: topic, subscription: consumerSubscription, wires: [["status"]] },
+            {id: "consumer", type: "pulsar-consumer", broker: "config", topic: topic, name: producerName, wires: [["receiver"], []] },
+            {id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            {id: "status", type: "helper"},
+            {id: "receiver", type: "helper"}
+        ];
+        helper.load([pulsarConfigNode, pulsarProducerNode, pulsarConsumerNode], flow, function () {
+            try {
+                const testValue = "test"+Math.random();
+                const producer = helper.getNode("producer");
+                //Node should be loaded
+                producer.should.not.be.null;
+                //Wait for status message
+                const status = helper.getNode("status");
+                status.on("input", function (msg) {
+                    try {
+                        console.log("Producer status received", msg);
+                        msg.should.have.property('payload');
+                        msg.payload.should.have.property('type');
+                        msg.payload.type.should.be.equal('producer');
+                        msg.payload.should.have.property('status');
+                        msg.payload.status.should.be.equal('ready');
+                        producer.receive({payload: testValue});
+                    } catch (err) {
+                        done(err);
+                    }
+                });
+                //Send a message
+                const receiver = helper.getNode("receiver");
+                receiver.should.not.be.null;
+                receiver.on("input", function (msg) {
+                    try {
+                        console.log("Message received", msg);
+                        msg.should.have.property('payload');
+                        msg.payload.should.be.equal(testValue);
+                        done();
+                    } catch (err) {
+                        done(err);
+                    }
+                });
+            } catch (err) {
+                done(err);
+            }
+        });
+
     });
 });
 

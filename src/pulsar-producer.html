@@ -3,16 +3,18 @@
         category: 'pulsar',
         color: '#a6bbcf',
         defaults: {
-            broker: {value:"",type:"pulsar-config",required:true},
-            topic: {value:"",required:true},
-            subscription: {value:"",required:true},
+            broker: { value: "", type:"pulsar-config", required:true},
+            topic: { value: "", required:true},
+            name: { value:"", required:false},
         },
         inputs: 1,
-        outputs: 0,
+        outputs: 1,
         icon: "font-awesome/fa-paper-plane",
         label: function() {
             return "Pulsar Producer" + (this.topic ? " (" + this.topic + ")" : "");
-        }
+        },
+        outputLabels: ['status'],
+        inputLabels: ['msg']
     });
 </script>
 
@@ -26,8 +28,9 @@
         <input type="text" id="node-input-topic">
     </div>
     <div class="form-row">
-        <label for="node-input-subscription"><i class="fa fa-bookmark"></i> Subscription</label>
-        <input type="text" id="node-input-subscription">
+        <label for="node-input-name"><i class="fa fa-bookmark"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
 </script>
 
 <script type="text/html" data-help-name="pulsar-producer">
