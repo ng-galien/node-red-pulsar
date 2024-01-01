@@ -2,8 +2,15 @@ module.exports = function(RED) {
     function PulsarConfigNode(n) {
         RED.nodes.createNode(this,n);
         const node = this;
-        node.on('close', function() {
-            node.client && node.client.close();
+        node.on('close', async function() {
+            try {
+                if(node.client) {
+                    return await node.client.close();
+                }
+            } catch (e) {
+                node.error('Error closing client: ' + e);
+            }
+            return Promise.resolve();
         });
         try {
             const Pulsar = require('pulsar-client');
