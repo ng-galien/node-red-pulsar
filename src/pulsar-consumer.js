@@ -89,7 +89,7 @@ module.exports = function(RED) {
             //if the buffer is empty, the message is not a json object
             const nodeMessage = {
                 topic: pulsarMessage.getTopicName(),
-                messageId: pulsarMessage.getMessageId(),
+                messageId: pulsarMessage.getMessageId().toString(),
                 publishTime: pulsarMessage.getPublishTimestamp(),
                 eventTime: pulsarMessage.getEventTimestamp(),
                 redeliveryCount: pulsarMessage.getRedeliveryCount(),
