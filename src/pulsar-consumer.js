@@ -128,8 +128,7 @@ module.exports = function(RED) {
         node.producerConfig = producerConfig;
 
         node.on('close', async function() {
-            const self = this;
-            self.consumer && await self.consumer.close();
+            node.consumer && await node.consumer.close();
         });
         node.status({fill: "red", shape: "dot", text: "disconnected"});
 

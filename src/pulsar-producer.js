@@ -73,9 +73,8 @@ module.exports = function (RED) {
         }
         node.producerConfig = producerConfig;
 
-        node.on('close', async function() {
-            const self = this;
-            self.producer && await self.producer.close();
+        node.on('close', function() {
+            node.producer && node.producer.close();
         });
         node.status({fill: "red", shape: "dot", text: "disconnected"});
 
@@ -104,7 +103,7 @@ module.exports = function (RED) {
             };
             node.send(message);
         }).catch(e => {
-            node.debug('Error creating producer: ' + e);
+            node.error('Error creating producer: ' + e);
             node.status({fill: "red", shape: "dot", text: "Connection error"});
         });
 
