@@ -1,6 +1,4 @@
 <script type="text/javascript">
-    console.log("register pulsar-schema")
-
     RED.nodes.registerType('pulsar-schema',{
         category: 'config',
         color: '#188fff',
@@ -15,7 +13,6 @@
             return this.name || "pulsar-schema";
         },
         oneditprepare: function() {
-
             $("#node-config-input-schemaType").typedInput({type:"schemaType", types:[{
                     value: "schemaType",
                     multiple: false,
