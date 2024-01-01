@@ -73,20 +73,26 @@ module.exports = function (RED) {
         }
         node.producerConfig = producerConfig;
 
-        node.on('close', async function() {
-            try {
-                if(node.producer) {
-                    return await node.producer.close();
-                }
-            } catch (e) {
-                node.error('Error closing producer: ' + e);
+        node.on('close', function(done) {
+            if (node.producer && node.producer.isConnected()) {
+                node.producer.close().then(() => {
+                    done();
+                }).catch((e) => {
+                    done(e);
+                });
+            } else {
+                done();
             }
-            return Promise.resolve();
         });
         node.status({fill: "red", shape: "dot", text: "disconnected"});
 
-        // Retrieve the config node
-        const pulsarClient = RED.nodes.getNode(properties.config).client;
+        var configNode = RED.nodes.getNode(properties.config);
+        if (!configNode) {
+            node.error('Config node not found');
+            node.status({fill: "red", shape: "dot", text: "Config node not found"});
+            return;
+        }
+        const pulsarClient = configNode.client;
 
         if(!pulsarClient) {
             node.error('Client not created');

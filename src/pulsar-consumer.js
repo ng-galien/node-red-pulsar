@@ -1,28 +1,5 @@
 const uuid = require('uuid');
 
-// export interface ConsumerConfig {
-//     topic?: string;
-//     topics?: string[];
-//     topicsPattern?: string;
-//     subscription: string;
-//     subscriptionType?: SubscriptionType;
-//     subscriptionInitialPosition?: InitialPosition;
-//     ackTimeoutMs?: number;
-//     nAckRedeliverTimeoutMs?: number;
-//     receiverQueueSize?: number;
-//     receiverQueueSizeAcrossPartitions?: number;
-//     consumerName?: string;
-//     properties?: { [key: string]: string };
-//     readCompacted?: boolean;
-//     privateKeyPath?: string;
-//     cryptoFailureAction?: ConsumerCryptoFailureAction;
-//     maxPendingChunkedMessage?: number;
-//     autoAckOldestChunkedMessageOnQueueFull?: number;
-//     batchIndexAckEnabled?: boolean;
-//     regexSubscriptionMode?: RegexSubscriptionMode;
-//     deadLetterPolicy?: DeadLetterPolicy;
-// }
-
 function propertiesToConsumerConfig(properties, RED, node) {
     const result = {};
     if (properties.topic) {
@@ -127,19 +104,25 @@ module.exports = function(RED) {
 
         node.producerConfig = producerConfig;
 
-        node.on('close', async function() {
-            try {
-                if(node.consumer) {
-                    return await node.consumer.close();
-                }
-            } catch (e) {
-                node.error('Error closing consumer: ' + e);
+        node.on('close', function(done) {
+            if(node.consumer && node.consumer.isConnected()) {
+                node.consumer.close().then(() => {
+                    done();
+                }).catch((e) => {
+                    done(e);
+                });
+            } else {
+                done();
             }
-            return Promise.resolve();
         });
         node.status({fill: "red", shape: "dot", text: "disconnected"});
-
-        const pulsarClient = RED.nodes.getNode(properties.config).client;
+        const configNode = RED.nodes.getNode(properties.config);
+        if (!configNode) {
+            node.error('Config node not found');
+            node.status({fill: "red", shape: "dot", text: "Config node not found"});
+            return;
+        }
+        const pulsarClient = configNode.client;
         if(!pulsarClient) {
             node.error('Client not created');
             node.status({fill: "red", shape: "dot", text: "Client not created"});

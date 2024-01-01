@@ -1,0 +1,18 @@
+version: "3.5"
+
+services:
+  pulsar:
+    image: apachepulsar/pulsar:3.1.1
+    command: ["bin/pulsar", "standalone"]
+
+  nodered:
+    build: .
+    container_name: nodered
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered:/data
+
+volumes:
+  nodered:
+    name: nodered

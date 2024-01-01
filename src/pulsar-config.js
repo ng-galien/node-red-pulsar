@@ -1,20 +1,26 @@
+const Pulsar = require('pulsar-client');
+
 module.exports = function(RED) {
     function PulsarConfigNode(n) {
         RED.nodes.createNode(this,n);
         const node = this;
-        node.on('close', async function() {
-            try {
-                if(node.client) {
-                    return await node.client.close();
-                }
-            } catch (e) {
-                node.error('Error closing client: ' + e);
+        node.on('close', function(removed, done) {
+            if (node.client && removed) {
+                node.client.close().then(() => {
+                    done();
+                }).catch((e) => {
+                    done(e);
+                });
+            } else {
+                done();
             }
-            return Promise.resolve();
         });
         try {
-            const Pulsar = require('pulsar-client');
-            this.client = new Pulsar.Client({
+
+            Pulsar.Client.setLogHandler((level, file, line, message) => {
+                console.log(level, file, line, message);
+            });
+            node.client = new Pulsar.Client({
                 serviceUrl: n.serviceUrl,
                 authentication: buildAuthentication(n.authentication),
                 operationTimeoutSeconds: n.operationTimeoutSeconds,
