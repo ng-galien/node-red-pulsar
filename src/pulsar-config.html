@@ -1,5 +1,13 @@
+
 <script type="text/javascript">
-    console.log("register pulsar-config");
+    
+    import { EditorRED } from '@types/node-red';
+    /**
+     * @type {EditorRED}
+     */
+
+    const RED = global.RED;
+
     RED.nodes.registerType('pulsar-config', {
         category: 'config',
         color: '#188fff',

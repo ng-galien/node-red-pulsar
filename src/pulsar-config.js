@@ -1,3 +1,4 @@
+/// <reference types="pulsar-client" />
 const Pulsar = require('pulsar-client');
 
 module.exports = function(RED) {
@@ -18,7 +19,20 @@ module.exports = function(RED) {
         try {
 
             Pulsar.Client.setLogHandler((level, file, line, message) => {
-                console.log(level, file, line, message);
+                switch (level) {
+                case Pulsar.LogLevel.DEBUG:
+                    node.debug(message);
+                    break;
+                case Pulsar.LogLevel.INFO:
+                    node.log(message);
+                    break;
+                case Pulsar.LogLevel.WARN:
+                    node.warn(message);
+                    break;
+                case Pulsar.LogLevel.ERROR:
+                    node.error(message);
+                    break;
+                }
             });
             node.client = new Pulsar.Client({
                 serviceUrl: n.serviceUrl,
@@ -34,12 +48,14 @@ module.exports = function(RED) {
                 statsIntervalSeconds: n.statsIntervalSeconds
             });
         } catch (e) {
-            this.error('Error creating pulsar client: ' + e);
+            node.error('Error creating pulsar client: ' + e);
         }
     }
+
     function buildAuthentication(authentication) {
         return undefined;
     }
+
     RED.nodes.registerType("pulsar-config", PulsarConfigNode);
 };
 
