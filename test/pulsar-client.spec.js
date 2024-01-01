@@ -156,6 +156,14 @@ describe('Pulsar Consumer/Producer', function () {
                 receiver.on("input", function (msg) {
                     try {
                         console.log("Message received", msg);
+                        msg.should.have.property('topic');
+                        msg.should.have.property('messageId');
+                        msg.should.have.property('publishTime');
+                        msg.should.have.property('eventTime');
+                        msg.should.have.property('redeliveryCount');
+                        msg.should.have.property('partitionKey');
+                        msg.should.have.property('properties');
+
                         msg.should.have.property('payload');
                         msg.payload.should.have.property('name');
                         msg.payload.name.should.be.equal(name);

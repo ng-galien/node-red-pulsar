@@ -85,24 +85,25 @@ module.exports = function(RED) {
         }
 
         producerConfig.listener = function (pulsarMessage, msgConsumer) {
-            node.debug('Message received');
+            node.debug('Message received' + pulsarMessage);
             //if the buffer is empty, the message is not a json object
+            const nodeMessage = {
+                topic: pulsarMessage.getTopicName(),
+                messageId: pulsarMessage.getMessageId(),
+                publishTime: pulsarMessage.getPublishTimestamp(),
+                eventTime: pulsarMessage.getEventTimestamp(),
+                redeliveryCount: pulsarMessage.getRedeliveryCount(),
+                partitionKey: pulsarMessage.getPartitionKey(),
+                properties: pulsarMessage.getProperties(),
+            }
             const str = pulsarMessage.getData().toString();
             try {
-                const data = JSON.parse(str);
-                const msg = {
-                    topic: node.topic,
-                    payload: data
-                };
-                node.send([msg, null]);
+                nodeMessage.payload = JSON.parse(str);
             } catch (e) {
                 node.debug('Message is not a json object');
-                const msg = {
-                    topic: node.topic,
-                    payload: str
-                };
-                node.send([msg, null]);
+                nodeMessage.payload = str;
             }
+            node.send([nodeMessage, null]);
             msgConsumer.acknowledge(pulsarMessage).then(r => {
                 node.debug('Message acknowledged'+r);
             }).catch(e => {
