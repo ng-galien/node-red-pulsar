@@ -1,23 +1,209 @@
 <script type="text/javascript">
-    RED.nodes.registerType('pulsar-config',{
+    console.log("register pulsar-config");
+    RED.nodes.registerType('pulsar-config', {
         category: 'config',
+        color: '#188fff',
         defaults: {
-            serviceUrl: {value:"pulsar://localhost:6650", required:true},
-            adminUrl: {value:"http://localhost:8080", required:false},
+            serviceUrl: {value: "", required: true},
+            adminUrl: {value: "", required: false},
+            authentication: {value: null, required: false, validate: validateAuthentication},
+            operationTimeoutSeconds: {value: null, required: false},
+            ioThreads: {value: null, required: false},
+            messageListenerThreads: {value: null, required: false},
+            concurrentLookupRequest: {value: null, required: false},
+            useTls: {value: null, required: false},
+            tlsTrustCertsFilePath: {value: null, required: false},
+            tlsValidateHostname: {value: null, required: false},
+            tlsAllowInsecureConnection: {value: null, required: false},
+            statsIntervalInSeconds: {value: null, required: false},
         },
-        label: function() {
-            return this.serviceUrl || 'pulsar-config';
+        label: function () {
+            return this.serviceUrl || 'pulsar-client-config';
+        },
+        oneditprepare: function () {
+            $("#node-config-input-serviceUrl").typedInput({
+                default: 'str',
+                types: ['str']
+            });
+            $("#node-config-input-authentication").typedInput({
+                default: 'json',
+                types: ['json'],
+                typeField: '#node-config-input-authentication-type'
+            });
+            // Number fields for timeout and threads
+            var numberFields = [
+                'operationTimeoutSeconds',
+                'ioThreads',
+                'messageListenerThreads',
+                'concurrentLookupRequest',
+                'statsIntervalInSeconds'
+            ];
+            numberFields.forEach(function (field) {
+                let input = $("#node-config-input-" + field);
+                input.typedInput({
+                    default: 'num',
+                    types: ['num'],
+                    typeField: '#node-config-input-' + field + '-type'
+                });
+                input.typedInput('width', '80px');
+            });
+            // Boolean fields for TLS settings
+            var booleanFields = [
+                'useTls',
+                'tlsValidateHostname',
+                'tlsAllowInsecureConnection'
+            ];
+            booleanFields.forEach(function (field) {
+                let input = $("#node-config-input-" + field);
+                input.typedInput({
+                    default: 'bool',
+                    types: ['bool'],
+                    typeField: '#node-config-input-' + field + '-type'
+                });
+                input.typedInput('width', '80px');
+            });
         }
     });
+
+    function valueIsBlank(value) {
+        return value === null || value === undefined || value === "";
+    }
+
+    function validateAuthentication(value) {
+        if (valueIsBlank(value)) {
+            return true;
+        }
+        try {
+            const auth = JSON.parse(value);
+            if (auth === null || typeof auth !== "object") {
+                return false;
+            }
+            if (!auth.type && !auth.config) {
+                return false;
+            }
+            switch (auth.type) {
+            case "AuthenticationTls" :
+                if (!auth.config.certificatePath || !auth.config.privateKeyPath) {
+                    return false;
+                }
+                break;
+            case "AuthenticationAthenz" :
+                if (!auth.config.tenantDomain
+                    && !auth.config.tenantService
+                    && !auth.config.providerDomain
+                    && !auth.config.privateKey
+                    && !auth.config.ztsUrl) {
+                    return false;
+                }
+                break;
+            case "AuthenticationToken" :
+                if (!auth.config.token) {
+                    return false;
+                }
+                break;
+            case "AuthenticationOAuth2" :
+                if (!auth.config.type
+                    && !auth.config.issuer_url) {
+                    return false;
+                }
+                break;
+            default:
+                return false;
+            }
+        } catch (e) {
+            return false;
+        }
+    }
+
+</script>
+<script type="text/html" data-template-name="pulsar-config">
+    <fieldset style="width: 450px">
+        <legend><i class="fa fa-globe"></i> Service</legend>
+    <div class="form-row">
+        <label for="node-config-input-serviceUrl"><i class="fa fa-globe"></i> URL</label>
+        <input type="text" id="node-config-input-serviceUrl" data-typed-input="true">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-adminUrl"><i class="fa fa-globe"></i> Admin URL</label>
+        <input type="text" id="node-config-input-adminUrl" data-typed-input="true">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-authentication"><i class="fa fa-lock"></i> Auth</label>
+        <input type="text" id="node-config-input-authentication" data-typed-input="true">
+        <input type="hidden" id="node-config-input-authentication-type">
+    </div>
+    </fieldset>
+
+    <!-- Runtime settings -->
+    <fieldset style="width: 450px">
+        <legend><i class="fa fa-cogs"></i> Runtime</legend>
+        <div class="form-row compact">
+            <!-- Inline numeric inputs for runtime settings -->
+            <label for="node-config-input-operationTimeoutSeconds"><i class="fa fa-clock-o"></i> Timeout</label>
+            <input type="text" id="node-config-input-operationTimeoutSeconds" data-typed-input="true">
+            <input type="hidden" id="node-config-input-operationTimeoutSeconds-type">
+
+            <label for="node-config-input-ioThreads"><i class="fa fa-cogs"></i> IO Threads</label>
+            <input type="text" id="node-config-input-ioThreads" data-typed-input="true">
+            <input type="hidden" id="node-config-input-ioThreads-type">
+        </div>
+        <div class="form-row compact">
+            <label for="node-config-input-messageListenerThreads"><i class="fa fa-cogs"></i> Listener Threads</label>
+            <input type="text" id="node-config-input-messageListenerThreads" data-typed-input="true">
+            <input type="hidden" id="node-config-input-messageListenerThreads-type">
+
+            <label for="node-config-input-concurrentLookupRequest"><i class="fa fa-cogs"></i> Lookup Requests</label>
+            <input type="text" id="node-config-input-concurrentLookupRequest" data-typed-input="true">
+            <input type="hidden" id="node-config-input-concurrentLookupRequest-type">
+        </div>
+    </fieldset>
+
+    <!-- TLS settings -->
+    <fieldset style="width: 450px">
+        <legend><i class="fa fa-lock"></i> TLS</legend>
+        <div class="form-row">
+            <!-- Inline boolean inputs for TLS settings -->
+            <label for="node-config-input-useTls"><i class="fa fa-lock"></i> Use TLS</label>
+            <input type="text" id="node-config-input-useTls" data-typed-input="true">
+            <input type="hidden" id="node-config-input-useTls-type">
+
+            <label for="node-config-input-tlsValidateHostname"><i class="fa fa-lock"></i> Validate Hostname</label>
+            <input type="text" id="node-config-input-tlsValidateHostname" data-typed-input="true">
+            <input type="hidden" id="node-config-input-tlsValidateHostname-type">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-tlsAllowInsecureConnection"><i class="fa fa-lock"></i> Allow Insecure Connection</label>
+            <input type="text" id="node-config-input-tlsAllowInsecureConnection" data-typed-input="true">
+            <input type="hidden" id="node-config-input-tlsAllowInsecureConnection-type">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-tlsTrustCertsFilePath"><i class="fa fa-file-text-o"></i> Certs Path</label>
+            <input type="text" id="node-config-input-tlsTrustCertsFilePath" data-typed-input="true">
+        </div>
+    </fieldset>
 </script>
 
-<script type="text/html" data-template-name="pulsar-config">
-    <div class="form-row">
-        <label for="node-config-input-serviceUrl"><i class="fa fa-bookmark"></i> Service URL</label>
-        <input type="url" id="node-config-input-serviceUrl" placeholder="pulsar://localhost:6650">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-adminUrl"><i class="fa fa-bookmark"></i> Admin URL</label>
-        <input type="url" id="node-config-input-adminUrl" placeholder="http://localhost:8080">
-    </div>
+
+<script type="text/markdown" data-help-name="pulsar-config">
+![Pulsar Logo](https://upload.wikimedia.org/wikipedia/commons/c/cb/Apache-pulsar-blue-logo.svg)
+
+Configure the connection to a **Pulsar** service.
+This configuration node is required by `pulsar-consumer` and `pulsar-producer` nodes.
+
+### Configuration Properties
+
+- `Service URL`: The URL of the Pulsar broker, e.g., `pulsar://localhost:6650`.
+- `Authentication`: Authentication credentials if required (JSON format).
+- `Operation Timeout Seconds`: The operation timeout in seconds.
+- `IO Threads`: The number of threads to use for handling incoming/outgoing messages.
+- `Message Listener Threads`: The number of threads to use for message listeners.
+- `Concurrent Lookup Request`: The number of concurrent lookup requests that can be sent to the Pulsar broker.
+- `Use TLS`: Whether to use TLS encryption for the connection.
+- `TLS Trust Certs File Path`: The file path to the TLS trust certificate.
+- `TLS Validate Hostname`: Whether to validate the hostname in the certificate.
+- `TLS Allow Insecure Connection`: Whether to allow insecure TLS connections.
+- `Stats Interval In Seconds`: The interval in seconds for stats to be reported.
+
+### References
+- [Pulsar documentation](https://pulsar.apache.org/docs)
 </script>

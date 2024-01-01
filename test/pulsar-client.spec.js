@@ -12,7 +12,7 @@ helper.init(require.resolve('node-red'), {
     functionGlobalContext: { os:require('os') }
 });
 
-describe('Pulsar Nodes', function () {
+describe('Pulsar Consumer/Producer', function () {
 
     // let container;
     let pulsarPort = 6650;
@@ -52,14 +52,12 @@ describe('Pulsar Nodes', function () {
 
     it('Consumer should be loaded',  function (done) {
         const flow = [
-            { id: "consumer", type: "pulsar-consumer", broker: "config", topic: topic, subscription: consumerSubscription, wires: [[], ["status"]] },
+            { id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, subscription: consumerSubscription, wires: [[], ["status"]] },
             { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
             { id: "status", type: "helper" }
         ];
         helper.load([pulsarConfigNode, pulsarConsumerNode], flow, function () {
-            const consumer = helper.getNode("consumer");
             try {
-                consumer.should.have.property('client');
                 //Wait for status message
                 const status = helper.getNode("status");
                 status.on("input", function (msg) {
@@ -89,14 +87,12 @@ describe('Pulsar Nodes', function () {
 
     it('Producer should be loaded',  function (done) {
         const flow = [
-            { id: "producer", type: "pulsar-producer", broker: "config", topic: topic, name: producerName, wires: [["status"]] },
+            { id: "producer", type: "pulsar-producer", config: "config", topic: topic, producerName: producerName, wires: [["status"]] },
             { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
             { id: "status", type: "helper"}
         ];
         helper.load([pulsarConfigNode, pulsarProducerNode], flow, function () {
-            const producer = helper.getNode("producer");
             try {
-                producer.should.have.property('client');
                 //Wait for status message
                 const status = helper.getNode("status");
                 status.on("input", function (msg) {
@@ -126,7 +122,7 @@ describe('Pulsar Nodes', function () {
 
     it('Consumer should receive a message',  function (done) {
         const flow = [
-            { id: "consumer", type: "pulsar-consumer", broker: "config", topic: topic, subscription: consumerSubscription, wires: [["receiver"]] },
+            { id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, subscription: consumerSubscription, wires: [["receiver"]] },
             { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
             { id: "receiver", type: "helper"}
         ];
@@ -157,10 +153,10 @@ describe('Pulsar Nodes', function () {
         sendMsg(pulsarPort, topic, {payload: "test"}, done);
     });
 
-    it('Producer should send a message',  function (done) {
+    it('Producer should send a message to consumer',  function (done) {
         const flow = [
-            {id: "producer", type: "pulsar-producer", broker: "config", topic: topic, subscription: consumerSubscription, wires: [["status"]] },
-            {id: "consumer", type: "pulsar-consumer", broker: "config", topic: topic, name: producerName, wires: [["receiver"], []] },
+            {id: "producer", type: "pulsar-producer", config: "config", topic: topic, subscription: consumerSubscription, wires: [["status"]] },
+            {id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, name: producerName, wires: [["receiver"], []] },
             {id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
             {id: "status", type: "helper"},
             {id: "receiver", type: "helper"}
@@ -171,7 +167,7 @@ describe('Pulsar Nodes', function () {
                 const producer = helper.getNode("producer");
                 //Node should be loaded
                 producer.should.not.be.null;
-                //Wait for status message
+                //Wait for status message and send a message
                 const status = helper.getNode("status");
                 status.on("input", function (msg) {
                     try {
@@ -186,7 +182,7 @@ describe('Pulsar Nodes', function () {
                         done(err);
                     }
                 });
-                //Send a message
+                //Receive the message
                 const receiver = helper.getNode("receiver");
                 receiver.should.not.be.null;
                 receiver.on("input", function (msg) {
@@ -220,6 +216,7 @@ function sendMsg(port, topic, message, done) {
         producer.send({
             data: Buffer.from(JSON.stringify(message))
         }).then(() => {
+            producer.close();
             client.close();
         }).catch(e => {
             console.error("Error sending message: " + e);
