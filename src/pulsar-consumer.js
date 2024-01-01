@@ -1,5 +1,14 @@
+/// <reference types="pulsar-client" />
+const Pulsar = require('pulsar-client');
 const uuid = require('uuid');
 
+/**
+ *
+ * @param properties
+ * @param RED
+ * @param node
+ * @returns {Pulsar.ClientConfig}
+ */
 function propertiesToConsumerConfig(properties, RED, node) {
     const result = {};
     if (properties.topic) {
@@ -130,8 +139,7 @@ module.exports = function(RED) {
         }
         node.status({fill: "yellow", shape: "dot", text: "connecting"});
 
-        pulsarClient.subscribe(node.producerConfig)
-            .then(consumer => {
+        pulsarClient.subscribe(node.producerConfig).then(consumer => {
             node.consumer = consumer;
             node.debug('Consumer created');
             node.status({fill: "green", shape: "dot", text: "connected"});

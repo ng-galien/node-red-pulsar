@@ -1,6 +1,13 @@
+/// <reference types="pulsar-client" />
+const Pulsar = require('pulsar-client');
 const propUtils = require('./properties-util');
 
-
+/**
+ *
+ * @param properties
+ * @param RED
+ * @returns {Pulsar.SchemaInfo}
+ */
 function propertiesToSchemaInfo(properties, RED) {
     const result = {};
     if (!properties.schemaType) {
@@ -11,10 +18,10 @@ function propertiesToSchemaInfo(properties, RED) {
         result.name = RED.util.evaluateNodeProperty(properties.name, "str", this);
     }
     if (propUtils.isNonEmptyString(properties.schema)) {
-        result.schema = RED.util.evaluateNodeProperty(properties.schema, "json", this);
+        result.schema = RED.util.evaluateNodeProperty(properties.schema, "str", this);
     }
     if (propUtils.isNonEmptyString(properties.properties)) {
-        result.schema = RED.util.evaluateNodeProperty(properties.properties, "json", this);
+        result.properties = RED.util.evaluateNodeProperty(properties.properties, "json", this);
     }
     return result;
 }

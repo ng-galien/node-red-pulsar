@@ -3,9 +3,11 @@ const helper = require("node-red-node-test-helper");
 const pulsarConsumerNode = require("../src/pulsar-consumer.js");
 const pulsarProducerNode = require("../src/pulsar-producer.js");
 const pulsarConfigNode = require("../src/pulsar-config.js");
+const pulsarSchemaNode = require("../src/pulsar-schema.js");
 const Pulsar = require('pulsar-client');
 const { createPulsarContainer, createTopic } = require("./pulsar-container.js");
 const {stopPulsarContainer} = require("./pulsar-container");
+const {schema} = require("avsc");
 
 
 helper.init(require.resolve('node-red'), {
@@ -19,6 +21,14 @@ describe('Pulsar Consumer/Producer', function () {
     const topic = "test"+Math.random();
     const consumerSubscription = "test"+Math.random();
     const producerName = "test"+Math.random();
+    const jsonSchema = {
+        type: "record",
+        name: "Test",
+        fields: [
+            {name: "name", type: "string"},
+            {name: "age", type: "int"}
+        ]
+    };
     let container;
 
     before(function (done) {
@@ -52,11 +62,12 @@ describe('Pulsar Consumer/Producer', function () {
 
     it('Consumer should be loaded',  function (done) {
         const flow = [
-            { id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, subscription: consumerSubscription, wires: [[], ["status"]] },
+            { id: "consumer", type: "pulsar-consumer", config: "config", schema: "schema", topic: topic, subscription: consumerSubscription, wires: [[], ["status"]] },
             { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             { id: "status", type: "helper" }
         ];
-        helper.load([pulsarConfigNode, pulsarConsumerNode], flow, function () {
+        helper.load([pulsarConfigNode, pulsarSchemaNode, pulsarConsumerNode], flow, function () {
             try {
                 //Wait for status message
                 const status = helper.getNode("status");
@@ -87,11 +98,12 @@ describe('Pulsar Consumer/Producer', function () {
 
     it('Producer should be loaded',  function (done) {
         const flow = [
-            { id: "producer", type: "pulsar-producer", config: "config", topic: topic, producerName: producerName, wires: [["status"]] },
+            { id: "producer", type: "pulsar-producer", config: "config", schema: "schema", topic: topic, producerName: producerName, wires: [["status"]] },
             { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             { id: "status", type: "helper"}
         ];
-        helper.load([pulsarConfigNode, pulsarProducerNode], flow, function () {
+        helper.load([pulsarConfigNode, pulsarSchemaNode, pulsarProducerNode], flow, function () {
             try {
                 //Wait for status message
                 const status = helper.getNode("status");
@@ -122,12 +134,19 @@ describe('Pulsar Consumer/Producer', function () {
 
     it('Consumer should receive a message',  function (done) {
         const flow = [
-            { id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, subscription: consumerSubscription, wires: [["receiver"]] },
+            { id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, schema: schema, subscription: consumerSubscription, wires: [["receiver"]] },
             { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             { id: "receiver", type: "helper"}
         ];
-        helper.load([pulsarConfigNode, pulsarConsumerNode], flow, function () {
+        helper.load([pulsarConfigNode, pulsarSchemaNode, pulsarConsumerNode], flow, function () {
             try {
+                const name = "test"+Math.random();
+                const age = Math.floor(Math.random() * 100);
+                const message = {
+                    name: name,
+                    age: age
+                };
                 const consumer = helper.getNode("consumer");
                 //Node should be loaded
                 consumer.should.not.be.null;
@@ -138,31 +157,40 @@ describe('Pulsar Consumer/Producer', function () {
                     try {
                         console.log("Message received", msg);
                         msg.should.have.property('payload');
-                        msg.payload.should.have.property('payload');
-                        msg.payload.payload.should.be.equal('test');
+                        msg.payload.should.have.property('name');
+                        msg.payload.name.should.be.equal(name);
+                        msg.payload.should.have.property('age');
+                        msg.payload.age.should.be.equal(age);
                         done();
                     } catch (err) {
                         done(err);
                     }
                 });
 
+                sendMsg(pulsarPort, topic, message, done);
             } catch (err) {
                 done(err);
             }
         });
-        sendMsg(pulsarPort, topic, {payload: "test"}, done);
     });
 
     it('Producer should send a message to consumer',  function (done) {
         const flow = [
-            {id: "producer", type: "pulsar-producer", config: "config", topic: topic, subscription: consumerSubscription, wires: [["status"]] },
+            {id: "producer", type: "pulsar-producer", config: "config", schema: "schema",topic: topic, subscription: consumerSubscription, wires: [["status"]] },
             {id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, name: producerName, wires: [["receiver"], []] },
             {id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             {id: "status", type: "helper"},
             {id: "receiver", type: "helper"}
         ];
-        helper.load([pulsarConfigNode, pulsarProducerNode, pulsarConsumerNode], flow, function () {
+        helper.load([pulsarConfigNode,pulsarSchemaNode, pulsarProducerNode, pulsarConsumerNode], flow, function () {
             try {
+                const name = "test"+Math.random();
+                const age = Math.floor(Math.random() * 100);
+                const message = {
+                    name: name,
+                    age: age
+                };
                 const testValue = "test"+Math.random();
                 const producer = helper.getNode("producer");
                 //Node should be loaded
@@ -177,7 +205,7 @@ describe('Pulsar Consumer/Producer', function () {
                         msg.payload.type.should.be.equal('producer');
                         msg.payload.should.have.property('status');
                         msg.payload.status.should.be.equal('ready');
-                        producer.receive({payload: testValue});
+                        producer.receive({payload: message});
                     } catch (err) {
                         done(err);
                     }
@@ -189,7 +217,10 @@ describe('Pulsar Consumer/Producer', function () {
                     try {
                         console.log("Message received", msg);
                         msg.should.have.property('payload');
-                        msg.payload.should.be.equal(testValue);
+                        msg.payload.should.have.property('name');
+                        msg.payload.name.should.be.equal(name);
+                        msg.payload.should.have.property('age');
+                        msg.payload.age.should.be.equal(age);
                         done();
                     } catch (err) {
                         done(err);
@@ -199,7 +230,6 @@ describe('Pulsar Consumer/Producer', function () {
                 done(err);
             }
         });
-
     });
 });
 
