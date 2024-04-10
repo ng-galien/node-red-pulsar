@@ -2,8 +2,8 @@
 const Pulsar = require('pulsar-client');
 
 module.exports = function(RED) {
-    function PulsarConfigNode(n) {
-        RED.nodes.createNode(this,n);
+    function PulsarConfigNode(parameters) {
+        RED.nodes.createNode(this, parameters);
         const node = this;
         node.on('close', function(removed, done) {
             if (node.client && removed) {
@@ -35,17 +35,17 @@ module.exports = function(RED) {
                 }
             });
             node.client = new Pulsar.Client({
-                serviceUrl: n.serviceUrl,
-                authentication: buildAuthentication(n.authentication),
-                operationTimeoutSeconds: n.operationTimeoutSeconds,
-                ioThreads: n.ioThreads,
-                messageListenerThreads: n.messageListenerThreads,
-                concurrentLookupRequest: n.concurrentLookupRequest,
-                useTls: n.useTls,
-                tlsTrustCertsFilePath: n.tlsTrustCertsFilePath,
-                tlsValidateHostname: n.tlsValidateHostname,
-                tlsAllowInsecureConnection: n.tlsAllowInsecureConnection,
-                statsIntervalSeconds: n.statsIntervalSeconds
+                serviceUrl: parameters.serviceUrl,
+                authentication: buildAuthentication(parameters.authentication),
+                operationTimeoutSeconds: parameters.operationTimeoutSeconds,
+                ioThreads: parameters.ioThreads,
+                messageListenerThreads: parameters.messageListenerThreads,
+                concurrentLookupRequest: parameters.concurrentLookupRequest,
+                useTls: parameters.useTls,
+                tlsTrustCertsFilePath: parameters.tlsTrustCertsFilePath,
+                tlsValidateHostname: parameters.tlsValidateHostname,
+                tlsAllowInsecureConnection: parameters.tlsAllowInsecureConnection,
+                statsIntervalSeconds: parameters.statsIntervalSeconds
             });
         } catch (e) {
             node.error('Error creating pulsar client: ' + e);

@@ -2,8 +2,8 @@ version: "3.5"
 
 services:
   pulsar:
-    image: apachepulsar/pulsar:3.1.1
-    command: ["bin/pulsar", "standalone"]
+    image: apachepulsar/pulsar:3.0.2
+    command: ["bin/pulsar", "standalone", "--no-functions-worker", "--no-stream-storage"]
 
   nodered:
     build: .
