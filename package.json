@@ -7,7 +7,8 @@
     "url": "git+https://github.com/ng-galien/node-red-contrib-pulsar.git"
   },
   "publishConfig": {
-    "@ng-galien:registry": "https://registry.npmjs.org/"
+    "@ng-galien:registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "scripts": {
     "deploy": "PROJECT_DIR=$(pwd) && cd ~/.node-red && npm install $PROJECT_DIR",
