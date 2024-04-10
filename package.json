@@ -23,7 +23,7 @@
       "pulsar-schema": "src/pulsar-schema.js"
     }
   },
-  "keywords": [],
+  "keywords": [ "node-red" ],
   "author": "",
   "license": "ISC",
   "dependencies": {
