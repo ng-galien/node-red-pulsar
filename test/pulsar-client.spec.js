@@ -1,9 +1,9 @@
 
 const helper = require("node-red-node-test-helper");
-const pulsarConsumerNode = require("../src/pulsar-consumer.js");
-const pulsarProducerNode = require("../src/pulsar-producer.js");
-const pulsarConfigNode = require("../src/pulsar-config.js");
-const pulsarSchemaNode = require("../src/pulsar-schema.js");
+const pulsarConsumerNode = require("../src/consumer/pulsar-consumer.ts");
+const pulsarProducerNode = require("../src/producer/pulsar-producer.js");
+const pulsarConfigNode = require("../src/client/pulsar-client.ts");
+const pulsarSchemaNode = require("../src/schema/pulsar-schema.js");
 const Pulsar = require('pulsar-client');
 const { createPulsarContainer, createTopic } = require("./pulsar-container.js");
 const {stopPulsarContainer} = require("./pulsar-container");
@@ -63,7 +63,7 @@ describe('Pulsar Consumer/Producer', function () {
     it('Consumer should be loaded',  function (done) {
         const flow = [
             { id: "consumer", type: "pulsar-consumer", config: "config", schema: "schema", topic: topic, subscription: consumerSubscription, wires: [[], ["status"]] },
-            { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "config", type: "pulsar-client", serviceUrl: "pulsar://localhost:" + pulsarPort },
             { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             { id: "status", type: "helper" }
         ];
@@ -99,7 +99,7 @@ describe('Pulsar Consumer/Producer', function () {
     it('Producer should be loaded',  function (done) {
         const flow = [
             { id: "producer", type: "pulsar-producer", config: "config", schema: "schema", topic: topic, producerName: producerName, wires: [["status"]] },
-            { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "config", type: "pulsar-client", serviceUrl: "pulsar://localhost:" + pulsarPort },
             { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             { id: "status", type: "helper"}
         ];
@@ -135,7 +135,7 @@ describe('Pulsar Consumer/Producer', function () {
     it('Consumer should receive a message',  function (done) {
         const flow = [
             { id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, schema: schema, subscription: consumerSubscription, wires: [["receiver"]] },
-            { id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            { id: "config", type: "pulsar-client", serviceUrl: "pulsar://localhost:" + pulsarPort },
             { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             { id: "receiver", type: "helper"}
         ];
@@ -186,7 +186,7 @@ describe('Pulsar Consumer/Producer', function () {
         const flow = [
             {id: "producer", type: "pulsar-producer", config: "config", schema: "schema",topic: topic, subscription: consumerSubscription, wires: [["status"]] },
             {id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, name: producerName, wires: [["receiver"], []] },
-            {id: "config", type: "pulsar-config", serviceUrl: "pulsar://localhost:" + pulsarPort },
+            {id: "config", type: "pulsar-client", serviceUrl: "pulsar://localhost:" + pulsarPort },
             { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
             {id: "status", type: "helper"},
             {id: "receiver", type: "helper"}

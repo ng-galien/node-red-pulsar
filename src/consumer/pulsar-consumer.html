@@ -1,49 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('pulsar-consumer',{
-        category: 'pulsar',
-        color: '#188fff',
-        defaults: {
-            config: { value: "", type:"pulsar-config", required: true },
-            topic: { value: "", required: true },
-            subscription: { value:"", required: false },
-            subscriptionType: { value: "", required: true },
-            subscriptionInitialPosition: { value: "", required: false },
-            ackTimeoutMs: { value: "", required: false },
-            nAckRedeliverTimeoutMs: { value: "", required: false },
-            receiverQueueSize: { value: "", required: false },
-            receiverQueueSizeAcrossPartitions: { value: "", required: false },
-            consumerName: { value: "", required: false },
-            properties: { value: "", required: false },
-            readCompacted: { value: "", required: false },
-            privateKeyPath: { value: "", required: false },
-            cryptoFailureAction: { value: "", required: false },
-            maxPendingChunkedMessage: { value: "", required: false },
-            autoAckOldestChunkedMessageOnQueueFull: { value: "", required: false },
-            schema: { value: "", type: "pulsar-schema", required: false },
-            batchIndexAckEnabled: { value: "", required: false },
-            regexSubscriptionMode: { value: "", required: false },
-            deadLetterPolicy: { value: "", required: false }
-        },
-        outputs: 2,
-        icon: "font-awesome/fa-inbox",
-        label: function() {
-            return "Consumer" + (this.topic ? " (" + this.topic + ")" : "");
-        },
-        outputLabels: ['msg', 'status'],
-        oneditprepare: function() {
-            $("#node-input-subscriptionType").typedInput({
-                type: "subscriptionType",
-                types: [{
-                    options: [
-                        {value: "Exclusive", label: "Exclusive"},
-                        {value: "Shared", label: "Shared"},
-                        {value: "Failover", label: "Failover"},
-                        {value: "KeyShared", label: "KeyShared"}
-                    ]
-                }]
-            });
-        }
-    });
+    $.getScript('resources/node-red-contrib-pulsar/pulsar-consumer.html.js')
 </script>
 
 <script type="text/html" data-template-name="pulsar-consumer">

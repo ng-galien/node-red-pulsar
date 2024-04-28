@@ -1,66 +1,6 @@
 const uuid = require('uuid');
-const propUtils = require('./properties-util');
+const propUtils = require('../properties-util');
 
-function propertiesToProducerConfig(properties) {
-    const result = {};
-    if (!properties.topic) {
-        throw new Error('Topic is required');
-    }
-    result.topic = properties.topic;
-    result.producerName = properties.producerName || 'producer-'+uuid.v4();
-    if(propUtils.isPositiveNumber(properties.sendTimeoutMs)) {
-        result.sendTimeoutMs = properties.sendTimeoutMs;
-    }
-    if(propUtils.isNumber(properties.initialSequenceId)) {
-        result.initialSequenceId = properties.initialSequenceId;
-    }
-    if(propUtils.isNumber(properties.maxPendingMessages)) {
-        result.maxPendingMessages = properties.maxPendingMessages;
-    }
-    if(propUtils.isPositiveNumber(properties.maxPendingMessagesAcrossPartitions)) {
-        result.maxPendingMessagesAcrossPartitions = properties.maxPendingMessagesAcrossPartitions;
-    }
-    if(propUtils.isBoolean(properties.blockIfQueueFull)) {
-        result.blockIfQueueFull = properties.blockIfQueueFull;
-    }
-    if(propUtils.isNonEmptyString(properties.messageRoutingMode)) {
-        result.messageRoutingMode = properties.messageRoutingMode;
-    }
-    if(propUtils.isNonEmptyString(properties.hashingScheme)) {
-        result.hashingScheme = properties.hashingScheme;
-    }
-    if(propUtils.isNonEmptyString(properties.compressionType)) {
-        result.compressionType = properties.compressionType;
-    }
-    if(propUtils.isBoolean(properties.batchingEnabled)) {
-        result.batchingEnabled = properties.batchingEnabled;
-    }
-    if(propUtils.isPositiveNumber(properties.batchingMaxPublishDelayMs)) {
-        result.batchingMaxPublishDelayMs = properties.batchingMaxPublishDelayMs;
-    }
-    if(propUtils.isPositiveNumber(properties.batchingMaxMessages)) {
-        result.batchingMaxMessages = properties.batchingMaxMessages;
-    }
-    if(propUtils.isObject(properties.properties)) {
-        result.properties = properties.properties;
-    }
-    if(propUtils.isNonEmptyString(properties.publicKeyPath)) {
-        result.publicKeyPath = properties.publicKeyPath;
-    }
-    if(propUtils.isNonEmptyString(properties.encryptionKey)) {
-        result.encryptionKey = properties.encryptionKey;
-    }
-    if(propUtils.isNonEmptyString(properties.cryptoFailureAction)) {
-        result.cryptoFailureAction = properties.cryptoFailureAction;
-    }
-    if(propUtils.isBoolean(properties.chunkingEnabled)) {
-        result.chunkingEnabled = properties.chunkingEnabled;
-    }
-    if(propUtils.isNonEmptyString(properties.accessMode)) {
-        result.accessMode = properties.accessMode;
-    }
-    return result;
-}
 
 module.exports = function (RED) {
     function PulsarProducer(properties) {

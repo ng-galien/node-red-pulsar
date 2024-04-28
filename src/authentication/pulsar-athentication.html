@@ -1,0 +1,64 @@
+<script type="text/javascript">
+    $.getScript('resources/node-red-contrib-pulsar/pulsar-authentication.html.js')
+</script>
+
+<script type="text/html" data-template-name="pulsar-authentication">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-authType"><i class="fa fa-key"></i> Authentication Type</label>
+        <input type="text" id="node-config-input-authType">
+    </div>
+    <fieldset style="width: 450px" class="jwt-token">
+        <div class="form-row">
+            <label for="node-config-input-jwtToken"><i class="fa fa-key"></i> JWT Token</label>
+            <input type="text" id="node-config-input-jwtToken">
+        </div>
+    </fieldset>
+    <fieldset style="width: 450px" class="oauth">
+        <div class="form-row">
+            <label for="node-config-input-oauthType"><i class="fa fa-key"></i> OAuth Type</label>
+            <input type="text" id="node-config-input-oauthType">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-oauthIssuerUrl"><i class="fa fa-key"></i> OAuth Issuer URL</label>
+            <input type="text" id="node-config-input-oauthIssuerUrl">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-oauthClientId"><i class="fa fa-key"></i> OAuth Client ID</label>
+            <input type="text" id="node-config-input-oauthClientId">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-oauthClientSecret"><i class="fa fa-key"></i> OAuth Client Secret</label>
+            <input type="text" id="node-config-input-oauthClientSecret">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-oauthPrivateKey"><i class="fa fa-key"></i> OAuth Private Key</label>
+            <input type="text" id="node-config-input-oauthPrivateKey">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-oauthAudience"><i class="fa fa-key"></i> OAuth Audience</label>
+            <input type="text" id="node-config-input-oauthAudience">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-oauthScope"><i class="fa fa-key"></i> OAuth Scope</label>
+            <input type="text" id="node-config-input-oauthScope">
+        </div>
+    </fieldset>
+    <fieldset style="width: 450px" class="tls">
+        <div class="form-row">
+            <label for="node-config-input-tlsCertificatePath"><i class="fa fa-key"></i> TLS Certificate Path</label>
+            <input type="text" id="node-config-input-tlsCertificatePath">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-tlsPrivateKeyPath"><i class="fa fa-key"></i> TLS Private Key Path</label>
+            <input type="text" id="node-config-input-tlsPrivateKeyPath">
+        </div>
+    </fieldset>
+</script>
+
+<script type="text/html" data-help-name="pulsar-authentication">
+    <p>Configure the connection to a Pulsar service. This configuration node is required by pulsar-consumer and pulsar-producer nodes.</p>
+</script>

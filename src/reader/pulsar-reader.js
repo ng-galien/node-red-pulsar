@@ -1,3 +1,4 @@
+// @ts-check
 /// <reference types="pulsar-client" />
 const Pulsar = require('pulsar-client');
 const uuid = require('uuid');
@@ -78,13 +79,13 @@ module.exports = function(RED) {
     function PulsarConsumer(properties) {
         RED.nodes.createNode(this, properties);
         const node = this;
-        const producerConfig = propertiesToConsumerConfig(properties, RED, node);
+        const readerConfig = propertiesToConsumerConfig(properties, RED, node);
         const schemaConfig = RED.nodes.getNode(properties.schema);
         if(schemaConfig && schemaConfig.schemaInfo) {
-            producerConfig.schema = schemaConfig.schemaInfo;
+            readerConfig.schema = schemaConfig.schemaInfo;
         }
 
-        producerConfig.listener = function (pulsarMessage, msgConsumer) {
+        readerConfig.listener = function (pulsarMessage, msgConsumer) {
             node.debug('Message received' + pulsarMessage);
             //if the buffer is empty, the message is not a json object
             const nodeMessage = {
@@ -140,7 +141,7 @@ module.exports = function(RED) {
         }
         node.status({fill: "yellow", shape: "dot", text: "connecting"});
 
-        pulsarClient.subscribe(node.producerConfig).then(consumer => {
+        pulsarClient.createReader(node.producerConfig).then(consumer => {
             node.consumer = consumer;
             node.debug('Consumer created');
             node.status({fill: "green", shape: "dot", text: "connected"});

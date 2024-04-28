@@ -3,3 +3,7 @@ node_modules/
 rest/
 docker/
 *.sh
+
+# TypeScript
+*.tsbuildinfo
+dist/
