@@ -1,28 +1,14 @@
-import {
-    CLIENT_NODE_TYPE,
-    CONSUMER_NODE_TYPE,
-    PULSAR_NODE_CATEGORY,
-    PulsarConsumerEditorConfig, SCHEMA_NODE_TYPE
-} from "../PulsarDef";
-import {EditorWidgetTypedInputType} from "node-red";
-
-/**
- * Type definition for EditorRED, imported from 'node-red'.
- */
-type EditorRED = import('node-red').EditorRED
-
-/**
- * Declaration for the RED constant of type EditorRED.
- */
-declare const RED: EditorRED
+type PulsarConsumerEditorConfig = import("../PulsarDefinition").PulsarConsumerEditorConfig
 
 
-RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_NODE_TYPE, {
-    category: PULSAR_NODE_CATEGORY,
+RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
+    category: PULSAR_CATEGORY,
+    icon: 'font-awesome/fa-inbox',
+    color: PULSAR_COLOR,
     defaults: {
         name: {value: ''},
-        clientNodeId: {value: '', type: CLIENT_NODE_TYPE, required: true},
-        schemaNodeId: {value: '', type: SCHEMA_NODE_TYPE, required: false},
+        clientNodeId: {value: '', type: CLIENT_ID, required: true},
+        schemaNodeId: {value: '', type: SCHEMA_ID, required: false},
         topic: {value: '', required: true},
         topicsPattern: {value: '', required: false},
         subscription: {value: '', required: true},
@@ -46,12 +32,7 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_NODE_TYPE, {
         return this.name || 'pulsar-client'
     },
     oneditprepare: function () {
-        interface Field {
-            name: string
-            type: EditorWidgetTypedInputType
-        }
-        //For boolean and number fields, the editor needs to be registered
-        const fields: Field[] = [
+        const fields: TypedField[] = [
             {name: 'ackTimeoutMs', type: 'num'},
             {name: 'nAckRedeliverTimeoutMs', type: 'num'},
             {name: 'receiverQueueSize', type: 'num'},
@@ -61,56 +42,14 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_NODE_TYPE, {
             {name: 'autoAckOldestChunkedMessageOnQueueFull', type: 'num'},
             {name: 'batchIndexAckEnabled', type: 'bool'},
         ]
-        fields.forEach(function (field) {
-            let input = $("#node-config-input-" + field.name);
-            input.typedInput({
-                default: field.type,
-                types: [field.type],
-                typeField: '#node-config-input-' + field.name + '-type'
-            });
-            input.typedInput('width', '80px');
-        })
-        $("#node-config-input-subscription-type").typedInput({
-            default: 'Shared',
-            types: [{
-                value: 'Shared',
-                options: [
-                    {value: 'Shared', label: 'Shared'},
-                    {value: 'Failover', label: 'Failover'},
-                    {value: 'KeyShared', label: 'KeyShared'}
-                ]
-            }]
-        })
-        $("#node-config-input-subscription-initial-position").typedInput({
-            default: 'Latest',
-            types: [{
-                value: 'Latest',
-                options: [
-                    {value: 'Latest', label: 'Latest'},
-                    {value: 'Earliest', label: 'Earliest'}
-                ]
-            }]
-        })
-        $("#node-config-input-regex-subscription-mode").typedInput({
-            default: 'AllTopics',
-            types: [{
-                value: 'AllTopics',
-                options: [
-                    {value: 'AllTopics', label: 'AllTopics'},
-                    {value: 'PersistentOnly', label: 'PersistentOnly'},
-                    {value: 'NonPersistentOnly', label: 'NonPersistentOnly'}
-                ]
-            }]
-        })
-        $("#node-config-input-crypto-failure-action").typedInput({
-            default: 'FAIL',
-            types: [{
-                value: 'FAIL',
-                options: [
-                    {value: 'FAIL', label: 'FAIL'},
-                    {value: 'CONSUME', label: 'CONSUME'}
-                ]
-            }]
-        })
+        configureTypedFields(false, fields)
+        type SubscriptionType = import("pulsar-client").SubscriptionType
+        configureEnumField<SubscriptionType>(false, 'subscriptionType', ['Shared', 'Exclusive', 'Failover', 'KeyShared'])
+        type SubscriptionInitialPosition = import("pulsar-client").InitialPosition
+        configureEnumField<SubscriptionInitialPosition>(false, 'subscriptionInitialPosition', ['Latest', 'Earliest'])
+        type RegexSubscriptionMode = import("pulsar-client").RegexSubscriptionMode
+        configureEnumField<RegexSubscriptionMode>(false, 'regexSubscriptionMode', ['AllTopics', 'PersistentOnly', 'NonPersistentOnly'])
+        type CryptoFailureAction = import("pulsar-client").ConsumerCryptoFailureAction
+        configureEnumField<CryptoFailureAction>(false, 'cryptoFailureAction', ['FAIL', 'DISCARD'])
     }
 })

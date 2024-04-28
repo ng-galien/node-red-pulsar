@@ -1,27 +1,83 @@
 <script type="text/javascript">
-    $.getScript('resources/node-red-contrib-pulsar/pulsar-consumer.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/consumer/pulsar-consumer.html.js')
 </script>
 
 <script type="text/html" data-template-name="pulsar-consumer">
+    <!--name-->
     <div class="form-row">
-        <label for="node-input-config"><i class="fa fa-cogs"></i> config</label>
-        <input type="text" id="node-input-config">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
     </div>
+    <!--clientNodeId-->
+    <div class="form-row">
+        <label for="node-input-clientNodeId"><i class="fa fa-cogs"></i> Client</label>
+        <input type="text" id="node-input-clientNodeId">
+    </div>
+    <!--schemaNodeId-->
+    <div class="form-row">
+        <label for="node-input-schemaNodeId"><i class="fa fa-puzzle-piece"></i> Schema</label>
+        <input type="text" id="node-input-schemaNodeId">
+    </div>
+    <!--topic-->
     <div class="form-row">
         <label for="node-input-topic"><i class="fa fa-comments"></i> Topic</label>
         <input type="text" id="node-input-topic">
     </div>
+    <!--topicPattern-->
+    <div class="form-row">
+        <label for="node-input-topicPattern"><i class="fa fa-comments"></i> Topic Pattern</label>
+        <input type="text" id="node-input-topicPattern">
+    </div>
+    <!--subscription-->
     <div class="form-row">
         <label for="node-input-subscription"><i class="fa fa-id-badge"></i> Subscription</label>
         <input type="text" id="node-input-subscription">
     </div>
+    <!--subscriptionType-->
     <div class="form-row">
         <label for="node-input-subscriptionType"><i class="fa fa-exchange "></i> Type</label>
         <input type="text" id="node-input-subscriptionType">
     </div>
+    <!--subscriptionInitialPosition-->
     <div class="form-row">
-        <label for="node-input-schema"><i class="fa fa-puzzle-piece"></i> Schema</label>
-        <input type="text" id="node-input-schema">
+        <label for="node-input-subscriptionInitialPosition"><i class="fa fa-exchange "></i> Initial Position</label>
+        <input type="text" id="node-input-subscriptionInitialPosition">
+    </div>
+    <!--ackTimeoutMs-->
+    <div class="form-row">
+        <label for="node-input-ackTimeoutMs"><i class="fa fa-clock-o"></i> Ack Timeout</label>
+        <input type="text" id="node-input-ackTimeoutMs">
+    </div>
+    <!--nAckRedeliverTimeoutMs-->
+    <div class="form-row">
+        <label for="node-input-nAckRedeliverTimeoutMs"><i class="fa fa-clock-o"></i> Nack Redelivery Delay</label>
+        <input type="text" id="node-input-nAckRedeliverTimeoutMs">
+    </div>
+    <!--receiverQueueSize-->
+    <div class="form-row">
+        <label for="node-input-receiverQueueSize"><i class="fa fa-cogs"></i> Receiver Queue Size</label>
+        <input type="text" id="node-input-receiverQueueSize">
+    </div>
+    <!--maxTotalReceiverQueueSizeAcrossPartitions-->
+    <div class="form-row">
+        <label for="node-input-maxTotalReceiverQueueSizeAcrossPartitions"><i class="fa fa-cogs"></i> Max Total Receiver Queue Size Across Partitions</label>
+        <input type="text" id="node-input-maxTotalReceiverQueueSizeAcrossPartitions">
+    </div>
+    <!--consumerName-->
+    <div class="form-row">
+        <label for="node-input-consumerName"><i class="fa fa-tag"></i> Consumer Name</label>
+        <input type="text" id="node-input-consumerName">
+    </div>
+    <!--readCompacted-->
+    <div class="form-row">
+        <label for="node-input-readCompacted"><i class="fa fa-cogs"></i> Read Compacted</label>
+        <input type="text" id="node-input-readCompacted">
+    </div>
+    <!--privateKeyPath-->
+    <div class="form-row">
+        <label for="node-input-privateKeyPath"><i class="fa fa-key"></i> Private Key Path</label>
+        <input type="text" id="node-input-privateKeyPath">
     </div>
 </script>
 

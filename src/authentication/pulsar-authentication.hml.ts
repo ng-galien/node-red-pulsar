@@ -1,20 +1,15 @@
-import {EditorNodeInstance} from "node-red";
-import {PulsarAuthenticationEditorConfig} from "../PulsarDef";
-
-type EditorRED = import('node-red').EditorRED
-
-declare const RED: EditorRED
+type PulsarAuthenticationEditorConfig = import('../PulsarDefinition').PulsarAuthenticationEditorConfig
 
 
-function nonNullString(this: EditorNodeInstance<PulsarAuthenticationEditorConfig>, value: string): boolean {
+function nonNullString(this: EditorNodeInstance, value: string): boolean {
     return value !== undefined && value !== ''
 }
 
-function urlString(this: EditorNodeInstance<PulsarAuthenticationEditorConfig>, value: string): boolean {
+function urlString(this: EditorNodeInstance, value: string): boolean {
     return value !== undefined && value.match(/^https?:\/\/.+/) !== null
 }
 
-function pathString(this: EditorNodeInstance<PulsarAuthenticationEditorConfig>, value: string): boolean {
+function pathString(this: EditorNodeInstance, value: string): boolean {
     return value !== undefined && value.match(/^\/.+/) !== null
 }
 
@@ -50,26 +45,26 @@ RED.nodes.registerType<PulsarAuthenticationEditorConfig>('pulsar-authentication'
         function updateOauthType() {
             const type = $("#node-config-input-oauth-type").val()
             switch (type) {
-                case "None":
-                    updateJwtToken(false)
-                    updateOauth(false)
-                    updateTls(false)
-                    break
-                case "Token":
-                    updateJwtToken(true)
-                    updateOauth(false)
-                    updateTls(false)
-                    break
-                case "OAuth2":
-                    updateJwtToken(false)
-                    updateOauth(true)
-                    updateTls(false)
-                    break
-                case "TLS":
-                    updateJwtToken(false)
-                    updateOauth(false)
-                    updateTls(true)
-                    break
+            case "None":
+                updateJwtToken(false)
+                updateOauth(false)
+                updateTls(false)
+                break
+            case "Token":
+                updateJwtToken(true)
+                updateOauth(false)
+                updateTls(false)
+                break
+            case "OAuth2":
+                updateJwtToken(false)
+                updateOauth(true)
+                updateTls(false)
+                break
+            case "TLS":
+                updateJwtToken(false)
+                updateOauth(false)
+                updateTls(true)
+                break
 
             }
         }

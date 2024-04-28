@@ -7,3 +7,5 @@ docker/
 # TypeScript
 *.tsbuildinfo
 dist/
+resources/
+tsconfig.tsbuildinfo

@@ -3,15 +3,10 @@ import * as EditorClient from '@node-red/editor-client'
 import {
     AuthenticationOauth2,
     AuthenticationTls,
-    AuthenticationToken, ClientConfig, ConsumerConfig,
+    AuthenticationToken, ClientConfig, ConsumerConfig, ProducerConfig,
     SchemaType
 } from 'pulsar-client'
 
-export const PULSAR_NODE_CATEGORY = 'pulsar'
-export const AUTHENTICATION_NODE_TYPE = 'pulsar-authentication'
-export const CLIENT_NODE_TYPE = 'pulsar-client'
-export const SCHEMA_NODE_TYPE = 'pulsar-schema'
-export const CONSUMER_NODE_TYPE = 'pulsar-consumer'
 
 //Authentication
 type PulsarAuthenticationType = 'none' | 'token' | 'oauth2' | 'tls'
@@ -68,3 +63,23 @@ export interface PulsarConsumerProperties extends ConsumerConfig {
 export interface PulsarConsumerConfig extends PulsarConsumerProperties, NodeRED.NodeDef {}
 
 export interface PulsarConsumerEditorConfig extends PulsarConsumerProperties, EditorClient.NodeProperties {}
+
+export interface PulsarProducerProperties extends ProducerConfig {
+    clientNodeId: string
+    schemaNodeId: string
+}
+
+export interface PulsarProducerConfig extends PulsarProducerProperties, NodeRED.NodeDef {}
+
+export interface PulsarProducerEditorConfig extends PulsarProducerProperties, EditorClient.NodeProperties {}
+
+export interface TypedField {
+    name: string
+    type: EditorWidgetTypedInputType
+}
+
+export const PulsarClientId = "pulsar-client"
+export const PulsarAuthenticationId = "pulsar-authentication"
+export const PulsarSchemaId = "pulsar-schema"
+export const PulsarConsumerId = "pulsar-consumer"
+export const PulsarProducerId = "pulsar-producer"

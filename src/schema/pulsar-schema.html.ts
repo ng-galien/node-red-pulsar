@@ -1,9 +1,6 @@
-import {PulsarSchemaEditorConfig, SCHEMA_NODE_TYPE } from '../PulsarDef';
+type PulsarSchemaEditorConfig = import("../PulsarDefinition").PulsarSchemaEditorConfig
 
-type EditorRED = import('node-red').EditorRED
-declare const RED: EditorRED
-
-RED.nodes.registerType<PulsarSchemaEditorConfig>(SCHEMA_NODE_TYPE, {
+RED.nodes.registerType<PulsarSchemaEditorConfig>(SCHEMA_ID, {
     category: 'config',
     color: '#188fff',
     icon: "font-awesome/fa-puzzle-piece",

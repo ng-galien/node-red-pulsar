@@ -1,4 +1,3 @@
 **
-!dist/**
-dist/**/*.html.js
-!resources/**
+!dist
+!resources

@@ -1,24 +1,12 @@
-import {AUTHENTICATION_NODE_TYPE, CLIENT_NODE_TYPE, PulsarClientEditorConfig} from "../PulsarDef";
-import {EditorNodeInstance, EditorWidgetTypedInputType} from "node-red";
+type PulsarClientEditorConfig = import("../PulsarDefinition").PulsarClientEditorConfig
 
-
-
-/**
- * Type definition for EditorRED, imported from 'node-red'.
- */
-type EditorRED = import('node-red').EditorRED
-
-/**
- * Declaration for the RED constant of type EditorRED.
- */
-declare const RED: EditorRED
 
 /**
  * Function to validate the Pulsar URL.
  * @param {string} value - The URL to be validated.
  * @returns {boolean} - Returns true if the URL is valid, false otherwise.
  */
-function validatePulsarUrl(this: EditorNodeInstance<PulsarClientEditorConfig>, value: string): boolean {
+function validatePulsarUrl(this: EditorNodeInstance, value: string): boolean {
     return value !== undefined && value.match(/^pulsar:\/\/.+/) !== null
 }
 
@@ -33,32 +21,30 @@ function displayTlsFields(show: boolean) {
 /**
  * Registration of the 'pulsar-client' type with its configuration.
  */
-RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_NODE_TYPE, {
+RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_ID, {
     category: 'config',
+    icon: 'font-awesome/fa-server',
+    color: PULSAR_COLOR,
     defaults: {
         name: {value: ''},
         serviceUrl: {value: '', required: true, validate: validatePulsarUrl},
-        authenticationNodeId: {value: '', type: AUTHENTICATION_NODE_TYPE, required: false},
-        operationTimeoutSeconds: {value: 30, required: false, validate: RED.validators.number()},
-        ioThreads: {value: 1, required: false, validate: RED.validators.number()},
-        messageListenerThreads: {value: 1, required: false, validate: RED.validators.number()},
-        concurrentLookupRequest: {value: 5000, required: false, validate: RED.validators.number()},
+        authenticationNodeId: {value: '', type: AUTHENTICATION_ID, required: false},
+        operationTimeoutSeconds: {value: 30, required: false, validate: RED.validators.number(true)},
+        ioThreads: {value: 1, required: false, validate: RED.validators.number(true)},
+        messageListenerThreads: {value: 1, required: false, validate: RED.validators.number(true)},
+        concurrentLookupRequest: {value: 50000, required: false, validate: RED.validators.number(true)},
         useTls: {value: false, required: false, validate: RED.validators.typedInput('bool')},
         tlsTrustCertsFilePath: {value: '', required: false},
         tlsValidateHostname: {value: false, required: false, validate: RED.validators.typedInput('bool')},
         tlsAllowInsecureConnection: {value: false, required: false, validate: RED.validators.typedInput('bool')},
-        statsIntervalInSeconds: {value: 60, required: false, validate: RED.validators.number()},
-        listenerName: {value: '', required: false}
+        statsIntervalInSeconds: {value: 60, required: false, validate: RED.validators.number(true)},
+        listenerName: {value: '', required: false, validate: (v) => v === '' || v.match(/^[a-zA-Z0-9_-]+$/) !== null},
     },
     label: function () {
         return this.name || 'pulsar-client'
     },
     oneditprepare: function () {
-        interface Field {
-            name: string
-            type: EditorWidgetTypedInputType
-        }
-        const fields: Field[] = [
+        const fields: TypedField[] = [
             {name: 'operationTimeoutSeconds', type: 'num'},
             {name: 'ioThreads', type: 'num'},
             {name: 'messageListenerThreads', type: 'num'},
@@ -68,15 +54,7 @@ RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_NODE_TYPE, {
             {name: 'tlsValidateHostname', type: 'bool'},
             {name: 'tlsAllowInsecureConnection', type: 'bool'}
         ];
-        fields.forEach(function (field) {
-            let input = $("#node-config-input-" + field.name);
-            input.typedInput({
-                default: field.type,
-                types: [field.type],
-                typeField: '#node-config-input-' + field.name + '-type'
-            });
-            input.typedInput('width', '80px');
-        });
+        configureTypedFields(true, fields)
         const useTls = this.useTls || false;
         displayTlsFields(useTls);
 
@@ -85,120 +63,3 @@ RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_NODE_TYPE, {
         })
     }
 })
-
-// <script type="text/javascript">
-//     RED.nodes.registerType('pulsar-config', {
-//         category: 'config',
-//         color: '#188fff',
-//         defaults: {
-//             serviceUrl: {value: "", required: true},
-//             adminUrl: {value: "", required: false},
-//             authentication: {value: null, required: false, validate: validateAuthentication},
-//             operationTimeoutSeconds: {value: null, required: false},
-//             ioThreads: {value: null, required: false},
-//             messageListenerThreads: {value: null, required: false},
-//             concurrentLookupRequest: {value: null, required: false},
-//             useTls: {value: null, required: false},
-//             tlsTrustCertsFilePath: {value: null, required: false},
-//             tlsValidateHostname: {value: null, required: false},
-//             tlsAllowInsecureConnection: {value: null, required: false},
-//             statsIntervalInSeconds: {value: null, required: false},
-//         },
-//         label: function () {
-//             return this.serviceUrl || 'pulsar-client-config';
-//         },
-//         oneditprepare: function () {
-//             $("#node-config-input-serviceUrl").typedInput({
-//                 default: 'str',
-//                 types: ['str']
-//             });
-//             $("#node-config-input-authentication").typedInput({
-//                 default: 'json',
-//                 types: ['json'],
-//                 typeField: '#node-config-input-authentication-type'
-//             });
-//             // Number fields for timeout and threads
-//             var numberFields = [
-//                 'operationTimeoutSeconds',
-//                 'ioThreads',
-//                 'messageListenerThreads',
-//                 'concurrentLookupRequest',
-//                 'statsIntervalInSeconds'
-//             ];
-//             numberFields.forEach(function (field) {
-//                 let input = $("#node-config-input-" + field);
-//                 input.typedInput({
-
-//                     default: 'num',
-//                     types: ['num'],
-//                     typeField: '#node-config-input-' + field + '-type'
-//                 });
-//                 input.typedInput('width', '80px');
-//             });
-//             // Boolean fields for TLS settings
-//             var booleanFields = [
-//                 'useTls',
-//                 'tlsValidateHostname',
-//                 'tlsAllowInsecureConnection'
-//             ];
-//             booleanFields.forEach(function (field) {
-//                 let input = $("#node-config-input-" + field);
-//                 input.typedInput({
-//                     default: 'bool',
-//                     types: ['bool'],
-//                     typeField: '#node-config-input-' + field + '-type'
-//                 });
-//                 input.typedInput('width', '80px');
-//             });
-//         }
-//     });
-
-//     function valueIsBlank(value) {
-//         return value === null || value === undefined || value === "";
-//     }
-
-//     function validateAuthentication(value) {
-//         if (valueIsBlank(value)) {
-//             return true;
-//         }
-//         try {
-//             const auth = JSON.parse(value);
-//             if (auth === null || typeof auth !== "object") {
-//                 return false;
-//             }
-//             if (!auth.type && !auth.config) {
-//                 return false;
-//             }
-//             switch (auth.type) {
-//             case "AuthenticationTls" :
-//                 if (!auth.config.certificatePath || !auth.config.privateKeyPath) {
-//                     return false;
-//                 }
-//                 break;
-//             case "AuthenticationAthenz" :
-//                 if (!auth.config.tenantDomain
-//                     && !auth.config.tenantService
-//                     && !auth.config.providerDomain
-//                     && !auth.config.privateKey
-//                     && !auth.config.ztsUrl) {
-//                     return false;
-//                 }
-//                 break;
-//             case "AuthenticationToken" :
-//                 if (!auth.config.token) {
-//                     return false;
-//                 }
-//                 break;
-//             case "AuthenticationOAuth2" :
-//                 if (!auth.config.type
-//                     && !auth.config.issuer_url) {
-//                     return false;
-//                 }
-//                 break;
-//             default:
-//                 return false;
-//             }
-//         } catch (e) {
-//             return false;
-//         }
-//     }

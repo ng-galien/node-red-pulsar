@@ -1,62 +1,6 @@
-<!--export interface ProducerConfig {-->
-<!--topic: string;-->
-<!--producerName?: string;-->
-<!--sendTimeoutMs?: number;-->
-<!--initialSequenceId?: number;-->
-<!--maxPendingMessages?: number;-->
-<!--maxPendingMessagesAcrossPartitions?: number;-->
-<!--blockIfQueueFull?: boolean;-->
-<!--messageRoutingMode?: MessageRoutingMode;-->
-<!--hashingScheme?: HashingScheme;-->
-<!--compressionType?: CompressionType;-->
-<!--batchingEnabled?: boolean;-->
-<!--batchingMaxPublishDelayMs?: number;-->
-<!--batchingMaxMessages?: number;-->
-<!--properties?: { [key: string]: string };-->
-<!--publicKeyPath?: string;-->
-<!--encryptionKey?: string;-->
-<!--cryptoFailureAction?: ProducerCryptoFailureAction;-->
-<!--chunkingEnabled?: boolean;-->
-<!--schema?: SchemaInfo;-->
-<!--accessMode?: ProducerAccessMode;-->
-<!--}-->
-
 <script type="text/javascript">
-    RED.nodes.registerType('pulsar-producer',{
-        category: 'pulsar',
-        color: '#188fff',
-        defaults: {
-            config: { value: "", type:"pulsar-config", required:true},
-            topic: { value: "", required: true },
-            producerName: { value:"", required: false },
-            sendTimeoutMs: { value: "", required: false },
-            initialSequenceId: { value: "", required: false },
-            maxPendingMessages: { value: "", required: false },
-            maxPendingMessagesAcrossPartitions: { value: "", required: false },
-            blockIfQueueFull: { value: "", required: false },
-            messageRoutingMode: { value: "", required: false },
-            hashingScheme: { value: "", required: false },
-            compressionType: { value: "", required: false },
-            batchingEnabled: { value: "", required: false },
-            batchingMaxPublishDelayMs: { value: "", required: false },
-            batchingMaxMessages: { value: "", required: false },
-            properties: { value: "", required: false },
-            publicKeyPath: { value: "", required: false },
-            encryptionKey: { value: "", required: false },
-            cryptoFailureAction: { value: "", required: false },
-            chunkingEnabled: { value: "", required: false },
-            schema: { value: "", type: "pulsar-schema", required: false },
-            accessMode: { value: "", required: false }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "font-awesome/fa-paper-plane",
-        label: function() {
-            return "Producer" + (this.topic ? " (" + this.topic + ")" : "");
-        },
-        outputLabels: ['status'],
-        inputLabels: ['msg']
-    });
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/producer/pulsar-producer.html.js')
 </script>
 
 <script type="text/html" data-template-name="pulsar-producer">

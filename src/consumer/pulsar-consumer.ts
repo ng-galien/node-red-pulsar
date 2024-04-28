@@ -1,7 +1,8 @@
 import * as NodeRED from 'node-red'
-import {CONSUMER_NODE_TYPE, PulsarConsumerConfig} from "../PulsarDef";
-import {Client, Consumer, SchemaInfo} from "pulsar-client";
+import {PulsarConsumerConfig, PulsarConsumerId} from "../PulsarDefinition";
+import {Consumer} from "pulsar-client";
 import {NodeMessage} from "node-red";
+import {closeActor, getActorActorRequirement} from "../PulsarNode";
 
 interface PulsarMessage extends NodeMessage {
     messageId: string
@@ -12,53 +13,52 @@ interface PulsarMessage extends NodeMessage {
     properties: Record<string, string>
 }
 
+type ConsumerNode = NodeRED.Node<Consumer>
+
+function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): PulsarConsumerConfig {
+    config.listener = (pulsarMessage, msgConsumer) => {
+        node.debug('Message received' + pulsarMessage)
+        //if the buffer is empty, the message is not a json object
+        const nodeMessage: PulsarMessage = {
+            topic: pulsarMessage.getTopicName(),
+            payload: null,
+            messageId: pulsarMessage.getMessageId().toString(),
+            publishTimeStamp: pulsarMessage.getPublishTimestamp(),
+            eventTimeStamp: pulsarMessage.getEventTimestamp(),
+            redeliveryCount: pulsarMessage.getRedeliveryCount(),
+            partitionKey: pulsarMessage.getPartitionKey(),
+            properties: pulsarMessage.getProperties(),
+        }
+        const str = pulsarMessage.getData().toString()
+        try {
+            nodeMessage.payload = JSON.parse(str)
+        } catch (e) {
+            node.debug('Message is not a json object')
+            nodeMessage.payload = str
+        }
+        node.send([nodeMessage, null])
+        msgConsumer.acknowledge(pulsarMessage).then(r => {
+            node.debug('Message acknowledged' + r)
+        }).catch(e => {
+            node.error('Error acknowledging message: ' + e)
+            node.status({fill: "red", shape: "dot", text: "Ack error"})
+        })
+    }
+    return config
+}
+
 /**
  * Registers the 'pulsar-consumer' type with its configuration.
  */
 export = (RED: NodeRED.NodeAPI): void => {
-    RED.nodes.registerType(CONSUMER_NODE_TYPE,
-        function (this: NodeRED.Node<Consumer>, config: PulsarConsumerConfig): void {
+    RED.nodes.registerType(PulsarConsumerId,
+        function (this: ConsumerNode, config: PulsarConsumerConfig): void {
             RED.nodes.createNode(this, config)
-            const clientNode = RED.nodes.getNode(config.clientNodeId) as NodeRED.Node<Client>
-            if(!clientNode) {
-                this.error('Client node not found')
-                this.status({fill: "red", shape: "dot", text: "Client node not found"})
+            const requirement = getActorActorRequirement(RED, this, config)
+            if (!requirement) {
                 return
             }
-            const schemaNode = RED.nodes.getNode(config.schemaNodeId) as NodeRED.Node<SchemaInfo>
-            if(schemaNode && schemaNode.credentials) {
-                config.schema = schemaNode.credentials
-            }
-            const client = clientNode.credentials
-            config.listener = (pulsarMessage, msgConsumer) => {
-                this.debug('Message received' + pulsarMessage)
-                //if the buffer is empty, the message is not a json object
-                const nodeMessage: PulsarMessage = {
-                    topic: pulsarMessage.getTopicName(),
-                    payload: null,
-                    messageId: pulsarMessage.getMessageId().toString(),
-                    publishTimeStamp: pulsarMessage.getPublishTimestamp(),
-                    eventTimeStamp: pulsarMessage.getEventTimestamp(),
-                    redeliveryCount: pulsarMessage.getRedeliveryCount(),
-                    partitionKey: pulsarMessage.getPartitionKey(),
-                    properties: pulsarMessage.getProperties(),
-                }
-                const str = pulsarMessage.getData().toString()
-                try {
-                    nodeMessage.payload = JSON.parse(str)
-                } catch (e) {
-                    this.debug('Message is not a json object')
-                    nodeMessage.payload = str
-                }
-                this.send([nodeMessage, null])
-                msgConsumer.acknowledge(pulsarMessage).then(r => {
-                    this.debug('Message acknowledged'+r)
-                }).catch(e => {
-                    this.error('Error acknowledging message: ' + e)
-                    this.status({fill: "red", shape: "dot", text: "Ack error"})
-                })
-            }
-            client.subscribe(config).then(consumer => {
+            requirement.subscribe(setupListener(config, this)).then(consumer => {
                 this.credentials = consumer
                 this.status({fill: "green", shape: "dot", text: "connected"})
             }).catch(e => {
@@ -66,20 +66,10 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
             })
             this.on('close', (done: () => void) => {
-                const consumer = this.credentials
-                if(consumer && consumer.isConnected()) {
-                    consumer.close().then(() => {
-                        done()
-                    }).catch((e) => {
-                        this.error('Error closing consumer: ' + e)
-                    })
-                } else {
-                    done()
-                }
+                closeActor(this, done)
             })
         }
     )
-
 }
 
 // /**

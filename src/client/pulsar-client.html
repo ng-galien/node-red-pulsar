@@ -1,8 +1,9 @@
 <script type="text/javascript">
-    $.getScript('resources/node-red-contrib-pulsar/pulsar-client.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/client/pulsar-client.html.js')
 </script>
 
-<script type="text/html" data-template-name="pulsar-config">
+<script type="text/html" data-template-name="pulsar-client">
     <fieldset style="width: 450px">
         <legend><i class="fa fa-globe"></i> Service</legend>
     <div class="form-row">
@@ -70,7 +71,7 @@
 </script>
 
 
-<script type="text/markdown" data-help-name="pulsar-config">
+<script type="text/markdown" data-help-name="pulsar-client">
 ![Pulsar Logo](https://upload.wikimedia.org/wikipedia/commons/c/cb/Apache-pulsar-blue-logo.svg)
 
 Configure the connection to a **Pulsar** service.
