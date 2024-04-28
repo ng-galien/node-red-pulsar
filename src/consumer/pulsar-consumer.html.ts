@@ -14,7 +14,7 @@ function validateTopic(this: EditorNode, _: string): boolean {
 
 RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
     category: PULSAR_CATEGORY,
-    icon: 'font-awesome/fa-inbox',
+    icon: 'font-awesome/fa-mailbox',
     color: PULSAR_COLOR,
     inputs: 1,
     outputs: 2,
