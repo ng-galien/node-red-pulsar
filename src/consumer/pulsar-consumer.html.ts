@@ -53,10 +53,5 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         configureEnumField<RegexSubscriptionMode>(false, 'regexSubscriptionMode', ['AllTopics', 'PersistentOnly', 'NonPersistentOnly'])
         type CryptoFailureAction = import("pulsar-client").ConsumerCryptoFailureAction
         configureEnumField<CryptoFailureAction>(false, 'cryptoFailureAction', ['FAIL', 'DISCARD'])
-    },
-
-    oneditsave: function (this: EditorNode) {
-        const consumerConfig = this as PulsarConsumerEditorConfig
-        console.log('saving consumer config', consumerConfig.clientNodeId)
     }
 })

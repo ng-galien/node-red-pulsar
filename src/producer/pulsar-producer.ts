@@ -75,7 +75,7 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.error('Error creating producer: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
             })
-            this.on('input', (msg, _send, _done) => {
+            this.on('input', (msg) => {
                 const node = this as ProducerNode
                 node.log('Message received' + JSON.stringify(msg))
                 const pulsarProducer = node.credentials

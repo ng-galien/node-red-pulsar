@@ -16,8 +16,7 @@ import {
     SubscriptionType
 } from "pulsar-client";
 import {requireClient, requireSchema} from "../PulsarNode";
-
-
+import uuid from 'uuid';
 
 type ConsumerNode = NodeRED.Node<Consumer>
 
@@ -38,14 +37,14 @@ function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): Consum
         topic: config.topic,
         topics: undefined,
         topicsPattern: undefined,
-        subscription: config.subscription || 'consumer-' + require('uuid').v4(),
+        subscription: config.subscription || 'consumer-' + uuid.v4(),
         subscriptionType: parseEnum<SubscriptionType>(config.subscriptionType),
         subscriptionInitialPosition: parseEnum<InitialPosition>(config.subscriptionType),
         ackTimeoutMs: parseNumber(config.ackTimeoutMs),
         nAckRedeliverTimeoutMs: parseNumber(config.nAckRedeliverTimeoutMs),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
         receiverQueueSizeAcrossPartitions: parseNumber(config.receiverQueueSizeAcrossPartitions),
-        consumerName: config.consumerName || 'consumer-' + require('uuid').v4(),
+        consumerName: config.consumerName || 'consumer-' + uuid.v4(),
         properties: undefined,
         listener: listener,
         readCompacted: parseBoolean(config.readCompacted),

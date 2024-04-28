@@ -12,7 +12,7 @@ import {
 type ReaderNode = NodeRED.Node<Reader>
 
 function createConfig(config: PulsarReaderConfig, node: ReaderNode): ReaderConfig {
-    const listener = (message: Message, _reader: Reader) => {
+    const listener = (message: Message) => {
         node.debug('Received message: ' + JSON.stringify(message))
         const nodeMessage = readPulsarMessage(message)
         node.send([nodeMessage, null])

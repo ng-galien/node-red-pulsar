@@ -24,7 +24,7 @@ function configureEnumField<T extends string>(isConfig: boolean, name: string, o
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function configureOptionalEnumField<T extends string>(isConfig: boolean, optional: Boolean, name: string, options: T[]) {
+function configureOptionalEnumField<T extends string>(isConfig: boolean, optional: boolean, name: string, options: T[]) {
     const id = (isConfig ? "node-config-input-" : "node-input-") + name
     $("#" + id).typedInput({
         default: optional ? undefined : options[0],
