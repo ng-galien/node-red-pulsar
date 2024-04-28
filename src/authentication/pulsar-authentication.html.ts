@@ -13,8 +13,10 @@ function pathString(this: EditorNodeInstance, value: string): boolean {
     return value !== undefined && value.match(/^\/.+/) !== null
 }
 
-RED.nodes.registerType<PulsarAuthenticationEditorConfig>('pulsar-authentication', {
+RED.nodes.registerType<PulsarAuthenticationEditorConfig>(AUTHENTICATION_ID, {
     category: 'config',
+    icon: 'font-awesome/fa-key',
+    color: PULSAR_COLOR,
     defaults: {
         name: {value: ''},
         authType: {value: 'none', required: true},

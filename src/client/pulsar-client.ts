@@ -7,20 +7,53 @@ import {
     ClientConfig,
     LogLevel
 } from "pulsar-client";
-import {AuthenticationImpl, NoAuthentication, PulsarClientConfig, PulsarClientId} from "../PulsarDefinition";
+import {
+    AuthenticationImpl,
+    NoAuthentication,
+    parseBoolean,
+    parseNumber,
+    parseString,
+    PulsarClientConfig,
+    PulsarClientId
+} from "../PulsarDefinition";
 
 type ClientAuthentication = AuthenticationToken | AuthenticationOauth2 | AuthenticationTls | undefined
 
+type RuntimeNode = NodeRED.Node<Client>
+
+type AuthenticationNode = NodeRED.Node<AuthenticationImpl>
+
+function createPulsarConfigNode(auth: AuthenticationNode, config: PulsarClientConfig): ClientConfig {
+    return {
+        serviceUrl: config.serviceUrl,
+        authentication: resolveAuthentication(auth),
+        operationTimeoutSeconds: parseNumber(config.operationTimeoutSeconds),
+        ioThreads: parseNumber(config.ioThreads),
+        messageListenerThreads: parseNumber(config.messageListenerThreads),
+        concurrentLookupRequest: parseNumber(config.concurrentLookupRequest),
+        useTls: parseBoolean(config.useTls),
+        tlsTrustCertsFilePath: config.tlsTrustCertsFilePath,
+        tlsValidateHostname: parseBoolean(config.tlsValidateHostname),
+        tlsAllowInsecureConnection: parseBoolean(config.tlsAllowInsecureConnection),
+        statsIntervalInSeconds: parseNumber(config.statsIntervalInSeconds),
+        listenerName: parseString(config.listenerName)
+    }
+}
 
 export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarClientId,
-        function (this: NodeRED.Node<Client>, config: PulsarClientConfig): void {
+        function (this: RuntimeNode, config: PulsarClientConfig): void {
             const authNode = RED.nodes.getNode(config.authenticationNodeId) as NodeRED.Node<AuthenticationImpl>
             RED.nodes.createNode(this, config)
-            config.authentication = resolveAuthentication(authNode)
-            createClient(this, config)
-            this.on('close', (done) => {
-                closeClient(this, done)
+            const client = createClient(this, createPulsarConfigNode(authNode, config))
+            if(client) {
+                this.credentials = client
+                mapClientLoginToNode(this)
+            }
+            this.on('close', (removed: boolean, done:() => void) => {
+                if (!removed) {
+                    closeClient(this, done)
+                }
             })
         }
     )
@@ -56,14 +89,15 @@ function resolveAuthentication(node?: NodeRED.Node<AuthenticationImpl>): ClientA
  *
  * @throws {Error} If there is an error creating the Pulsar client.
  */
-function createClient(node: NodeRED.Node<Client>, clientConfig: ClientConfig) {
+function createClient(node: NodeRED.Node<Client>, clientConfig: ClientConfig): Client | undefined {
     try {
-        const client = new Client(clientConfig)
-        mapClientLoginToNode(node)
-        node.credentials = client
+        node.log('Creating pulsar client')
+        node.log('Client config: ' + JSON.stringify(clientConfig))
+        return new Client(clientConfig)
     }
     catch (e) {
         node.error('Error creating pulsar client: ' + e)
+        return undefined
     }
 }
 
@@ -76,8 +110,9 @@ function createClient(node: NodeRED.Node<Client>, clientConfig: ClientConfig) {
  * @return {void}
  */
 function closeClient(node: NodeRED.Node<Client>, done: () => void): void {
-    if (node.credentials) {
-        node.credentials.close().then(() => {
+    const client = node.credentials
+    if (client) {
+        client.close().then(() => {
             done()
         }).catch((e) => {
             node.error(e)

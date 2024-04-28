@@ -1,19 +1,63 @@
 import * as NodeRED from "node-red";
-import {PulsarProducerConfig, PulsarProducerId} from "../PulsarDefinition";
-import {Producer} from "pulsar-client";
-import {closeActor, getActorActorRequirement} from "../PulsarNode";
+import {
+    parseBoolean,
+    parseEnum,
+    parseNumber,
+    parseString,
+    PulsarProducerConfig,
+    PulsarProducerId
+} from "../PulsarDefinition";
+import {
+    CompressionType,
+    HashingScheme,
+    MessageRoutingMode,
+    Producer, ProducerAccessMode,
+    ProducerConfig,
+    ProducerCryptoFailureAction
+} from "pulsar-client";
+import {closeActor, requireClient, requireSchema} from "../PulsarNode";
 
 type ProducerNode = NodeRED.Node<Producer>
+
+function createConfig(config: PulsarProducerConfig): ProducerConfig {
+    return {
+        topic: config.topic,
+        producerName: parseString(config.producerName),
+        sendTimeoutMs: parseNumber(config.sendTimeoutMs),
+        initialSequenceId: parseNumber(config.initialSequenceId),
+        maxPendingMessages: parseNumber(config.maxPendingMessages),
+        maxPendingMessagesAcrossPartitions: parseNumber(config.maxPendingMessagesAcrossPartitions),
+        blockIfQueueFull: parseBoolean(config.blockIfQueueFull),
+        messageRoutingMode: parseEnum<MessageRoutingMode>(config.messageRoutingMode),
+        hashingScheme: parseEnum<HashingScheme>(config.hashingScheme),
+        compressionType: parseEnum<CompressionType>(config.compressionType),
+        batchingEnabled: parseBoolean(config.batchingEnabled),
+        batchingMaxPublishDelayMs: parseNumber(config.batchingMaxPublishDelayMs),
+        batchingMaxMessages: parseNumber(config.batchingMaxMessages),
+        properties: undefined,
+        publicKeyPath: parseString(config.publicKeyPath),
+        encryptionKey: parseString(config.encryptionKey),
+        cryptoFailureAction: parseEnum<ProducerCryptoFailureAction>(config.cryptoFailureAction),
+        chunkingEnabled: parseBoolean(config.chunkingEnabled),
+        accessMode: parseEnum<ProducerAccessMode>(config.accessMode),
+        schema: undefined
+    }
+
+}
 
 export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarProducerId,
         function (this: ProducerNode, config: PulsarProducerConfig) {
             RED.nodes.createNode(this, config);
-            const requirement = getActorActorRequirement(RED, this, config)
-            if (!requirement) {
+            const client = requireClient(RED, config)
+            if (!client) {
+                this.error('Client not created')
                 return
             }
-            requirement.createProducer(config).then(producer => {
+            const producerConfig = createConfig(config)
+            producerConfig.schema = requireSchema(RED, config)
+            this.log('Producer config: ' + JSON.stringify(producerConfig))
+            client.createProducer(producerConfig).then(producer => {
                 this.debug('Producer created')
                 this.credentials = producer
                 this.status({fill: "green", shape: "dot", text: "connected"})
@@ -31,12 +75,12 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.error('Error creating producer: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
             })
-            const node = this
-            const pulsarProducer = node.credentials
-            this.on('input', function (msg, _send, done) {
+            this.on('input', (msg, _send, _done) => {
+                const node = this as ProducerNode
+                node.log('Message received' + JSON.stringify(msg))
+                const pulsarProducer = node.credentials
                 if (pulsarProducer) {
                     node.status({fill: "blue", shape: "dot", text: "message received"})
-                    node.debug('Message received')
                     if (!msg.payload) {
                         node.warn('Payload is empty')
                         node.status({fill: "yellow", shape: "dot", text: "Payload is empty"})
@@ -52,11 +96,17 @@ export = (RED: NodeRED.NodeAPI): void => {
                         node.error('Error sending message: ' + e)
                         node.status({fill: "red", shape: "dot", text: "Send error"})
                     })
+                } else {
+                    node.error('Producer not created')
+                    node.status({fill: "red", shape: "dot", text: "Producer not created"})
                 }
-                done()
             })
-            node.on('close', function(done: () => void) {
-                closeActor(node, done)
+            this.on('close', (removed: boolean, done: () => void) => {
+                if (!removed) {
+                    closeActor(this, done)
+                } else {
+                    done()
+                }
             })
         })
 }

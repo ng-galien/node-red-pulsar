@@ -4,68 +4,96 @@
 </script>
 
 <script type="text/html" data-template-name="pulsar-client">
-    <fieldset style="width: 450px">
-        <legend><i class="fa fa-globe"></i> Service</legend>
-    <div class="form-row">
-        <label for="node-config-input-serviceUrl"><i class="fa fa-globe"></i> URL</label>
-        <input type="text" id="node-config-input-serviceUrl" data-typed-input="true">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-adminUrl"><i class="fa fa-globe"></i> Admin URL</label>
-        <input type="text" id="node-config-input-adminUrl" data-typed-input="true">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-authentication"><i class="fa fa-lock"></i> Auth</label>
-        <input type="text" id="node-config-input-authentication" data-typed-input="true">
-        <input type="hidden" id="node-config-input-authentication-type">
-    </div>
-    </fieldset>
-
-    <!-- Runtime settings -->
-    <fieldset style="width: 450px">
-        <legend><i class="fa fa-cogs"></i> Runtime</legend>
-        <div class="form-row compact">
-            <!-- Inline numeric inputs for runtime settings -->
-            <label for="node-config-input-operationTimeoutSeconds"><i class="fa fa-clock-o"></i> Timeout</label>
-            <input type="text" id="node-config-input-operationTimeoutSeconds" data-typed-input="true">
-            <input type="hidden" id="node-config-input-operationTimeoutSeconds-type">
-
-            <label for="node-config-input-ioThreads"><i class="fa fa-cogs"></i> IO Threads</label>
-            <input type="text" id="node-config-input-ioThreads" data-typed-input="true">
-            <input type="hidden" id="node-config-input-ioThreads-type">
+    <fieldset>
+        <legend>
+            <small><i class="fa fa-globe"></i> Server</small>
+        </legend>
+        <div class="form-row">
+            <div>
+                <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+                <input type="text" id="node-config-input-name">
+            </div>
         </div>
-        <div class="form-row compact">
-            <label for="node-config-input-messageListenerThreads"><i class="fa fa-cogs"></i> Listener Threads</label>
-            <input type="text" id="node-config-input-messageListenerThreads" data-typed-input="true">
-            <input type="hidden" id="node-config-input-messageListenerThreads-type">
-
-            <label for="node-config-input-concurrentLookupRequest"><i class="fa fa-cogs"></i> Lookup Requests</label>
-            <input type="text" id="node-config-input-concurrentLookupRequest" data-typed-input="true">
-            <input type="hidden" id="node-config-input-concurrentLookupRequest-type">
+        <div class="form-row">
+            <label for="node-config-input-authenticationNodeId">Auth</label>
+            <input type="text" id="node-config-input-authenticationNodeId">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-serviceUrl">Broker URL</label>
+            <input type="text" id="node-config-input-serviceUrl" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-adminUrl">Admin URL</label>
+            <input type="text" id="node-config-input-adminUrl" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-useTls"><i class="fa fa-lock"></i> Use TLS</label>
+            <input type="text" id="node-config-input-useTls" data-typed-input="true">
+            <input type="hidden" id="node-config-input-useTls-type">
         </div>
     </fieldset>
 
     <!-- TLS settings -->
-    <fieldset style="width: 450px">
-        <legend><i class="fa fa-lock"></i> TLS</legend>
+    <fieldset class="tls">
+        <legend>
+            <small><i class="fa fa-lock"></i> Tls Configuration</small>
+        </legend>
         <div class="form-row">
-            <!-- Inline boolean inputs for TLS settings -->
-            <label for="node-config-input-useTls"><i class="fa fa-lock"></i> Use TLS</label>
-            <input type="text" id="node-config-input-useTls" data-typed-input="true">
-            <input type="hidden" id="node-config-input-useTls-type">
-
-            <label for="node-config-input-tlsValidateHostname"><i class="fa fa-lock"></i> Validate Hostname</label>
-            <input type="text" id="node-config-input-tlsValidateHostname" data-typed-input="true">
-            <input type="hidden" id="node-config-input-tlsValidateHostname-type">
-        </div>
-        <div class="form-row">
-            <label for="node-config-input-tlsAllowInsecureConnection"><i class="fa fa-lock"></i> Allow Insecure Connection</label>
-            <input type="text" id="node-config-input-tlsAllowInsecureConnection" data-typed-input="true">
-            <input type="hidden" id="node-config-input-tlsAllowInsecureConnection-type">
-        </div>
-        <div class="form-row">
-            <label for="node-config-input-tlsTrustCertsFilePath"><i class="fa fa-file-text-o"></i> Certs Path</label>
+            <label for="node-config-input-tlsTrustCertsFilePath">Certs Path</label>
             <input type="text" id="node-config-input-tlsTrustCertsFilePath" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <!-- Inline numeric inputs for TLS settings -->
+            <div style="display: flex">
+                <div style="width: 45%">
+                    <label for="node-config-input-tlsValidateHostname">Validate Hostname</label>
+                    <input type="text" id="node-config-input-tlsValidateHostname" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-tlsValidateHostname-type">
+                </div>
+                <div style="width: 45%">
+                    <label for="node-config-input-tlsAllowInsecureConnection">Insecure Connection</label>
+                    <input type="text" id="node-config-input-tlsAllowInsecureConnection" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-tlsAllowInsecureConnection-type">
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <!-- Runtime settings -->
+    <fieldset>
+        <legend>
+            <small><i class="fa fa-cogs"></i> Runtime Settings</small>
+        </legend>
+        <div class="form-row">
+            <label for="node-config-input-listenerName">Listener Name</label>
+            <input type="text" id="node-config-input-listenerName" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <div style="display: flex">
+                <div style="width: 45%">
+                    <label for="node-config-input-operationTimeoutSeconds">Timeout (s)</label>
+                    <input type="text" id="node-config-input-operationTimeoutSeconds" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-operationTimeoutSeconds-type">
+                </div>
+                <div style="width: 45%">
+                    <label for="node-config-input-ioThreads">IO Threads</label>
+                    <input type="text" id="node-config-input-ioThreads" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-ioThreads-type">
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div style="display: flex">
+                <div style="width: 45%">
+                    <label for="node-config-input-messageListenerThreads">Listener Threads</label>
+                    <input type="text" id="node-config-input-messageListenerThreads" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-messageListenerThreads-type">
+                </div>
+                <div style="width: 45%">
+                    <label for="node-config-input-concurrentLookupRequest">Lookup Requests</label>
+                    <input type="text" id="node-config-input-concurrentLookupRequest" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-concurrentLookupRequest-type">
+                </div>
+            </div>
         </div>
     </fieldset>
 </script>

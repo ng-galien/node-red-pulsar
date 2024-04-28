@@ -1,8 +1,22 @@
 import * as NodeRED from 'node-red'
-import {PulsarConsumerConfig, PulsarConsumerId} from "../PulsarDefinition";
-import {Consumer} from "pulsar-client";
+import {
+    parseBoolean,
+    parseEnum,
+    parseNumber,
+    parseString,
+    PulsarConsumerConfig,
+    PulsarConsumerId
+} from "../PulsarDefinition";
+import {
+    Consumer,
+    ConsumerConfig,
+    ConsumerCryptoFailureAction,
+    InitialPosition,
+    RegexSubscriptionMode,
+    SubscriptionType
+} from "pulsar-client";
 import {NodeMessage} from "node-red";
-import {closeActor, getActorActorRequirement} from "../PulsarNode";
+import {closeActor, requireClient, requireSchema} from "../PulsarNode";
 
 interface PulsarMessage extends NodeMessage {
     messageId: string
@@ -15,9 +29,9 @@ interface PulsarMessage extends NodeMessage {
 
 type ConsumerNode = NodeRED.Node<Consumer>
 
-function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): PulsarConsumerConfig {
-    config.listener = (pulsarMessage, msgConsumer) => {
-        node.debug('Message received' + pulsarMessage)
+function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): ConsumerConfig {
+    const listener = (pulsarMessage, msgConsumer) => {
+        node.log('Message received' + pulsarMessage)
         //if the buffer is empty, the message is not a json object
         const nodeMessage: PulsarMessage = {
             topic: pulsarMessage.getTopicName(),
@@ -44,7 +58,30 @@ function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): Pulsar
             node.status({fill: "red", shape: "dot", text: "Ack error"})
         })
     }
-    return config
+    return {
+        topic: config.topic,
+        topics: undefined,
+        topicsPattern: undefined,
+        subscription: config.subscription || 'consumer-' + require('uuid').v4(),
+        subscriptionType: parseEnum<SubscriptionType>(config.subscriptionType),
+        subscriptionInitialPosition: parseEnum<InitialPosition>(config.subscriptionType),
+        ackTimeoutMs: parseNumber(config.ackTimeoutMs),
+        nAckRedeliverTimeoutMs: parseNumber(config.nAckRedeliverTimeoutMs),
+        receiverQueueSize: parseNumber(config.receiverQueueSize),
+        receiverQueueSizeAcrossPartitions: parseNumber(config.receiverQueueSizeAcrossPartitions),
+        consumerName: config.consumerName || 'consumer-' + require('uuid').v4(),
+        properties: undefined,
+        listener: listener,
+        readCompacted: parseBoolean(config.readCompacted),
+        privateKeyPath: parseString(config.privateKeyPath),
+        cryptoFailureAction: parseEnum<ConsumerCryptoFailureAction>(config.cryptoFailureAction),
+        maxPendingChunkedMessage: parseNumber(config.maxPendingChunkedMessage),
+        autoAckOldestChunkedMessageOnQueueFull: parseNumber(config.autoAckOldestChunkedMessageOnQueueFull),
+        batchIndexAckEnabled: parseBoolean(config.batchIndexAckEnabled),
+        regexSubscriptionMode: parseEnum<RegexSubscriptionMode>(config.regexSubscriptionMode),
+        deadLetterPolicy: undefined,
+        batchReceivePolicy: undefined
+    }
 }
 
 /**
@@ -54,19 +91,27 @@ export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarConsumerId,
         function (this: ConsumerNode, config: PulsarConsumerConfig): void {
             RED.nodes.createNode(this, config)
-            const requirement = getActorActorRequirement(RED, this, config)
+            const requirement = requireClient(RED, config)
             if (!requirement) {
+                this.error('Config node not found')
                 return
             }
-            requirement.subscribe(setupListener(config, this)).then(consumer => {
+            const consumerConfig = setupListener(config, this)
+            consumerConfig.schema = requireSchema(RED, config)
+            requirement.subscribe(consumerConfig).then(consumer => {
                 this.credentials = consumer
+                this.log('Consumer created')
                 this.status({fill: "green", shape: "dot", text: "connected"})
             }).catch(e => {
                 this.error('Error creating consumer: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
             })
-            this.on('close', (done: () => void) => {
-                closeActor(this, done)
+            this.on('close', (removed: boolean, done: () => void) => {
+                if (!removed) {
+                    closeActor(this, done)
+                } else {
+                    done()
+                }
             })
         }
     )

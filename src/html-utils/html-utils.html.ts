@@ -11,7 +11,10 @@ function configureTypedFields(isConfig: boolean, fields: TypedField[]) {
             types: [field.type],
             typeField: '#' + id + '-type'
         });
-        input.typedInput('width', '80px');
+        input.typedInput('width', '100px');
+        if (field.value !== undefined) {
+            input.typedInput('value', field.value)
+        }
     })
 }
 

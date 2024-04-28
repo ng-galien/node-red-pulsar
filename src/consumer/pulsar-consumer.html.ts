@@ -1,35 +1,47 @@
 type PulsarConsumerEditorConfig = import("../PulsarDefinition").PulsarConsumerEditorConfig
 
+type EditorNode = import('node-red').EditorNodeInstance<PulsarConsumerEditorConfig>
+
+function validateTopic(this: EditorNode, _: string): boolean {
+    const topicsPattern = $('#node-input-topicsPattern').val() as string
+    const topic = $('#node-input-topic').val() as string
+    console.log('topic', topic)
+    console.log('topicsPattern', topicsPattern)
+    const topicOk =  topic !== undefined && topic.match(/^\S+$/) !== null
+    const topicsPatternOk = topicsPattern !== undefined && topicsPattern.match(/^\S+$/) !== null
+    return topicOk || topicsPatternOk
+}
 
 RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
     category: PULSAR_CATEGORY,
     icon: 'font-awesome/fa-inbox',
     color: PULSAR_COLOR,
+    inputs: 1,
+    outputs: 2,
     defaults: {
         name: {value: ''},
-        clientNodeId: {value: '', type: CLIENT_ID, required: true},
-        schemaNodeId: {value: '', type: SCHEMA_ID, required: false},
-        topic: {value: '', required: true},
-        topicsPattern: {value: '', required: false},
-        subscription: {value: '', required: true},
+        clientNodeId: {value: '', required:true, type: CLIENT_ID },
+        schemaNodeId: {value: '', required: false, type: SCHEMA_ID },
+        topic: {value: '', required: false, validate: validateTopic },
+        subscription: {value: '', required: true, validate: RED.validators.regex(/^[a-zA-Z0-9_-]+$/)},
         subscriptionType: {value: 'Shared', required: true},
         subscriptionInitialPosition: {value: 'Latest', required: true},
-        ackTimeoutMs: {value: 10000, required: false, validate: RED.validators.number()},
-        nAckRedeliverTimeoutMs: {value: 60000, required: false, validate: RED.validators.number()},
-        receiverQueueSize: {value: 100, required: false, validate: RED.validators.number()},
-        receiverQueueSizeAcrossPartitions: {value: 1000, required: false, validate: RED.validators.number()},
+        ackTimeoutMs: {value: '10000', required: false, validate: RED.validators.number()},
+        nAckRedeliverTimeoutMs: {value: '60000', required: false, validate: RED.validators.number()},
+        receiverQueueSize: {value: '100', required: false, validate: RED.validators.number()},
+        receiverQueueSizeAcrossPartitions: {value: '1000', required: false, validate: RED.validators.number()},
         consumerName: {value: '', required: false},
-        readCompacted: {value: false, required: false, validate: RED.validators.typedInput('bool')},
+        readCompacted: {value: 'false', required: false, validate: RED.validators.typedInput('bool')},
         privateKeyPath: {value: '', required: false},
         cryptoFailureAction: {value: 'FAIL', required: false},
-        maxPendingChunkedMessage: {value: 10, required: false, validate: RED.validators.number()},
-        autoAckOldestChunkedMessageOnQueueFull: {value: 10, required: false, validate: RED.validators.number()},
-        batchIndexAckEnabled: {value: false, required: false, validate: RED.validators.typedInput('bool')},
+        maxPendingChunkedMessage: {value: '10', required: false, validate: RED.validators.number()},
+        autoAckOldestChunkedMessageOnQueueFull: {value: '10', required: false, validate: RED.validators.number()},
+        batchIndexAckEnabled: {value: 'false', required: false, validate: RED.validators.typedInput('bool')},
         regexSubscriptionMode: {value: 'AllTopics', required: false},
         deadLetterPolicy: {value: undefined, required: false},
     },
-    label: function () {
-        return this.name || 'pulsar-client'
+    label: function (this: EditorNode) {
+        return this.name || this.topic || 'pulsar-consumer'
     },
     oneditprepare: function () {
         const fields: TypedField[] = [
@@ -51,5 +63,10 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         configureEnumField<RegexSubscriptionMode>(false, 'regexSubscriptionMode', ['AllTopics', 'PersistentOnly', 'NonPersistentOnly'])
         type CryptoFailureAction = import("pulsar-client").ConsumerCryptoFailureAction
         configureEnumField<CryptoFailureAction>(false, 'cryptoFailureAction', ['FAIL', 'DISCARD'])
+    },
+
+    oneditsave: function (this: EditorNode) {
+        const consumerConfig = this as PulsarConsumerEditorConfig
+        console.log('saving consumer config', consumerConfig.clientNodeId)
     }
 })
