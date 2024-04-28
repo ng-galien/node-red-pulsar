@@ -164,3 +164,10 @@ export function parseEnum<T extends string>(value?: string): T | undefined {
     }
     return undefined
 }
+
+export function parseMandatoryEnum<T extends string>(value?: string): T {
+    if (value) {
+        return value as T
+    }
+    throw new Error('Missing mandatory enum value')
+}
