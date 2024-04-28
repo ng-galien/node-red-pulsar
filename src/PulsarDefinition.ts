@@ -124,23 +124,80 @@ export interface PulsarProducerConfig extends PulsarProducerProperties, NodeRED.
 
 export interface PulsarProducerEditorConfig extends PulsarProducerProperties, EditorClient.NodeProperties {}
 
+//Reader
+export interface PulsarReaderProperties {
+    clientNodeId: string
+    schemaNodeId: string
+    topic: string
+    receiverQueueSize?: string
+    readerName?: string
+    subscriptionRolePrefix?: string
+    readCompacted?: string
+    privateKeyPath?: string
+    cryptoFailureAction?: string
+}
+
+export interface PulsarReaderConfig extends PulsarReaderProperties, NodeRED.NodeDef {}
+
+export interface PulsarReaderEditorConfig extends PulsarReaderProperties, EditorClient.NodeProperties {}
+
+//Editor
 export interface TypedField {
     name: string
     type: EditorWidgetTypedInputType,
     value?: string
 }
 
+/**
+ * The identifier for the Pulsar client.
+ *
+ * @type {string}
+ */
 export const PulsarClientId = "pulsar-client"
+
+/**
+ * The identifier for the Pulsar authentication.
+ */
 export const PulsarAuthenticationId = "pulsar-authentication"
+
+/**
+ * The identifier for the Pulsar schema.
+ */
 export const PulsarSchemaId = "pulsar-schema"
+
+/**
+ * The identifier for the Pulsar consumer.
+ */
 export const PulsarConsumerId = "pulsar-consumer"
+
+/**
+ * The identifier for the Pulsar producer.
+ */
 export const PulsarProducerId = "pulsar-producer"
 
+/**
+ * The identifier for the Pulsar reader.
+ */
+export const PulsarReaderId = "pulsar-reader"
+
+/**
+ * Parses a string representation of a number into a number.
+ *
+ * @param {string} value - The string representation of the number to parse.
+ * @return {number | undefined} - The parsed number or undefined if the input value is not a valid number.
+ */
 export function parseNumber(value?: string): number | undefined {
     const num = Number(value)
     return isNaN(num) ? undefined : num
 }
 
+
+/**
+ * Parses a string value to a boolean. Returns `true` if the value is 'true', `false` if the value is 'false', or `undefined` if the value is neither 'true' nor 'false'.
+ *
+ * @param {string} value - The string value to parse.
+ * @return {boolean|undefined} - The parsed boolean value. Returns `true` if the value is 'true', `false` if the value is 'false', or `undefined` if the value is neither 'true' nor 'false'.
+ */
 export function parseBoolean(value?: string): boolean | undefined {
     if (value === 'true') {
         return true
@@ -151,6 +208,14 @@ export function parseBoolean(value?: string): boolean | undefined {
     return undefined
 }
 
+
+/**
+ * Parses a string value and returns the value if it is not empty, otherwise returns undefined.
+ *
+ * @param {string} value - The string value to be parsed.
+ *
+ * @return {string | undefined} - The parsed string value. If value is not empty, returns the value. Otherwise, returns undefined.
+ */
 export function parseString(value?: string): string | undefined {
     if (value) {
         return value === '' ? undefined : value
@@ -158,6 +223,13 @@ export function parseString(value?: string): string | undefined {
     return undefined
 }
 
+/**
+ * Parses a string value and returns the value if it is not empty, otherwise throws an error.
+ *
+ * @param {string} value - The string value to be parsed.
+ *
+ * @return {string} - The parsed string value. If value is not empty, returns the value. Otherwise, throws an error.
+ */
 export function parseEnum<T extends string>(value?: string): T | undefined {
     if (value) {
         return value as T
@@ -165,6 +237,13 @@ export function parseEnum<T extends string>(value?: string): T | undefined {
     return undefined
 }
 
+/**
+ * Parses a string value and returns the value if it is not empty, otherwise throws an error.
+ *
+ * @param {string} value - The string value to be parsed.
+ *
+ * @return {string} - The parsed string value. If value is not empty, returns the value. Otherwise, throws an error.
+ */
 export function parseMandatoryEnum<T extends string>(value?: string): T {
     if (value) {
         return value as T
