@@ -2,19 +2,9 @@ type PulsarConsumerEditorConfig = import("../PulsarDefinition").PulsarConsumerEd
 
 type EditorNode = import('node-red').EditorNodeInstance<PulsarConsumerEditorConfig>
 
-function validateTopic(this: EditorNode, _: string): boolean {
-    const topicsPattern = $('#node-input-topicsPattern').val() as string
-    const topic = $('#node-input-topic').val() as string
-    console.log('topic', topic)
-    console.log('topicsPattern', topicsPattern)
-    const topicOk =  topic !== undefined && topic.match(/^\S+$/) !== null
-    const topicsPatternOk = topicsPattern !== undefined && topicsPattern.match(/^\S+$/) !== null
-    return topicOk || topicsPatternOk
-}
-
 RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
     category: PULSAR_CATEGORY,
-    icon: 'font-awesome/fa-mailbox',
+    icon: 'font-awesome/fa-envelope',
     color: PULSAR_COLOR,
     inputs: 1,
     outputs: 2,
@@ -22,7 +12,7 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         name: {value: ''},
         clientNodeId: {value: '', required:true, type: CLIENT_ID },
         schemaNodeId: {value: '', required: false, type: SCHEMA_ID },
-        topic: {value: '', required: false, validate: validateTopic },
+        topic: {value: '', required: false },
         subscription: {value: '', required: true, validate: RED.validators.regex(/^[a-zA-Z0-9_-]+$/)},
         subscriptionType: {value: 'Shared', required: true},
         subscriptionInitialPosition: {value: 'Latest', required: true},
