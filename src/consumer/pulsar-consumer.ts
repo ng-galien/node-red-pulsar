@@ -5,53 +5,29 @@ import {
     parseNumber,
     parseString,
     PulsarConsumerConfig,
-    PulsarConsumerId
+    PulsarConsumerId, readPulsarMessage
 } from "../PulsarDefinition";
 import {
     Consumer,
     ConsumerConfig,
     ConsumerCryptoFailureAction,
-    InitialPosition,
+    InitialPosition, Message,
     RegexSubscriptionMode,
     SubscriptionType
 } from "pulsar-client";
-import {NodeMessage} from "node-red";
-import {closeActor, requireClient, requireSchema} from "../PulsarNode";
+import {requireClient, requireSchema} from "../PulsarNode";
 
-interface PulsarMessage extends NodeMessage {
-    messageId: string
-    publishTimeStamp: number
-    eventTimeStamp: number
-    redeliveryCount: number
-    partitionKey: string
-    properties: Record<string, string>
-}
+
 
 type ConsumerNode = NodeRED.Node<Consumer>
 
 function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): ConsumerConfig {
-    const listener = (pulsarMessage, msgConsumer) => {
+    const listener = (pulsarMessage: Message, consumer: Consumer) => {
         node.log('Message received' + pulsarMessage)
         //if the buffer is empty, the message is not a json object
-        const nodeMessage: PulsarMessage = {
-            topic: pulsarMessage.getTopicName(),
-            payload: null,
-            messageId: pulsarMessage.getMessageId().toString(),
-            publishTimeStamp: pulsarMessage.getPublishTimestamp(),
-            eventTimeStamp: pulsarMessage.getEventTimestamp(),
-            redeliveryCount: pulsarMessage.getRedeliveryCount(),
-            partitionKey: pulsarMessage.getPartitionKey(),
-            properties: pulsarMessage.getProperties(),
-        }
-        const str = pulsarMessage.getData().toString()
-        try {
-            nodeMessage.payload = JSON.parse(str)
-        } catch (e) {
-            node.debug('Message is not a json object')
-            nodeMessage.payload = str
-        }
+        const nodeMessage = readPulsarMessage(pulsarMessage)
         node.send([nodeMessage, null])
-        msgConsumer.acknowledge(pulsarMessage).then(r => {
+        consumer.acknowledge(pulsarMessage).then(r => {
             node.debug('Message acknowledged' + r)
         }).catch(e => {
             node.error('Error acknowledging message: ' + e)
@@ -105,13 +81,6 @@ export = (RED: NodeRED.NodeAPI): void => {
             }).catch(e => {
                 this.error('Error creating consumer: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
-            })
-            this.on('close', (removed: boolean, done: () => void) => {
-                if (!removed) {
-                    closeActor(this, done)
-                } else {
-                    done()
-                }
             })
         }
     )

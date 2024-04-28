@@ -15,7 +15,7 @@ import {
     ProducerConfig,
     ProducerCryptoFailureAction
 } from "pulsar-client";
-import {closeActor, requireClient, requireSchema} from "../PulsarNode";
+import {requireClient, requireSchema} from "../PulsarNode";
 
 type ProducerNode = NodeRED.Node<Producer>
 
@@ -99,13 +99,6 @@ export = (RED: NodeRED.NodeAPI): void => {
                 } else {
                     node.error('Producer not created')
                     node.status({fill: "red", shape: "dot", text: "Producer not created"})
-                }
-            })
-            this.on('close', (removed: boolean, done: () => void) => {
-                if (!removed) {
-                    closeActor(this, done)
-                } else {
-                    done()
                 }
             })
         })

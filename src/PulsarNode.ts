@@ -1,26 +1,6 @@
-import {Client, Consumer, Producer, SchemaInfo} from "pulsar-client";
+import {Client, SchemaInfo} from "pulsar-client";
 import * as NodeRED from "node-red";
 import {PulsarConsumerConfig, PulsarProducerConfig} from "./PulsarDefinition";
-
-type PulsarActor = Producer | Consumer
-type PulsarNode = NodeRED.Node<PulsarActor>
-
-export function closeActor(_node: PulsarNode, callback: () => void) {
-    callback();
-    // const actor = node.credentials
-    // if(actor && actor.isConnected()) {
-    //     actor.close().then(() => {
-    //         node.status({fill: "red", shape: "dot", text: "disconnected"})
-    //         callback()
-    //     }).catch(e => {
-    //         node.error('Error closing actor: ' + e)
-    //         node.status({fill: "red", shape: "dot", text: "Error closing"})
-    //         callback()
-    //     })
-    // } else {
-    //     callback()
-    // }
-}
 
 type RED = NodeRED.NodeAPI
 

@@ -20,9 +20,14 @@ function configureTypedFields(isConfig: boolean, fields: TypedField[]) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureEnumField<T extends string>(isConfig: boolean, name: string, options: T[]) {
+    configureOptionalEnumField(isConfig, false, name, options)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function configureOptionalEnumField<T extends string>(isConfig: boolean, optional: Boolean, name: string, options: T[]) {
     const id = (isConfig ? "node-config-input-" : "node-input-") + name
     $("#" + id).typedInput({
-        default: options[0],
+        default: optional ? undefined : options[0],
         types: [{
             value: options[0],
             options: options.map(value => ({value, label: value}))
@@ -44,4 +49,6 @@ const SCHEMA_ID = "pulsar-schema"
 const CONSUMER_ID = "pulsar-consumer"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PRODUCER_ID = "pulsar-producer"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const READER_ID = "pulsar-reader"
 

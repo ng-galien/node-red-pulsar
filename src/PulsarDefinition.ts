@@ -3,9 +3,10 @@ import * as EditorClient from '@node-red/editor-client'
 import {
     AuthenticationOauth2,
     AuthenticationTls,
-    AuthenticationToken,
+    AuthenticationToken, Message,
     SchemaType
 } from 'pulsar-client'
+import {NodeMessage} from "node-red";
 
 
 //Authentication
@@ -125,10 +126,13 @@ export interface PulsarProducerConfig extends PulsarProducerProperties, NodeRED.
 export interface PulsarProducerEditorConfig extends PulsarProducerProperties, EditorClient.NodeProperties {}
 
 //Reader
+export type StartMessage = "Earliest" | "Latest"
+
 export interface PulsarReaderProperties {
     clientNodeId: string
     schemaNodeId: string
     topic: string
+    startMessage: StartMessage
     receiverQueueSize?: string
     readerName?: string
     subscriptionRolePrefix?: string
@@ -249,4 +253,32 @@ export function parseMandatoryEnum<T extends string>(value?: string): T {
         return value as T
     }
     throw new Error('Missing mandatory enum value')
+}
+
+export interface DecodedPulsarMessage extends NodeMessage {
+    messageId: string
+    publishTimeStamp: number
+    eventTimeStamp: number
+    redeliveryCount: number
+    partitionKey: string
+    properties: Record<string, string>
+}
+
+export function readPulsarMessage(pulsarMessage: Message): DecodedPulsarMessage {
+    const data = pulsarMessage.getData().toString("utf-8")
+    let payload: any = data
+    try {
+        payload = JSON.parse(data)
+    } catch (e) {
+        // Ignore
+    }
+    return {
+        payload: payload,
+        messageId: pulsarMessage.getMessageId().toString(),
+        publishTimeStamp: pulsarMessage.getPublishTimestamp(),
+        eventTimeStamp: pulsarMessage.getEventTimestamp(),
+        redeliveryCount: pulsarMessage.getRedeliveryCount(),
+        partitionKey: pulsarMessage.getPartitionKey(),
+        properties: pulsarMessage.getProperties()
+    }
 }

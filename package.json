@@ -21,14 +21,15 @@
   "node-red": {
     "nodes": {
       "pulsar-client": "dist/client/pulsar-client.js",
-      "pulsar-consumer": "dist/consumer/pulsar-consumer.js",
-      "pulsar-producer": "dist/producer/pulsar-producer.js",
+      "pulsar-authentication": "dist/authentication/pulsar-authentication.js",
       "pulsar-schema": "dist/schema/pulsar-schema.js",
-      "pulsar-authentication": "dist/authentication/pulsar-authentication.js"
+      "pulsar-consumer": "dist/consumer/pulsar-consumer.js",
+      "pulsar-reader": "dist/reader/pulsar-reader.js",
+      "pulsar-producer": "dist/producer/pulsar-producer.js"
     }
   },
   "keywords": [
-    "node-red"
+    "node-red", "pulsar", "apache", "streaming", "messaging"
   ],
   "author": "",
   "license": "ISC",
