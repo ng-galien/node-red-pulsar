@@ -50,7 +50,7 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.status({fill: "green", shape: "dot", text: "connected"})
             }).catch(e => {
                 this.error('Error creating reader: ' + e)
-                this.status({fill: "red", shape: "dot", text: "Connection error"
+                this.status({fill: "red", shape: "dot", text: "Connection error"})
             })
         }
     )
