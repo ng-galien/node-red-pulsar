@@ -6,7 +6,7 @@ import {
     parseEnum,
     parseNumber,
     parseString,
-    PulsarReaderConfig, readPulsarMessage
+    PulsarReaderConfig, PulsarReaderId, readPulsarMessage
 } from "../PulsarDefinition";
 
 type ReaderNode = NodeRED.Node<Reader>
@@ -35,7 +35,7 @@ function createConfig(config: PulsarReaderConfig, node: ReaderNode): ReaderConfi
  * Registers the 'pulsar-consumer' type with its configuration.
  */
 export = (RED: NodeRED.NodeAPI): void => {
-    RED.nodes.registerType('pulsar-reader',
+    RED.nodes.registerType(PulsarReaderId,
         function (this: ReaderNode, config: PulsarReaderConfig): void {
             RED.nodes.createNode(this, config);
             const client = requireClient(RED, config)

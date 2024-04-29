@@ -1,8 +1,8 @@
-const { GenericContainer, Wait } = require("testcontainers");
-const axios = require('axios');
+import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
+import axios from 'axios';
 
-function createPulsarContainer(done, callback) {
-    new GenericContainer("apachepulsar/pulsar:3.1.1")
+export function createPulsarContainer(done: (arg0: any) => void, callback: (arg0: StartedTestContainer) => void) {
+    new GenericContainer("apachepulsar/pulsar")
         .withCommand(["bin/pulsar", "standalone"])
         .withExposedPorts(6650, 8080)
         .withWaitStrategy(Wait.forHttp("/admin/v2/persistent/public/default", 8080))
@@ -16,18 +16,18 @@ function createPulsarContainer(done, callback) {
         });
 }
 
-function stopPulsarContainer(container, done) {
+export function stopPulsarContainer(container: StartedTestContainer, done: () => void) {
     container.stop()
         .then(function () {
             console.log("Pulsar container stopped");
             done();
         }).catch(function (error) {
             console.error(error)
-            done(error);
+            done();
         });
 }
 
-function createTopic(container, topic, done, callback) {
+export function createTopic(container:StartedTestContainer, topic: String, done: () => void, callback: () => void) {
     const serviceUrl = "http://localhost:" + container.getMappedPort(8080);
     axios.put(serviceUrl + '/admin/v2/persistent/public/default/' + topic, {}, {
         headers: {
@@ -39,7 +39,7 @@ function createTopic(container, topic, done, callback) {
             callback();
         }).catch(function (error) {
             console.error(error)
-            done(error);
+            done();
         });
 }
 

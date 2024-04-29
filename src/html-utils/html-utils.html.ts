@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-type EditorWidgetTypedInputType = import("node-red").EditorWidgetTypedInputType
+
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureTypedFields(isConfig: boolean, fields: TypedField[]) {

@@ -1,7 +1,7 @@
 import * as NodeRED from 'node-red'
 import {
     parseBoolean,
-    parseEnum,
+    parseEnum, parseMandatoryEnum,
     parseNumber,
     parseString,
     PulsarConsumerConfig,
@@ -38,8 +38,8 @@ function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): Consum
         topics: undefined,
         topicsPattern: undefined,
         subscription: config.subscription || 'consumer-' + uuid.v4(),
-        subscriptionType: parseEnum<SubscriptionType>(config.subscriptionType),
-        subscriptionInitialPosition: parseEnum<InitialPosition>(config.subscriptionType),
+        subscriptionType: parseMandatoryEnum<SubscriptionType>(config.subscriptionType),
+        subscriptionInitialPosition: parseEnum<InitialPosition>(config.subscriptionInitialPosition),
         ackTimeoutMs: parseNumber(config.ackTimeoutMs),
         nAckRedeliverTimeoutMs: parseNumber(config.nAckRedeliverTimeoutMs),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
@@ -77,6 +77,17 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.credentials = consumer
                 this.log('Consumer created')
                 this.status({fill: "green", shape: "dot", text: "connected"})
+                const message = {
+                    topic: 'pulsar',
+                    payload: {
+                        type: 'consumer',
+                        status: 'ready',
+                        topic: config.topic,
+                        subscription: config.subscription,
+                        subscriptionType: config.subscriptionType
+                    }
+                };
+                this.send([null, message]);
             }).catch(e => {
                 this.error('Error creating consumer: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})

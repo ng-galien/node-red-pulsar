@@ -73,7 +73,7 @@ export interface PulsarConsumerProperties {
     schemaNodeId: string
     topic: string
     subscription?: string
-    subscriptionType?: string
+    subscriptionType: string
     subscriptionInitialPosition?: string
     ackTimeoutMs?: string
     nAckRedeliverTimeoutMs?: string
@@ -145,6 +145,7 @@ export interface PulsarReaderConfig extends PulsarReaderProperties, NodeRED.Node
 
 export interface PulsarReaderEditorConfig extends PulsarReaderProperties, EditorClient.NodeProperties {}
 
+type EditorWidgetTypedInputType = import("node-red").EditorWidgetTypedInputType
 //Editor
 export interface TypedField {
     name: string
@@ -157,32 +158,42 @@ export interface TypedField {
  *
  * @type {string}
  */
-export const PulsarClientId = "pulsar-client"
+export const PulsarClientId: string = "pulsar-client"
 
 /**
  * The identifier for the Pulsar authentication.
+ *
+ * @type {string}
  */
-export const PulsarAuthenticationId = "pulsar-authentication"
+export const PulsarAuthenticationId: string = "pulsar-authentication"
 
 /**
  * The identifier for the Pulsar schema.
+ *
+ * @type {string}
  */
-export const PulsarSchemaId = "pulsar-schema"
+export const PulsarSchemaId: string = "pulsar-schema"
 
 /**
  * The identifier for the Pulsar consumer.
+ *
+ * @type {string}
  */
-export const PulsarConsumerId = "pulsar-consumer"
+export const PulsarConsumerId: string = "pulsar-consumer"
 
 /**
  * The identifier for the Pulsar producer.
+ *
+ * @type {string}
  */
-export const PulsarProducerId = "pulsar-producer"
+export const PulsarProducerId: string = "pulsar-producer"
 
 /**
  * The identifier for the Pulsar reader.
+ *
+ * @type {string}
  */
-export const PulsarReaderId = "pulsar-reader"
+export const PulsarReaderId: string = "pulsar-reader"
 
 /**
  * Parses a string representation of a number into a number.
