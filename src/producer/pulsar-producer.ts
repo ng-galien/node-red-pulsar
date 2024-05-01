@@ -3,43 +3,17 @@ import {
     PulsarProducerConfig,
     PulsarProducerId
 } from "../PulsarDefinition";
-import {
-    CompressionType,
-    HashingScheme,
-    MessageRoutingMode,
-    Producer, ProducerAccessMode,
-    ProducerConfig,
-    ProducerCryptoFailureAction
-} from "pulsar-client";
+import {Producer, ProducerConfig,} from "pulsar-client";
 import {requireClient, requireSchema} from "../PulsarNode";
-import {parseBoolean, parseEnum, parseNumber, parseNonEmptyString} from "../PulsarConfig";
+import {producerConfig} from "../PulsarConfig";
 
 type ProducerNode = NodeRED.Node<Producer>
 
-function createConfig(config: PulsarProducerConfig): ProducerConfig {
+function setupProducer(RED: NodeRED.NodeAPI, config: PulsarProducerConfig): ProducerConfig {
     return {
-        topic: config.topic,
-        producerName: parseNonEmptyString(config.producerName),
-        sendTimeoutMs: parseNumber(config.sendTimeoutMs),
-        initialSequenceId: parseNumber(config.initialSequenceId),
-        maxPendingMessages: parseNumber(config.maxPendingMessages),
-        maxPendingMessagesAcrossPartitions: parseNumber(config.maxPendingMessagesAcrossPartitions),
-        blockIfQueueFull: parseBoolean(config.blockIfQueueFull),
-        messageRoutingMode: parseEnum<MessageRoutingMode>(config.messageRoutingMode),
-        hashingScheme: parseEnum<HashingScheme>(config.hashingScheme),
-        compressionType: parseEnum<CompressionType>(config.compressionType),
-        batchingEnabled: parseBoolean(config.batchingEnabled),
-        batchingMaxPublishDelayMs: parseNumber(config.batchingMaxPublishDelayMs),
-        batchingMaxMessages: parseNumber(config.batchingMaxMessages),
-        properties: undefined,
-        publicKeyPath: parseNonEmptyString(config.publicKeyPath),
-        encryptionKey: parseNonEmptyString(config.encryptionKey),
-        cryptoFailureAction: parseEnum<ProducerCryptoFailureAction>(config.cryptoFailureAction),
-        chunkingEnabled: parseBoolean(config.chunkingEnabled),
-        accessMode: parseEnum<ProducerAccessMode>(config.accessMode),
-        schema: undefined
+        schema: requireSchema(RED, config),
+        ... producerConfig(config)
     }
-
 }
 
 export = (RED: NodeRED.NodeAPI): void => {
@@ -51,9 +25,7 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.error('Client not created')
                 return
             }
-            const producerConfig = createConfig(config)
-            producerConfig.schema = requireSchema(RED, config)
-            this.log('Producer config: ' + JSON.stringify(producerConfig))
+            const producerConfig = setupProducer(RED, config)
             client.createProducer(producerConfig).then(producer => {
                 this.debug('Producer created')
                 this.credentials = producer

@@ -109,7 +109,7 @@ export interface PulsarProducerProperties {
     batchingEnabled?: string
     batchingMaxPublishDelayMs?: string
     batchingMaxMessages?: string
-    properties?: Record<string, string>
+    properties?: String
     publicKeyPath?: string
     encryptionKey?: string
     cryptoFailureAction?: string

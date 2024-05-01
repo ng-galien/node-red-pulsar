@@ -1,8 +1,9 @@
-import {PulsarConsumerConfig} from "./PulsarDefinition";
+import {PulsarConsumerConfig, PulsarProducerConfig} from "./PulsarDefinition";
 import {
+    CompressionType,
     ConsumerConfig,
-    ConsumerCryptoFailureAction,
-    InitialPosition,
+    ConsumerCryptoFailureAction, HashingScheme,
+    InitialPosition, MessageRoutingMode, ProducerAccessMode, ProducerConfig, ProducerCryptoFailureAction,
     RegexSubscriptionMode,
     SubscriptionType
 } from "pulsar-client";
@@ -182,5 +183,29 @@ export function consumerConfig(config: PulsarConsumerConfig): ConsumerConfig {
         regexSubscriptionMode: parseChoice<RegexSubscriptionMode>(['PersistentOnly', 'NonPersistentOnly', "AllTopics"], config.regexSubscriptionMode),
         deadLetterPolicy: undefined,
         batchReceivePolicy: undefined
+    }
+}
+
+export function producerConfig(config: PulsarProducerConfig): ProducerConfig {
+    return {
+        topic: config.topic,
+        producerName: parseNonEmptyString(config.producerName),
+        sendTimeoutMs: parseNumber(config.sendTimeoutMs),
+        initialSequenceId: parseNumber(config.initialSequenceId),
+        maxPendingMessages: parseNumber(config.maxPendingMessages),
+        maxPendingMessagesAcrossPartitions: parseNumber(config.maxPendingMessagesAcrossPartitions),
+        blockIfQueueFull: parseBoolean(config.blockIfQueueFull),
+        messageRoutingMode: parseChoice<MessageRoutingMode>(['UseSinglePartition', 'CustomPartition', 'RoundRobinDistribution'], config.messageRoutingMode),
+        hashingScheme: parseChoice<HashingScheme>(['Murmur3_32Hash', 'BoostHash', 'JavaStringHash'], config.hashingScheme),
+        compressionType: parseChoice<CompressionType>(['Zlib', 'LZ4', 'ZSTD', "SNAPPY"], config.compressionType),
+        batchingEnabled: parseBoolean(config.batchingEnabled),
+        batchingMaxPublishDelayMs: parseNumber(config.batchingMaxPublishDelayMs),
+        batchingMaxMessages: parseNumber(config.batchingMaxMessages),
+        properties: undefined,
+        publicKeyPath: parseNonEmptyString(config.publicKeyPath),
+        encryptionKey: parseNonEmptyString(config.encryptionKey),
+        cryptoFailureAction: parseChoice<ProducerCryptoFailureAction>(['FAIL', 'SEND'], config.cryptoFailureAction),
+        chunkingEnabled: parseBoolean(config.chunkingEnabled),
+        accessMode: parseChoice<ProducerAccessMode>(['Shared', 'Exclusive', 'ExclusiveWithFencing', 'WaitForExclusive'], config.accessMode)
     }
 }
