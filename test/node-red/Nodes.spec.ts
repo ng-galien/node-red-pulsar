@@ -20,6 +20,7 @@ import {Node} from "node-red";
 import { v4 } from 'uuid';
 import {Logger} from "tslog";
 import axios from "axios";
+import {expect} from "chai";
 
 const logger = new Logger();
 
@@ -116,14 +117,10 @@ describe('Pulsar Consumer/Producer', function () {
         const expectedSchema: SchemaInfo = {
             name: "sample",
             schemaType: "Json",
-            schema: JSON.stringify(jsonSchema)
+            schema: JSON.stringify(jsonSchema),
+            properties: undefined
         }
-        // @ts-ignore
-        schema.name.should.be.equal(expectedSchema.name);
-        schema.schemaType.should.be.equal(expectedSchema.schemaType);
-        // @ts-ignore
-        schema.schema.should.be.equal(expectedSchema.schema);
-        logger.info("Schema loaded")
+        expect(expectedSchema).to.be.eql(schema);
     })
 
     it('Client should initialize',  async function () {
@@ -159,28 +156,15 @@ describe('Pulsar Consumer/Producer', function () {
             try {
                 status.on("input", function (msg) {
                     try {
-                        logger.info("Message received", msg);
-                        msg.should.have.property('topic');
-                        // @ts-ignore
-                        msg.topic.should.be.equal('pulsar');
-                        msg.should.have.property('payload');
-                        // @ts-ignore
-                        msg.payload.should.have.property('type');
-                        // @ts-ignore
-                        msg.payload.type.should.be.equal('consumer');
-                        // @ts-ignore
-                        msg.payload.should.have.property('status');
-                        // @ts-ignore
-                        msg.payload.status.should.be.equal('ready');
-                        // @ts-ignore
-                        msg.payload.should.have.property('topic');
-                        // @ts-ignore
-                        msg.payload.topic.should.be.equal(topic);
-                        // @ts-ignore
-                        msg.payload.should.have.property('subscription');
-                        // @ts-ignore
-                        msg.payload.subscription.should.be.equal(subscriptionName);
-                        logger.info("Consumer loaded")
+                        logger.debug("Message received", msg);
+                        const expected = {
+                            type: "consumer",
+                            status: "ready",
+                            topic: topic,
+                            subscription: subscriptionName,
+                            subscriptionType: "Shared"
+                        }
+                        expect(msg.payload).to.be.eql(expected);
                         resolve();
                     } catch (err) {
                         logger.error(err);
