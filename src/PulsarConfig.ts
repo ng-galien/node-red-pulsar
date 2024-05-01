@@ -1,4 +1,4 @@
-import {PulsarConsumerConfig, PulsarProducerConfig, PulsarReaderConfig} from "./PulsarDefinition";
+import {PulsarConsumerConfig, PulsarProducerConfig, PulsarReaderConfig, StartMessage} from "./PulsarDefinition";
 import {
     CompressionType,
     ConsumerConfig,
@@ -189,11 +189,14 @@ export function producerConfig(config: PulsarProducerConfig): ProducerConfig {
     }
 }
 
+export function readerPosition(start: StartMessage): MessageId {
+    return start === "Earliest" ? MessageId.earliest() : MessageId.latest()
+}
+
 export function readerConfig(config: PulsarReaderConfig): ReaderConfig {
-    const startMessage = config.startMessage == "Earliest" ? MessageId.earliest : MessageId.latest
     return {
         topic: config.topic,
-        startMessageId: startMessage(),
+        startMessageId: readerPosition(config.startMessage),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
         readerName: parseNonEmptyString(config.readerName),
         subscriptionRolePrefix: parseNonEmptyString(config.subscriptionRolePrefix),

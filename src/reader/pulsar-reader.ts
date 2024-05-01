@@ -2,9 +2,9 @@ import * as NodeRED from "node-red";
 import {Message, Reader, ReaderConfig} from "pulsar-client";
 import {requireClient} from "../PulsarNode";
 import {
-    PulsarReaderConfig, PulsarReaderId, readPulsarMessage
+    PulsarReaderConfig, PulsarReaderId, readPulsarMessage, StartMessage
 } from "../PulsarDefinition";
-import {readerConfig} from "../PulsarConfig";
+import {parseChoice, readerConfig, readerPosition} from "../PulsarConfig";
 
 type ReaderNode = NodeRED.Node<Reader>
 
@@ -50,6 +50,45 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.error('Error creating reader: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
             })
+            this.on('input', (msg) => {
+                if (msg.topic === 'seek') {
+                    if(isRightSeekPayloadPosition(msg.payload)) {
+                        seekPosition(this, msg.payload as StartMessage)
+                    } else if (isRightSeekPayloadTimestamp(msg.payload)) {
+                        seekTimestamp(this, msg.payload as number)
+                    } else {
+                        this.error('Invalid seek payload: ' + msg.payload + ' type: ' + typeof msg.payload)
+                    }
+                } else {
+                    this.error('Invalid input: ' + JSON.stringify(msg))
+                }
+            })
         }
     )
+}
+
+function isRightSeekPayloadPosition(payload: any): boolean {
+    return typeof payload === 'string' && parseChoice<StartMessage>(['Earliest', 'Latest'], payload) !== undefined
+}
+
+function isRightSeekPayloadTimestamp(payload: any): boolean {
+    return typeof payload === 'number' && payload >= 0
+}
+
+function seekPosition(node: ReaderNode, value: StartMessage) {
+    const reader = node.credentials as Reader
+    reader.seek(readerPosition(value)).then(() => {
+        node.log('Seeked to: ' + value)
+    }).catch(e => {
+        node.error('Error seeking: ' + e)
+    })
+}
+
+function seekTimestamp(node: ReaderNode, value: number) {
+    const reader = node.credentials as Reader
+    reader.seekTimestamp(value).then(() => {
+        node.log('Seeked to timestamp: ' + value)
+    }).catch(e => {
+        node.error('Error seeking: ' + e)
+    })
 }

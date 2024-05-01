@@ -19,16 +19,22 @@ RED.nodes.registerType<PulsarReaderEditorConfig>(READER_ID, {
         privateKeyPath: {value: '', required: false},
         cryptoFailureAction: {value: 'FAIL', required: false},
     },
-    // label: function (this: EditorNode) {
-    //     return this.name || this.topic || 'pulsar-reader'
-    // },
+    label: function () {
+        return this.name || this.topic || "Reader"
+    },
+    outputLabels: function(i) {
+        return i === 0 ? "Message" : "Status"
+    },
+    inputLabels: function() {
+        return "Control"
+    },
     oneditprepare: function () {
         configureTypedFields(false, [
             {name: 'receiverQueueSize', type: 'num'},
             {name: 'readCompacted', type: 'bool'},
         ])
         type StartMessage = import("../PulsarDefinition").StartMessage
-        configureOptionalEnumField<StartMessage>(false, true, 'subscriptionType', ['Earliest', 'Latest'])
+        configureOptionalEnumField<StartMessage>(false, true, 'startMessage', ['Earliest', 'Latest'])
         type CryptoFailureAction = import("pulsar-client").ConsumerCryptoFailureAction
         configureOptionalEnumField<CryptoFailureAction>(false, true, 'cryptoFailureAction', ['FAIL', 'DISCARD'])
     }
