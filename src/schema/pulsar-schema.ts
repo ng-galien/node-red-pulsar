@@ -1,8 +1,26 @@
 import * as NodeRED from 'node-red'
 import {PulsarSchemaConfig, PulsarSchemaId} from "../PulsarDefinition";
 import {SchemaInfo, SchemaType} from "pulsar-client";
-import {parseMandatoryEnum} from "../PulsarConfig";
+import {parseMandatoryChoice} from "../PulsarConfig";
 
+const SchemaTypeChoice: SchemaType[] = [
+    'None',
+    'String',
+    'Json',
+    'Protobuf',
+    'Avro',
+    'Boolean',
+    'Int8',
+    'Int16',
+    'Int32',
+    'Int64',
+    'Float32',
+    'Float64',
+    'KeyValue',
+    'Bytes',
+    'AutoConsume',
+    'AutoPublish'
+]
 
 /**
  * Creates a schema information object from the provided configuration.
@@ -20,8 +38,8 @@ import {parseMandatoryEnum} from "../PulsarConfig";
  */
 function createSchemaInfo(config: PulsarSchemaConfig): SchemaInfo {
     return {
-        name: config.name,
-        schemaType: parseMandatoryEnum<SchemaType>(config.type),
+        name: config.schemaName,
+        schemaType: parseMandatoryChoice<SchemaType>(SchemaTypeChoice, config.schemaType),
         schema: config.schema,
         properties: undefined
     }

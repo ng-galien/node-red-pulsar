@@ -7,7 +7,7 @@ import {
     SubscriptionType
 } from "pulsar-client";
 
-import { v4 } from 'uuid';
+const { v4: uuidv4 } = require('uuid');
 
 /**
  * Parses a string representation of a number into a number.
@@ -164,14 +164,14 @@ export function consumerConfig(config: PulsarConsumerConfig): ConsumerConfig {
         topic: topic.single,
         topics: topic.list,
         topicsPattern: topic.pattern,
-        subscription: config.subscription || 'consumer-' + v4(),
+        subscription: config.subscription || 'consumer-' + uuidv4(),
         subscriptionType: parseMandatoryChoice<SubscriptionType>(['Exclusive', 'Shared', 'KeyShared', 'Failover'], config.subscriptionType),
         subscriptionInitialPosition: parseChoice<InitialPosition>(['Latest', 'Earliest'], config.subscriptionInitialPosition),
         ackTimeoutMs: parseNumber(config.ackTimeoutMs),
         nAckRedeliverTimeoutMs: parseNumber(config.nAckRedeliverTimeoutMs),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
         receiverQueueSizeAcrossPartitions: parseNumber(config.receiverQueueSizeAcrossPartitions),
-        consumerName: config.consumerName || 'consumer-' + v4(),
+        consumerName: config.consumerName || 'consumer-' + uuidv4(),
         properties: undefined,
         readCompacted: parseBoolean(config.readCompacted),
         privateKeyPath: parseNonEmptyString(config.privateKeyPath),

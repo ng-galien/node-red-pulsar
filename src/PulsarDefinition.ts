@@ -4,6 +4,7 @@ import * as EditorClient from '@node-red/editor-client'
 import {AuthenticationOauth2, AuthenticationTls, AuthenticationToken, Message, SchemaType} from 'pulsar-client'
 
 
+
 //Authentication
 type PulsarAuthenticationType = 'none' | 'token' | 'oauth2' | 'tls'
 

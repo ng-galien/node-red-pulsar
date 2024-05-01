@@ -17,7 +17,7 @@
     "format": "eslint --max-warnings=0 --fix src/**/*.ts",
     "lint": "eslint src/**/*.ts",
     "deploy": "PROJECT_DIR=$(pwd) && cd ~/.node-red && npm install $PROJECT_DIR",
-    "test": "cross-env TS_NODE_COMPILER_OPTIONS='{\"module\": \"CommonJS\" }' mocha -r ts-node/register 'test/**/*.spec.ts'"
+    "test": "ts-mocha --exit -p tsconfig.json test/**/*.spec.ts"
   },
   "node-red": {
     "nodes": {

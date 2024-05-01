@@ -1,67 +1,49 @@
 import helper, {TestFlowsItem} from "node-red-node-test-helper";
-import pulsarConsumerNode from "../src/consumer/pulsar-consumer";
-// import pulsarProducerNode from "../src/producer/pulsar-producer";
-import pulsarClientNode from "../src/client/pulsar-client";
-import pulsarSchemaNode from "../src/schema/pulsar-schema";
-import Pulsar, {Client} from 'pulsar-client';
+// @ts-ignore
+import pulsarConsumerNode from "../../src/consumer/pulsar-consumer";
+// @ts-ignore
+import pulsarProducerNode from "../../src/producer/pulsar-producer";
+// @ts-ignore
+import pulsarClientNode from "../../src/client/pulsar-client";
+import pulsarSchemaNode from "../../src/schema/pulsar-schema";
+// @ts-ignore
+import Pulsar, {Client, SchemaInfo} from 'pulsar-client';
 import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
+// @ts-ignore
 import {
     PulsarClientConfig,
-    PulsarClientId,
-    PulsarConsumerConfig, PulsarSchemaConfig,
+    PulsarClientId, PulsarConsumerConfig,
+    PulsarSchemaConfig,
     PulsarSchemaId
-} from "../src/PulsarDefinition";
+} from "../../src/PulsarDefinition";
 import {Node} from "node-red";
 import { v4 } from 'uuid';
 import {Logger} from "tslog";
 import axios from "axios";
 
-const log = new Logger();
+const logger = new Logger();
 
-function createPulsarContainer(done: (err?: String) => void, callback: (cont: StartedTestContainer) => void) {
-    new GenericContainer("apachepulsar/pulsar")
+async function createPulsarContainer() {
+    logger.info("Starting pulsar container")
+    return new GenericContainer("apachepulsar/pulsar")
         .withCommand(["bin/pulsar", "standalone"])
         .withExposedPorts(6650, 8080)
         .withWaitStrategy(Wait.forHttp("/admin/v2/persistent/public/default", 8080))
         .start()
-        .then(function (container) {
-            log.info("Pulsar container started")
-            callback(container);
-        })
-        .catch(function (error) {
-            log.error(error);
-            done(error);
-        });
 }
 
-function stopPulsarContainer(container: StartedTestContainer, done: (err?: string) => void) {
-    container.stop()
-        .then(function () {
-            log.info("Pulsar container stopped");
-            done();
-        })
-        .catch(function (reason) {
-            log.error(reason);
-            done(reason);
-        });
+async function stopPulsarContainer(container: StartedTestContainer) {
+    console.log("Stopping pulsar container")
+    return container.stop()
 }
 
-function createTopic(container: StartedTestContainer, topic: string, done: (err?: string) => void, callback: () => void) {
-    const serviceUrl = "http://localhost:" + container.getMappedPort(8080);
+async function createTopic(brokerUrl: String, topic: string) {
     const config = {
         headers: {
             'Content-Type': 'application/json'
         }
     }
-    axios.put(serviceUrl + '/admin/v2/persistent/public/default/' + topic, {}, config)
-        .then(function () {
-            log.info("Topic created");
-            callback();
-        })
-        .catch(function (reason) {
-            log.error("Error creating topic");
-            done(reason);
-        });
+    return axios.put(brokerUrl + '/admin/v2/persistent/public/default/' + topic, {}, config)
 }
 
 
@@ -77,11 +59,13 @@ const jsonSchema = {
 
 helper.init(require.resolve('node-red'));
 
-function clientConf(pulsarPort: number): TestFlowsItem<PulsarClientConfig> {
+let container: StartedTestContainer;
+// @ts-ignore
+function clientConf(): TestFlowsItem<PulsarClientConfig> {
     return {
         id: "client",
         type: PulsarClientId,
-        serviceUrl: "pulsar://localhost:" + pulsarPort
+        serviceUrl: "pulsar://localhost:" + container.getMappedPort(6650)
     }
 }
 
@@ -89,6 +73,7 @@ function schemaConf(): TestFlowsItem<PulsarSchemaConfig> {
     return {
         id: "schema",
         type: PulsarSchemaId,
+        schemaName: "sample",
         schemaType: "Json",
         schema: JSON.stringify(jsonSchema)
     }
@@ -96,58 +81,63 @@ function schemaConf(): TestFlowsItem<PulsarSchemaConfig> {
 
 describe('Pulsar Consumer/Producer', function () {
 
-    let pulsarPort = 6650;
     const topic = "tests-" + v4();
-    // @ts-ignore
-    const producerName = "tests-" + v4();
 
-    let container: StartedTestContainer;
-
-    before(function (done) {
+    before(async function () {
+        logger.info('Before')
         this.timeout(60000);
-        createPulsarContainer(done, function (pulsar) {
-            pulsarPort = pulsar.getMappedPort(6650);
-            container = pulsar;
-            createTopic(pulsar, topic, done, function () {
-                console.log("Starting node-red server")
-                helper.startServer(done);
-            });
-        });
+        const pulsar = await createPulsarContainer();
+        container = pulsar;
+        const brokerUrl = "http://localhost:" + pulsar.getMappedPort(8080);
+        return createTopic(brokerUrl, topic);
     });
 
     afterEach(function(done) {
+        logger.info('AfterEach')
         helper.unload().then(function() {
             done();
         });
     });
 
-    after( function(done) {
-        helper.stopServer(function () {
-            if(container) {
-                stopPulsarContainer(container, done);
-            } else {
-                done();
-            }
-        });
+    after( async function () {
+        logger.info('After')
+        await stopPulsarContainer(container)
+        return new Promise<void>((resolve) => {
+            helper.stopServer(resolve);
+        })
     });
 
-    it('Client should initialized',  function (done) {
-        helper.load([pulsarClientNode], [clientConf(pulsarPort)], function () {
-            try {
-                //Wait for status message
-                const node = helper.getNode("client") as Node<Client>;
-                node.should.not.be.null;
-                const client = node.credentials;
-                client.should.not.be.null;
-                client.should.be.an.instanceOf(Pulsar.Client);
-                done();
-            } catch (err) {
-                done(err);
-            }
-        });
+    it('Schema should be loaded',  async function () {
+        await helper.load([pulsarSchemaNode], [schemaConf()]);
+        const node = helper.getNode("schema") as Node<Pulsar.SchemaInfo>;
+        node.should.not.be.null;
+        const schema: SchemaInfo = node.credentials;
+        schema.should.not.be.null;
+        const expectedSchema: SchemaInfo = {
+            name: "sample",
+            schemaType: "Json",
+            schema: JSON.stringify(jsonSchema)
+        }
+        // @ts-ignore
+        schema.name.should.be.equal(expectedSchema.name);
+        schema.schemaType.should.be.equal(expectedSchema.schemaType);
+        // @ts-ignore
+        schema.schema.should.be.equal(expectedSchema.schema);
+        logger.info("Schema loaded")
+    })
+
+    it('Client should initialize',  async function () {
+        await helper.load([pulsarClientNode], [clientConf()]);
+        const node = helper.getNode("client") as Node<Client>;
+        node.should.not.be.null;
+        const client: Client = node.credentials;
+        client.should.not.be.null;
+        client.should.be.an.instanceOf(Pulsar.Client);
+        logger.info("Client loaded")
     });
 
-    it('Consumer should be loaded',  function (done) {
+    it('Consumer should be loaded',  async function () {
+        const subscriptionName = "test-" + v4();
         const consumerConf: TestFlowsItem<PulsarConsumerConfig> = {
             id: "consumer",
             type: "pulsar-consumer",
@@ -155,38 +145,54 @@ describe('Pulsar Consumer/Producer', function () {
             schemaNodeId: "schema",
             topic: topic,
             subscriptionType: "Shared",
+            subscription: subscriptionName,
             wires: [[], ["status"]]
         }
         const flow = [
-            clientConf(pulsarPort), schemaConf(), consumerConf, { id: "status", type: "helper" }
+            clientConf(), schemaConf(), consumerConf, { id: "status", type: "helper" }
         ];
-        helper.load([pulsarClientNode, pulsarSchemaNode, pulsarConsumerNode], flow, function () {
+        await helper.load([pulsarClientNode, pulsarSchemaNode, pulsarConsumerNode], flow);
+        const status = helper.getNode("status");
+        status.should.not.be.null;
+        const test = new Promise<void>((resolve, reject) => {
+            const status = helper.getNode("status");
             try {
-                //Wait for status message
-                const status = helper.getNode("status");
                 status.on("input", function (msg) {
                     try {
-                        //console.log("Message received", msg);
+                        logger.info("Message received", msg);
                         msg.should.have.property('topic');
-                        // msg.topic.should.be.equal('pulsar');
-                        // msg.should.have.property('payload');
-                        // msg.payload.should.have.property('type');
-                        // msg.payload.type.should.be.equal('consumer');
-                        // msg.payload.should.have.property('status');
-                        // msg.payload.status.should.be.equal('ready');
-                        // msg.payload.should.have.property('topic');
-                        // msg.payload.topic.should.be.equal(topic);
-                        // msg.payload.should.have.property('subscription');
-                        // msg.payload.subscription.should.be.equal(consumerSubscription);
-                        done();
+                        // @ts-ignore
+                        msg.topic.should.be.equal('pulsar');
+                        msg.should.have.property('payload');
+                        // @ts-ignore
+                        msg.payload.should.have.property('type');
+                        // @ts-ignore
+                        msg.payload.type.should.be.equal('consumer');
+                        // @ts-ignore
+                        msg.payload.should.have.property('status');
+                        // @ts-ignore
+                        msg.payload.status.should.be.equal('ready');
+                        // @ts-ignore
+                        msg.payload.should.have.property('topic');
+                        // @ts-ignore
+                        msg.payload.topic.should.be.equal(topic);
+                        // @ts-ignore
+                        msg.payload.should.have.property('subscription');
+                        // @ts-ignore
+                        msg.payload.subscription.should.be.equal(subscriptionName);
+                        logger.info("Consumer loaded")
+                        resolve();
                     } catch (err) {
-                        done(err);
+                        logger.error(err);
+                        reject(err);
                     }
                 });
             } catch (err) {
-                done(err);
+                logger.error(err);
+                reject(err);
             }
         });
+        await test;
     });
 
     // it('Producer should be loaded',  function (done) {
