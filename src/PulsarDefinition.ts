@@ -1,12 +1,7 @@
 import * as NodeRED from 'node-red'
+import {NodeMessage} from 'node-red'
 import * as EditorClient from '@node-red/editor-client'
-import {
-    AuthenticationOauth2,
-    AuthenticationTls,
-    AuthenticationToken, Message,
-    SchemaType
-} from 'pulsar-client'
-import {NodeMessage} from "node-red";
+import {AuthenticationOauth2, AuthenticationTls, AuthenticationToken, Message, SchemaType} from 'pulsar-client'
 
 
 //Authentication
@@ -195,76 +190,6 @@ export const PulsarProducerId: string = "pulsar-producer"
  */
 export const PulsarReaderId: string = "pulsar-reader"
 
-/**
- * Parses a string representation of a number into a number.
- *
- * @param {string} value - The string representation of the number to parse.
- * @return {number | undefined} - The parsed number or undefined if the input value is not a valid number.
- */
-export function parseNumber(value?: string): number | undefined {
-    const num = Number(value)
-    return isNaN(num) ? undefined : num
-}
-
-
-/**
- * Parses a string value to a boolean. Returns `true` if the value is 'true', `false` if the value is 'false', or `undefined` if the value is neither 'true' nor 'false'.
- *
- * @param {string} value - The string value to parse.
- * @return {boolean|undefined} - The parsed boolean value. Returns `true` if the value is 'true', `false` if the value is 'false', or `undefined` if the value is neither 'true' nor 'false'.
- */
-export function parseBoolean(value?: string): boolean | undefined {
-    if (value === 'true') {
-        return true
-    }
-    if (value === 'false') {
-        return false
-    }
-    return undefined
-}
-
-
-/**
- * Parses a string value and returns the value if it is not empty, otherwise returns undefined.
- *
- * @param {string} value - The string value to be parsed.
- *
- * @return {string | undefined} - The parsed string value. If value is not empty, returns the value. Otherwise, returns undefined.
- */
-export function parseString(value?: string): string | undefined {
-    if (value) {
-        return value === '' ? undefined : value
-    }
-    return undefined
-}
-
-/**
- * Parses a string value and returns the value if it is not empty, otherwise throws an error.
- *
- * @param {string} value - The string value to be parsed.
- *
- * @return {string} - The parsed string value. If value is not empty, returns the value. Otherwise, throws an error.
- */
-export function parseEnum<T extends string>(value?: string): T | undefined {
-    if (value) {
-        return value as T
-    }
-    return undefined
-}
-
-/**
- * Parses a string value and returns the value if it is not empty, otherwise throws an error.
- *
- * @param {string} value - The string value to be parsed.
- *
- * @return {string} - The parsed string value. If value is not empty, returns the value. Otherwise, throws an error.
- */
-export function parseMandatoryEnum<T extends string>(value?: string): T {
-    if (value) {
-        return value as T
-    }
-    throw new Error('Missing mandatory enum value')
-}
 
 export interface DecodedPulsarMessage extends NodeMessage {
     messageId: string

@@ -1,25 +1,28 @@
 import * as NodeRED from 'node-red'
 import {
-    parseBoolean,
-    parseEnum, parseMandatoryEnum,
-    parseNumber,
-    parseString,
     PulsarConsumerConfig,
     PulsarConsumerId, readPulsarMessage
 } from "../PulsarDefinition";
 import {
     Consumer,
     ConsumerConfig,
-    ConsumerCryptoFailureAction,
-    InitialPosition, Message,
-    RegexSubscriptionMode,
-    SubscriptionType
+    Message
 } from "pulsar-client";
 import {requireClient, requireSchema} from "../PulsarNode";
-import uuid from 'uuid';
+import {
+    consumerConfig
+} from "../PulsarConfig";
 
 type ConsumerNode = NodeRED.Node<Consumer>
 
+/**
+ * Sets up a listener for consuming messages from Pulsar
+ *
+ * @param {PulsarConsumerConfig} config - The configuration for the Pulsar consumer
+ * @param {ConsumerNode} node - The consumer node to handle the received messages
+ *
+ * @return {ConsumerConfig} - The configuration for the consumer, including the listener
+ */
 function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): ConsumerConfig {
     const listener = (pulsarMessage: Message, consumer: Consumer) => {
         node.log('Message received' + pulsarMessage)
@@ -34,28 +37,8 @@ function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): Consum
         })
     }
     return {
-        topic: config.topic,
-        topics: undefined,
-        topicsPattern: undefined,
-        subscription: config.subscription || 'consumer-' + uuid.v4(),
-        subscriptionType: parseMandatoryEnum<SubscriptionType>(config.subscriptionType),
-        subscriptionInitialPosition: parseEnum<InitialPosition>(config.subscriptionInitialPosition),
-        ackTimeoutMs: parseNumber(config.ackTimeoutMs),
-        nAckRedeliverTimeoutMs: parseNumber(config.nAckRedeliverTimeoutMs),
-        receiverQueueSize: parseNumber(config.receiverQueueSize),
-        receiverQueueSizeAcrossPartitions: parseNumber(config.receiverQueueSizeAcrossPartitions),
-        consumerName: config.consumerName || 'consumer-' + uuid.v4(),
-        properties: undefined,
         listener: listener,
-        readCompacted: parseBoolean(config.readCompacted),
-        privateKeyPath: parseString(config.privateKeyPath),
-        cryptoFailureAction: parseEnum<ConsumerCryptoFailureAction>(config.cryptoFailureAction),
-        maxPendingChunkedMessage: parseNumber(config.maxPendingChunkedMessage),
-        autoAckOldestChunkedMessageOnQueueFull: parseNumber(config.autoAckOldestChunkedMessageOnQueueFull),
-        batchIndexAckEnabled: parseBoolean(config.batchIndexAckEnabled),
-        regexSubscriptionMode: parseEnum<RegexSubscriptionMode>(config.regexSubscriptionMode),
-        deadLetterPolicy: undefined,
-        batchReceivePolicy: undefined
+        ...consumerConfig(config)
     }
 }
 

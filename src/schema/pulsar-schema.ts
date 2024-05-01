@@ -1,6 +1,7 @@
 import * as NodeRED from 'node-red'
-import {parseMandatoryEnum, PulsarSchemaConfig, PulsarSchemaId} from "../PulsarDefinition";
+import {PulsarSchemaConfig, PulsarSchemaId} from "../PulsarDefinition";
 import {SchemaInfo, SchemaType} from "pulsar-client";
+import {parseMandatoryEnum} from "../PulsarConfig";
 
 
 /**

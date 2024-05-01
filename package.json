@@ -17,7 +17,7 @@
     "format": "eslint --max-warnings=0 --fix src/**/*.ts",
     "lint": "eslint src/**/*.ts",
     "deploy": "PROJECT_DIR=$(pwd) && cd ~/.node-red && npm install $PROJECT_DIR",
-    "test": "cross-env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'src/**/*.spec.ts'"
+    "test": "cross-env TS_NODE_COMPILER_OPTIONS='{\"module\": \"CommonJS\" }' mocha -r ts-node/register 'test/**/*.spec.ts'"
   },
   "node-red": {
     "nodes": {
@@ -39,9 +39,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/uuid": "^9.0.8",
     "avsc": "^5.7.7",
     "pulsar-client": "^1.11.0",
     "save-dev": "^0.0.1-security",
+    "tslog": "^4.9.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -52,7 +54,7 @@
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
     "axios": "^1.6.3",
-    "chai": "^5.1.0",
+    "chai": "^4.4.1",
     "chai-wait-for": "^2.0.2",
     "cpx": "^1.5.0",
     "cross-env": "^7.0.3",
@@ -62,6 +64,7 @@
     "node-red-node-test-helper": "^0.3.3",
     "standard-version": "^9.5.0",
     "testcontainers": "^10.9.0",
+    "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }

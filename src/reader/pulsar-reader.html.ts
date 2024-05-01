@@ -19,9 +19,9 @@ RED.nodes.registerType<PulsarReaderEditorConfig>(READER_ID, {
         privateKeyPath: {value: '', required: false},
         cryptoFailureAction: {value: 'FAIL', required: false},
     },
-    label: function (this: EditorNode) {
-        return this.name || this.topic || 'pulsar-reader'
-    },
+    // label: function (this: EditorNode) {
+    //     return this.name || this.topic || 'pulsar-reader'
+    // },
     oneditprepare: function () {
         configureTypedFields(false, [
             {name: 'receiverQueueSize', type: 'num'},

@@ -1,9 +1,5 @@
 import * as NodeRED from "node-red";
 import {
-    parseBoolean,
-    parseEnum,
-    parseNumber,
-    parseString,
     PulsarProducerConfig,
     PulsarProducerId
 } from "../PulsarDefinition";
@@ -16,13 +12,14 @@ import {
     ProducerCryptoFailureAction
 } from "pulsar-client";
 import {requireClient, requireSchema} from "../PulsarNode";
+import {parseBoolean, parseEnum, parseNumber, parseNonEmptyString} from "../PulsarConfig";
 
 type ProducerNode = NodeRED.Node<Producer>
 
 function createConfig(config: PulsarProducerConfig): ProducerConfig {
     return {
         topic: config.topic,
-        producerName: parseString(config.producerName),
+        producerName: parseNonEmptyString(config.producerName),
         sendTimeoutMs: parseNumber(config.sendTimeoutMs),
         initialSequenceId: parseNumber(config.initialSequenceId),
         maxPendingMessages: parseNumber(config.maxPendingMessages),
@@ -35,8 +32,8 @@ function createConfig(config: PulsarProducerConfig): ProducerConfig {
         batchingMaxPublishDelayMs: parseNumber(config.batchingMaxPublishDelayMs),
         batchingMaxMessages: parseNumber(config.batchingMaxMessages),
         properties: undefined,
-        publicKeyPath: parseString(config.publicKeyPath),
-        encryptionKey: parseString(config.encryptionKey),
+        publicKeyPath: parseNonEmptyString(config.publicKeyPath),
+        encryptionKey: parseNonEmptyString(config.encryptionKey),
         cryptoFailureAction: parseEnum<ProducerCryptoFailureAction>(config.cryptoFailureAction),
         chunkingEnabled: parseBoolean(config.chunkingEnabled),
         accessMode: parseEnum<ProducerAccessMode>(config.accessMode),

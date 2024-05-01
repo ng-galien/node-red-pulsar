@@ -10,12 +10,10 @@ import {
 import {
     AuthenticationImpl,
     NoAuthentication,
-    parseBoolean,
-    parseNumber,
-    parseString,
     PulsarClientConfig,
     PulsarClientId
 } from "../PulsarDefinition";
+import {parseBoolean, parseNumber, parseNonEmptyString} from "../PulsarConfig";
 
 type ClientAuthentication = AuthenticationToken | AuthenticationOauth2 | AuthenticationTls | undefined
 
@@ -36,7 +34,7 @@ function createPulsarConfigNode(auth: AuthenticationNode, config: PulsarClientCo
         tlsValidateHostname: parseBoolean(config.tlsValidateHostname),
         tlsAllowInsecureConnection: parseBoolean(config.tlsAllowInsecureConnection),
         statsIntervalInSeconds: parseNumber(config.statsIntervalInSeconds),
-        listenerName: parseString(config.listenerName)
+        listenerName: parseNonEmptyString(config.listenerName)
     }
 }
 

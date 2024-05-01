@@ -2,12 +2,9 @@ import * as NodeRED from "node-red";
 import {ConsumerCryptoFailureAction, Message, MessageId, Reader, ReaderConfig} from "pulsar-client";
 import {requireClient} from "../PulsarNode";
 import {
-    parseBoolean,
-    parseEnum,
-    parseNumber,
-    parseString,
     PulsarReaderConfig, PulsarReaderId, readPulsarMessage
 } from "../PulsarDefinition";
+import {parseBoolean, parseEnum, parseNumber, parseNonEmptyString} from "../PulsarConfig";
 
 type ReaderNode = NodeRED.Node<Reader>
 
@@ -22,11 +19,11 @@ function createConfig(config: PulsarReaderConfig, node: ReaderNode): ReaderConfi
         topic: config.topic,
         startMessageId: startMessage(),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
-        readerName: parseString(config.readerName),
-        subscriptionRolePrefix: parseString(config.subscriptionRolePrefix),
+        readerName: parseNonEmptyString(config.readerName),
+        subscriptionRolePrefix: parseNonEmptyString(config.subscriptionRolePrefix),
         readCompacted: parseBoolean(config.readCompacted),
         listener: listener,
-        privateKeyPath: parseString(config.privateKeyPath),
+        privateKeyPath: parseNonEmptyString(config.privateKeyPath),
         cryptoFailureAction: parseEnum<ConsumerCryptoFailureAction>(config.cryptoFailureAction)
     }
 }
