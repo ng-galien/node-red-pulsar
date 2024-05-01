@@ -1,102 +1,50 @@
 import helper, {TestFlowsItem} from "node-red-node-test-helper";
-// @ts-ignore
-import pulsarConsumerNode from "../../src/consumer/pulsar-consumer";
-// @ts-ignore
-import pulsarProducerNode from "../../src/producer/pulsar-producer";
-// @ts-ignore
 import pulsarClientNode from "../../src/client/pulsar-client";
 import pulsarSchemaNode from "../../src/schema/pulsar-schema";
-// @ts-ignore
+import pulsarProducerNode from "../../src/producer/pulsar-producer";
+import pulsarConsumerNode from "../../src/consumer/pulsar-consumer";
+import pulsarReaderNode from "../../src/reader/pulsar-reader";
 import Pulsar, {Client, SchemaInfo} from 'pulsar-client';
 import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
 // @ts-ignore
 import {
     PulsarClientConfig,
-    PulsarClientId, PulsarConsumerConfig,
+    PulsarClientId,
+    PulsarConsumerConfig, PulsarConsumerId,
+    PulsarProducerConfig, PulsarProducerId,
+    PulsarReaderConfig, PulsarReaderId,
     PulsarSchemaConfig,
     PulsarSchemaId
 } from "../../src/PulsarDefinition";
 import {Node} from "node-red";
-import { v4 } from 'uuid';
+import {v4} from 'uuid';
 import {Logger} from "tslog";
 import axios from "axios";
 import {expect} from "chai";
 
 const logger = new Logger();
 
-async function createPulsarContainer() {
-    logger.info("Starting pulsar container")
-    return new GenericContainer("apachepulsar/pulsar")
-        .withCommand(["bin/pulsar", "standalone"])
-        .withExposedPorts(6650, 8080)
-        .withWaitStrategy(Wait.forHttp("/admin/v2/persistent/public/default", 8080))
-        .start()
-}
+describe('Pulsar Integration Test', function () {
 
-async function stopPulsarContainer(container: StartedTestContainer) {
-    console.log("Stopping pulsar container")
-    return container.stop()
-}
-
-async function createTopic(brokerUrl: String, topic: string) {
-    const config = {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-    return axios.put(brokerUrl + '/admin/v2/persistent/public/default/' + topic, {}, config)
-}
-
-
-// @ts-ignore
-const jsonSchema = {
-    type: "record",
-    name: "Test",
-    fields: [
-        {name: "name", type: "string"},
-        {name: "age", type: "int"}
-    ]
-};
-
-helper.init(require.resolve('node-red'));
-
-let container: StartedTestContainer;
-// @ts-ignore
-function clientConf(): TestFlowsItem<PulsarClientConfig> {
-    return {
-        id: "client",
-        type: PulsarClientId,
-        serviceUrl: "pulsar://localhost:" + container.getMappedPort(6650)
-    }
-}
-
-function schemaConf(): TestFlowsItem<PulsarSchemaConfig> {
-    return {
-        id: "schema",
-        type: PulsarSchemaId,
-        schemaName: "sample",
-        schemaType: "Json",
-        schema: JSON.stringify(jsonSchema)
-    }
-}
-
-describe('Pulsar Consumer/Producer', function () {
-
-    const topic = "tests-" + v4();
+    const topic = "it-" + v4();
+    let container: StartedTestContainer;
 
     before(async function () {
         logger.info('Before')
         this.timeout(60000);
-        const pulsar = await createPulsarContainer();
-        container = pulsar;
-        const brokerUrl = "http://localhost:" + pulsar.getMappedPort(8080);
-        return createTopic(brokerUrl, topic);
+        container = await createPulsarContainer();
+        return createTopic(container, topic);
     });
+
+    beforeEach(function(done) {
+        logger.info('BeforeEach')
+        helper.startServer(done);
+    })
 
     afterEach(function(done) {
         logger.info('AfterEach')
         helper.unload().then(function() {
-            done();
+            helper.stopServer(done);
         });
     });
 
@@ -124,7 +72,7 @@ describe('Pulsar Consumer/Producer', function () {
     })
 
     it('Client should initialize',  async function () {
-        await helper.load([pulsarClientNode], [clientConf()]);
+        await helper.load([pulsarClientNode], [clientConf(container)]);
         const node = helper.getNode("client") as Node<Client>;
         node.should.not.be.null;
         const client: Client = node.credentials;
@@ -133,226 +81,260 @@ describe('Pulsar Consumer/Producer', function () {
         logger.info("Client loaded")
     });
 
-    it('Consumer should be loaded',  async function () {
-        const subscriptionName = "test-" + v4();
-        const consumerConf: TestFlowsItem<PulsarConsumerConfig> = {
-            id: "consumer",
-            type: "pulsar-consumer",
-            clientNodeId: "client",
-            schemaNodeId: "schema",
-            topic: topic,
-            subscriptionType: "Shared",
-            subscription: subscriptionName,
-            wires: [[], ["status"]]
-        }
+    it('Producer should be loaded',  async function () {
+        const producerName = "test-producer-" + v4()
         const flow = [
-            clientConf(), schemaConf(), consumerConf, { id: "status", type: "helper" }
-        ];
+            clientConf(container), schemaConf(), producerConf(topic, producerName), statusConf()
+        ]
+        await helper.load([pulsarClientNode, pulsarSchemaNode, pulsarProducerNode], flow)
+        const status = helper.getNode("status")
+        status.should.not.be.null
+        const expected = {
+            type: "producer",
+            status: "ready",
+            topic: topic,
+            producerName: producerName
+        }
+        await expectPayload("status", expected)
+    });
+
+    it('Consumer should be loaded',  async function () {
+        const subscriptionName = "test-" + v4()
+        const flow = [
+            clientConf(container), schemaConf(), consumerConf(topic, subscriptionName), statusConf(), receiverConf()
+        ]
         await helper.load([pulsarClientNode, pulsarSchemaNode, pulsarConsumerNode], flow);
+        const expected = {
+            type: "consumer",
+            status: "ready",
+            topic: topic,
+            subscription: subscriptionName,
+            subscriptionType: "Shared"
+        }
+        await expectPayload("status", expected)
+    });
+
+    it('Reader should be loaded',  async function () {
+        const flow = [
+            clientConf(container), schemaConf(), readerConf(topic), statusConf(), receiverConf()
+        ]
+        await helper.load([pulsarClientNode, pulsarSchemaNode, pulsarReaderNode], flow);
+        const expected = {
+            type: "reader",
+            status: "ready",
+            topic: topic
+        }
+        await expectPayload("status", expected)
+    })
+
+    it('Consumer should receive a message',  async function () {
+        const subscriptionName = "test-" + v4()
+        const flow = [
+            clientConf(container), schemaConf(), consumerConf(topic, subscriptionName), receiverConf()
+        ]
+        await helper.load([pulsarClientNode, pulsarSchemaNode, pulsarConsumerNode], flow);
+        const name = "test"+Math.random();
+        const age = Math.floor(Math.random() * 100);
+        const message = {
+            name: name,
+            age: age
+        };
+        await sendMsgToBroker(container, topic, message);
+        await expectPayload("receiver", message)
+    })
+
+    it('Reader should receive a message',  async function () {
+        const flow = [
+            clientConf(container), schemaConf(), readerConf(topic), receiverConf()
+        ]
+        await helper.load([pulsarClientNode, pulsarSchemaNode, pulsarReaderNode], flow);
+        const name = "test"+Math.random();
+        const age = Math.floor(Math.random() * 100);
+        const message = {
+            name: name,
+            age: age
+        };
+        await sendMsgToBroker(container, topic, message);
+        await expectPayload("receiver", message)
+    })
+
+    it('Producer should send a message to consumer',  async function () {
+        const producerName = "test-producer-" + v4()
+        const subscriptionName = "test-" + v4()
+        const flow = [
+            clientConf(container), schemaConf(), producerConf(topic, producerName), consumerConf(topic, subscriptionName), statusConf(), receiverConf()
+        ]
+        await helper.load([pulsarClientNode, pulsarSchemaNode, pulsarProducerNode, pulsarConsumerNode], flow);
+        const name = "test"+Math.random();
+        const age = Math.floor(Math.random() * 100);
+        const message = {
+            name: name,
+            age: age
+        };
+        const producer = helper.getNode("producer");
+        producer.should.not.be.null;
         const status = helper.getNode("status");
         status.should.not.be.null;
-        const test = new Promise<void>((resolve, reject) => {
-            const status = helper.getNode("status");
-            try {
-                status.on("input", function (msg) {
-                    try {
-                        logger.debug("Message received", msg);
-                        const expected = {
-                            type: "consumer",
-                            status: "ready",
-                            topic: topic,
-                            subscription: subscriptionName,
-                            subscriptionType: "Shared"
-                        }
-                        expect(msg.payload).to.be.eql(expected);
-                        resolve();
-                    } catch (err) {
-                        logger.error(err);
-                        reject(err);
-                    }
-                });
-            } catch (err) {
-                logger.error(err);
-                reject(err);
-            }
+        status.on("input", function () {
+            producer.receive({payload: message});
         });
-        await test;
-    });
+        await expectPayload("receiver", message)
+    })
 
-    // it('Producer should be loaded',  function (done) {
-    //     const producer: TestFlowsItem<PulsarProducerConfig> = {
-    //         id: "producer",
-    //         type: "pulsar-producer",
-    //         clientNodeId: "client",
-    //         schemaNodeId: "schema",
-    //         topic: topic,
-    //         producerName: producerName,
-    //         wires: [["status"]]
-    //     }
-    //     const flow = [
-    //         clientConf(pulsarPort), schemaConf(),
-    //         producer, { id: "status", type: "helper" }
-    //     ];
-    //     helper.load([pulsarClientNode, pulsarSchemaNode, pulsarProducerNode], flow, function () {
-    //         try {
-    //             //Wait for status message
-    //             const status = helper.getNode("status");
-    //             status.on("input", function (msg) {
-    //                 try {
-    //                     //console.log("Message received", msg);
-    //                     msg.should.have.property('topic');
-    //                     // msg.topic.should.be.equal('pulsar');
-    //                     // msg.should.have.property('payload');
-    //                     // msg.payload.should.have.property('type');
-    //                     // msg.payload.type.should.be.equal('producer');
-    //                     // msg.payload.should.have.property('status');
-    //                     // msg.payload.status.should.be.equal('ready');
-    //                     // msg.payload.should.have.property('topic');
-    //                     // msg.payload.topic.should.be.equal(topic);
-    //                     // msg.payload.should.have.property('producerName');
-    //                     // msg.payload.producerName.should.be.equal(producerName);
-    //                     done();
-    //                 } catch (err) {
-    //                     done(err);
-    //                 }
-    //             });
-    //         } catch (err) {
-    //             done(err);
-    //         }
-    //     });
-    // });
-    //
-    // it('Consumer should receive a message',  function (done) {
-    //     const flow = [
-    //         { id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, schema: "schema", subscription: consumerSubscription, wires: [["receiver"]] },
-    //         { id: "config", type: "pulsar-client", serviceUrl: "pulsar://localhost:" + pulsarPort },
-    //         { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
-    //         { id: "receiver", type: "helper"}
-    //     ];
-    //     helper.load([pulsarClientNode, pulsarSchemaNode, pulsarConsumerNode], flow, function () {
-    //         try {
-    //             const name = "test"+Math.random();
-    //             const age = Math.floor(Math.random() * 100);
-    //             const message = {
-    //                 name: name,
-    //                 age: age
-    //             };
-    //             const consumer = helper.getNode("consumer");
-    //             //Node should be loaded
-    //             consumer.should.not.be.null;
-    //             //Send a message
-    //             const receiver = helper.getNode("receiver");
-    //             receiver.should.not.be.null;
-    //             receiver.on("input", function (msg) {
-    //                 try {
-    //                     //console.log("Message received", msg);
-    //                     msg.should.have.property('topic');
-    //                     msg.should.have.property('messageId');
-    //                     msg.should.have.property('publishTime');
-    //                     msg.should.have.property('eventTime');
-    //                     msg.should.have.property('redeliveryCount');
-    //                     msg.should.have.property('partitionKey');
-    //                     msg.should.have.property('properties');
-    //
-    //                     msg.should.have.property('payload');
-    //                     // msg.payload.should.have.property('name');
-    //                     // msg.payload.name.should.be.equal(name);
-    //                     // msg.payload.should.have.property('age');
-    //                     // msg.payload.age.should.be.equal(age);
-    //                     done();
-    //                 } catch (err) {
-    //                     done(err);
-    //                 }
-    //             });
-    //
-    //             sendMsg(pulsarPort, topic, message, done);
-    //         } catch (err) {
-    //             done(err);
-    //         }
-    //     });
-    // });
-    //
-    // it('Producer should send a message to consumer',  function (done) {
-    //     const flow = [
-    //         {id: "producer", type: "pulsar-producer", config: "config", schema: "schema",topic: topic, subscription: consumerSubscription, wires: [["status"]] },
-    //         {id: "consumer", type: "pulsar-consumer", config: "config", topic: topic, name: producerName, wires: [["receiver"], []] },
-    //         {id: "config", type: "pulsar-client", serviceUrl: "pulsar://localhost:" + pulsarPort },
-    //         { id: "schema", type: "pulsar-schema", schemaType: "Json", schema: JSON.stringify(jsonSchema) },
-    //         {id: "status", type: "helper"},
-    //         {id: "receiver", type: "helper"}
-    //     ];
-    //     helper.load([pulsarClientNode,pulsarSchemaNode, pulsarProducerNode, pulsarConsumerNode], flow, function () {
-    //         try {
-    //             const name = "test"+Math.random();
-    //             const age = Math.floor(Math.random() * 100);
-    //             const message = {
-    //                 name: name,
-    //                 age: age
-    //             };
-    //             //const testValue = "tests"+Math.random();
-    //             const producer = helper.getNode("producer");
-    //             //Node should be loaded
-    //             producer.should.not.be.null;
-    //             //Wait for status message and send a message
-    //             const status = helper.getNode("status");
-    //             status.on("input", function () {
-    //                 try {
-    //                     //console.log("Producer status received", msg);
-    //                     // msg.should.have.property('payload');
-    //                     // msg.payload.should.have.property('type');
-    //                     // msg.payload.type.should.be.equal('producer');
-    //                     // msg.payload.should.have.property('status');
-    //                     // msg.payload.status.should.be.equal('ready');
-    //                     producer.receive({payload: message});
-    //                 } catch (err) {
-    //                     done(err);
-    //                 }
-    //             });
-    //             //Receive the message
-    //             const receiver = helper.getNode("receiver");
-    //             receiver.should.not.be.null;
-    //             receiver.on("input", function (msg) {
-    //                 try {
-    //                     //console.log("Message received", msg);
-    //                     msg.should.have.property('payload');
-    //                     // msg.payload.should.have.property('name');
-    //                     // msg.payload.name.should.be.equal(name);
-    //                     // msg.payload.should.have.property('age');
-    //                     // msg.payload.age.should.be.equal(age);
-    //                     done();
-    //                 } catch (err) {
-    //                     done(err);
-    //                 }
-    //             });
-    //         } catch (err) {
-    //             done(err);
-    //         }
-    //     });
-    // });
 });
 
+async function createPulsarContainer() {
+    logger.info("Starting pulsar container")
+    return new GenericContainer("apachepulsar/pulsar")
+        .withCommand(["bin/pulsar", "standalone"])
+        .withExposedPorts(6650, 8080)
+        .withWaitStrategy(Wait.forHttp("/admin/v2/persistent/public/default", 8080))
+        .start()
+}
+
+async function stopPulsarContainer(container: StartedTestContainer) {
+    console.log("Stopping pulsar container")
+    return container.stop()
+}
+
+async function createTopic(broker: StartedTestContainer, topic: string) {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    return axios.put(brokerApiUrl(broker) + '/admin/v2/persistent/public/default/' + topic, {}, config)
+}
+
+const jsonSchema = {
+    type: "record",
+    name: "Test",
+    fields: [
+        {name: "name", type: "string"},
+        {name: "age", type: "int"}
+    ]
+};
+
+helper.init(require.resolve('node-red'));
 
 // @ts-ignore
-function sendMsg(port: number, topic: string, message: { name: string; age: number; }, done: { (err?: string): void; (arg0: any): void; }) {
-    const serviceUrl = "pulsar://localhost:" + port;
+function clientConf(broker: StartedTestContainer): TestFlowsItem<PulsarClientConfig> {
+    return {
+        id: "client",
+        type: PulsarClientId,
+        serviceUrl: brokerUrl(broker)
+    }
+}
+
+function schemaConf(): TestFlowsItem<PulsarSchemaConfig> {
+    return {
+        id: "schema",
+        type: PulsarSchemaId,
+        schemaName: "sample",
+        schemaType: "Json",
+        schema: JSON.stringify(jsonSchema)
+    }
+}
+
+function statusConf() {
+    return {
+        id: "status",
+        type: "helper"
+    }
+}
+
+function receiverConf() {
+    return {
+        id: "receiver",
+        type: "helper"
+    }
+}
+
+function consumerConf(topic: string, sub: string): TestFlowsItem<PulsarConsumerConfig> {
+    return {
+        id: "consumer",
+        type: PulsarConsumerId,
+        clientNodeId: "client",
+        schemaNodeId: "schema",
+        topic: topic,
+        subscriptionType: "Shared",
+        subscription: sub,
+        wires: [["receiver"], ["status"]]
+    }
+}
+
+function readerConf(topic: string): TestFlowsItem<PulsarReaderConfig> {
+    return {
+        id: "reader",
+        type: PulsarReaderId,
+        clientNodeId: "client",
+        schemaNodeId: "schema",
+        topic: topic,
+        startMessage: "Latest",
+        wires: [["receiver"], ["status"]]
+    }
+}
+
+function producerConf(topic: string, producerName: string): TestFlowsItem<PulsarProducerConfig> {
+    return {
+        id: "producer",
+        type: PulsarProducerId,
+        clientNodeId: "client",
+        schemaNodeId: "schema",
+        topic: topic,
+        producerName: producerName,
+        wires: [["status"]]
+    }
+}
+
+function expectPayload(node: string, payload: {}) {
+    const n = helper.getNode(node);
+    n.should.not.be.null;
+    return new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            reject(new Error('Timeout: No message received'));
+        }, 1000); // 5 seconds timeout
+
+        try {
+            n.on("input", function (msg) {
+                clearTimeout(timeout);
+                try {
+                    logger.debug("Message received", msg);
+                    expect(msg.payload).to.be.eql(payload);
+                    resolve();
+                } catch (err) {
+                    logger.error(err);
+                    reject(err);
+                }
+            });
+        } catch (err) {
+            logger.error(err);
+            reject(err);
+        }
+    })
+}
+
+async function sendMsgToBroker(broker: StartedTestContainer, topic: string, message: any) {
     const client = new Pulsar.Client({
-        serviceUrl: serviceUrl,
+        serviceUrl: brokerUrl(broker),
         operationTimeoutSeconds: 30
     });
-    client.createProducer({
-        topic: topic
-    }).then(producer => {
-        //console.log("Producer created");
-        producer.send({
-            data: Buffer.from(JSON.stringify(message))
-        }).then(() => {
-            producer.close();
-            client.close();
-        }).catch(e => {
-            done(e);
-        });
-    }).catch(e => {
-        client.close();
-        done(e);
+    const producer = await client.createProducer({
+        topic: topic,
+        producerName: "test-producer"+v4()
     });
+    await producer.send({
+        data: Buffer.from(JSON.stringify(message)),
+        eventTimestamp: Date.now()
+    });
+    await producer.close();
+    await client.close();
+}
+
+function brokerUrl(broker: StartedTestContainer) {
+    return "pulsar://localhost:" + broker.getMappedPort(6650);
+}
+
+function brokerApiUrl(broker: StartedTestContainer) {
+    return "http://localhost:" + broker.getMappedPort(8080);
 }

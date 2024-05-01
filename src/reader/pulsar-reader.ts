@@ -45,6 +45,15 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.credentials = reader
                 this.log('Reader created: ' + JSON.stringify(reader))
                 this.status({fill: "green", shape: "dot", text: "connected"})
+                const message = {
+                    topic: 'pulsar',
+                    payload: {
+                        type: 'reader',
+                        status: 'ready',
+                        topic: config.topic
+                    }
+                };
+                this.send([null, message]);
             }).catch(e => {
                 this.error('Error creating reader: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
