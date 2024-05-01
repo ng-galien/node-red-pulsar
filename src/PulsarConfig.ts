@@ -1,9 +1,16 @@
-import {PulsarConsumerConfig, PulsarProducerConfig} from "./PulsarDefinition";
+import {PulsarConsumerConfig, PulsarProducerConfig, PulsarReaderConfig} from "./PulsarDefinition";
 import {
     CompressionType,
     ConsumerConfig,
-    ConsumerCryptoFailureAction, HashingScheme,
-    InitialPosition, MessageRoutingMode, ProducerAccessMode, ProducerConfig, ProducerCryptoFailureAction,
+    ConsumerCryptoFailureAction,
+    HashingScheme,
+    InitialPosition,
+    MessageId,
+    MessageRoutingMode,
+    ProducerAccessMode,
+    ProducerConfig,
+    ProducerCryptoFailureAction,
+    ReaderConfig,
     RegexSubscriptionMode,
     SubscriptionType
 } from "pulsar-client";
@@ -49,34 +56,6 @@ export function parseNonEmptyString(value?: string): string | undefined {
         return value === '' ? undefined : value
     }
     return undefined
-}
-
-/**
- * Parses a string value and returns the value if it is not empty, otherwise throws an error.
- *
- * @param {string} value - The string value to be parsed.
- *
- * @return {string} - The parsed string value. If value is not empty, returns the value. Otherwise, throws an error.
- */
-export function parseEnum<T extends string>(value?: string): T | undefined {
-    if (value && value !== '') {
-        return value as T
-    }
-    return undefined
-}
-
-/**
- * Parses a string value and returns the value if it is not empty, otherwise throws an error.
- *
- * @param {string} value - The string value to be parsed.
- *
- * @return {string} - The parsed string value. If value is not empty, returns the value. Otherwise, throws an error.
- */
-export function parseMandatoryEnum<T extends string>(value?: string): T {
-    if (value && value !== '') {
-        return value as T
-    }
-    throw new Error('Missing mandatory enum value')
 }
 
 /**
@@ -207,5 +186,19 @@ export function producerConfig(config: PulsarProducerConfig): ProducerConfig {
         cryptoFailureAction: parseChoice<ProducerCryptoFailureAction>(['FAIL', 'SEND'], config.cryptoFailureAction),
         chunkingEnabled: parseBoolean(config.chunkingEnabled),
         accessMode: parseChoice<ProducerAccessMode>(['Shared', 'Exclusive', 'ExclusiveWithFencing', 'WaitForExclusive'], config.accessMode)
+    }
+}
+
+export function readerConfig(config: PulsarReaderConfig): ReaderConfig {
+    const startMessage = config.startMessage == "Earliest" ? MessageId.earliest : MessageId.latest
+    return {
+        topic: config.topic,
+        startMessageId: startMessage(),
+        receiverQueueSize: parseNumber(config.receiverQueueSize),
+        readerName: parseNonEmptyString(config.readerName),
+        subscriptionRolePrefix: parseNonEmptyString(config.subscriptionRolePrefix),
+        readCompacted: parseBoolean(config.readCompacted),
+        privateKeyPath: parseNonEmptyString(config.privateKeyPath),
+        cryptoFailureAction: parseChoice<ConsumerCryptoFailureAction>(['FAIL', 'DISCARD', 'CONSUME'], config.cryptoFailureAction)
     }
 }

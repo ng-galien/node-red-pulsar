@@ -1,5 +1,5 @@
 // Mocha/Chai and related testing framework packages
-import {assert} from "chai";
+import {expect} from "chai";
 import {describe, it} from "mocha";
 import {PulsarProducerConfig} from "../../src/PulsarDefinition";
 import {ProducerConfig} from "pulsar-client";
@@ -37,13 +37,25 @@ describe("producerConfig", () => {
 
     it("should return a valid producer config", () => {
         const config: ProducerConfig = producerConfig(mockPulsarProducerConfig);
-        const optionalKeys = ["clientNodeId", "id", "schemaNodeId", "type", "z", "name"];
-        assert.typeOf(config, "object");
-        Object.keys(mockPulsarProducerConfig)
-            .filter((key) => !optionalKeys.includes(key))
-            .forEach((key) => {
-                const expectedValue = config[key] === undefined ? "" : mockPulsarProducerConfig[key];
-                assert.strictEqual(expectedValue, mockPulsarProducerConfig[key], `${key} should be equal to given value`);
-            });
+        expect(config).to.be.an("object");
+        expect(config.topic).to.equal("test-topic");
+        expect(config.producerName).to.equal("test-producer");
+        expect(config.sendTimeoutMs).to.equal(500);
+        expect(config.initialSequenceId).to.equal(1);
+        expect(config.maxPendingMessages).to.equal(100);
+        expect(config.maxPendingMessagesAcrossPartitions).to.equal(50);
+        expect(config.blockIfQueueFull).to.be.false;
+        expect(config.messageRoutingMode).to.equal("RoundRobinDistribution");
+        expect(config.hashingScheme).to.equal("Murmur3_32Hash");
+        expect(config.compressionType).to.equal("Zlib");
+        expect(config.batchingEnabled).to.be.false;
+        expect(config.batchingMaxPublishDelayMs).to.equal(100);
+        expect(config.batchingMaxMessages).to.equal(5);
+        expect(config.properties).to.be.undefined;
+        expect(config.publicKeyPath).to.equal("public-key-path");
+        expect(config.encryptionKey).to.equal("key");
+        expect(config.cryptoFailureAction).to.equal("FAIL");
+        expect(config.chunkingEnabled).to.be.false;
+        expect(config.accessMode).to.equal("Shared");
     });
 });
