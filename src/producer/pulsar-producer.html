@@ -6,129 +6,128 @@
 <script type="text/html" data-template-name="pulsar-producer">
 <!--    name-->
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name">
+        <label for="node-input-name" style="width: 25%"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" style="width: 67%">
     </div>
 <!--    clientNodeId-->
     <div class="form-row">
-        <label for="node-input-clientNodeId"><i class="fa fa-cogs"></i> Config</label>
-        <input type="text" id="node-input-clientNodeId">
+        <label for="node-input-clientNodeId" style="width: 25%"><i class="fa fa-cogs"></i> Config</label>
+        <input type="text" id="node-input-clientNodeId" style="width: 67%">
     </div>
 <!--    schemaNodeId-->
     <div class="form-row">
-        <label for="node-input-schemaNodeId"><i class="fa fa-puzzle-piece"></i> Schema</label>
-        <input type="text" id="node-input-schemaNodeId">
+        <label for="node-input-schemaNodeId" style="width: 25%"><i class="fa fa-puzzle-piece"></i> Schema</label>
+        <input type="text" id="node-input-schemaNodeId" style="width: 67%">
     </div>
 <!--    topic-->
     <div class="form-row">
-        <label for="node-input-topic"><i class="fa fa-comments"></i> Topic</label>
-        <input type="text" id="node-input-topic">
+        <label for="node-input-topic" style="width: 25%"><i class="fa fa-comments"></i> Topic</label>
+        <input type="text" id="node-input-topic" style="width: 67%">
     </div>
 <!--    producerName-->
     <div class="form-row">
-        <label for="node-input-producerName"><i class="fa fa-id-badge"></i> Producer Name</label>
-        <input type="text" id="node-input-producerName">
+        <label for="node-input-producerName" style="width: 25%"><i class="fa fa-id-badge"></i> Producer Name</label>
+        <input type="text" id="node-input-producerName" style="width: 67%">
     </div>
 <!--    sendTimeoutMs-->
     <div class="form-row">
-        <label for="node-input-sendTimeoutMs"><i class="fa fa-clock"></i> Send Timeout</label>
+        <label for="node-input-sendTimeoutMs" style="width: 70%"><i class="fa fa-clock-o"></i> Send Timeout</label>
         <input type="text" id="node-input-sendTimeoutMs">
         <input type="hidden" id="node-input-sendTimeoutMs-type">
     </div>
 <!--    initialSequenceId-->
     <div class="form-row">
-        <label for="node-input-initialSequenceId"><i class="fa fa-cogs"></i> Initial Sequence ID</label>
+        <label for="node-input-initialSequenceId" style="width: 70%"><i class="fa fa-cogs"></i> Initial Sequence ID</label>
         <input type="text" id="node-input-initialSequenceId">
         <input type="hidden" id="node-input-initialSequenceId-type">
     </div>
 <!--    maxPendingMessages-->
     <div class="form-row">
-        <label for="node-input-maxPendingMessages"><i class="fa fa-cogs"></i> Max Pending Messages</label>
+        <label for="node-input-maxPendingMessages" style="width: 70%"><i class="fa fa-cogs"></i> Max Pending Messages</label>
         <input type="text" id="node-input-maxPendingMessages">
         <input type="hidden" id="node-input-maxPendingMessages-type">
     </div>
 <!--    maxPendingMessagesAcrossPartitions-->
     <div class="form-row">
-        <label for="node-input-maxPendingMessagesAcrossPartitions"><i class="fa fa-cogs"></i> Max Pending Messages Across Partitions</label>
+        <label for="node-input-maxPendingMessagesAcrossPartitions" style="width: 70%"><i class="fa fa-cogs"></i> Max Pending Messages Across Partitions</label>
         <input type="text" id="node-input-maxPendingMessagesAcrossPartitions">
         <input type="hidden" id="node-input-maxPendingMessagesAcrossPartitions-type">
     </div>
 <!--    blockIfQueueFull-->
     <div class="form-row">
-        <label for="node-input-blockIfQueueFull"><i class="fa fa-cogs"></i> Block If Queue Full</label>
+        <label for="node-input-blockIfQueueFull" style="width: 70%"><i class="fa fa-cogs"></i> Block If Queue Full</label>
         <input type="text" id="node-input-blockIfQueueFull">
         <input type="hidden" id="node-input-blockIfQueueFull-type">
     </div>
 <!--    messageRoutingMode-->
     <div class="form-row">
-        <label for="node-input-messageRoutingMode"><i class="fa fa-cogs"></i> Message Routing Mode</label>
-        <input type="text" id="node-input-messageRoutingMode">
+        <label for="node-input-messageRoutingMode" style="width: 40%"><i class="fa fa-cogs"></i> Message Routing Mode</label>
+        <input type="text" id="node-input-messageRoutingMode" style="width: 52%">
         <input type="hidden" id="node-input-messageRoutingMode-type">
     </div>
 <!--    hashingScheme-->
     <div class="form-row">
-        <label for="node-input-hashingScheme"><i class="fa fa-cogs"></i> Hashing Scheme</label>
-        <input type="text" id="node-input-hashingScheme">
+        <label for="node-input-hashingScheme" style="width: 40%"><i class="fa fa-cogs"></i> Hashing Scheme</label>
+        <input type="text" id="node-input-hashingScheme" style="width: 52%">
         <input type="hidden" id="node-input-hashingScheme-type">
     </div>
 <!--    compressionType-->
     <div class="form-row">
-        <label for="node-input-compressionType"><i class="fa fa-cogs"></i> Compression Type</label>
-        <input type="text" id="node-input-compressionType">
+        <label for="node-input-compressionType" style="width: 40%"><i class="fa fa-cogs"></i> Compression Type</label>
+        <input type="text" id="node-input-compressionType" style="width: 52%">
         <input type="hidden" id="node-input-compressionType-type">
     </div>
 <!--    batchingEnabled-->
-    <div class="form-row">
-        <label for="node-input-batchingEnabled"><i class="fa fa-cogs"></i> Batching Enabled</label>
-        <input type="text" id="node-input-batchingEnabled">
-        <input type="hidden" id="node-input-batchingEnabled-type">
-    </div>
+<div class="form-row">
+    <label for="node-input-batchingEnabled" style="width: 35%"><i class="fa fa-cogs"></i> Batching Enabled</label>
+    <input type="radio" id="node-input-batchingEnabled" name="batching-chunking" checked style="width: 10%">
+    <label for="node-input-chunkingEnabled" style="width: 35%"><i class="fa fa-cogs"></i> Chunking Enabled</label>
+    <input type="radio" id="node-input-chunkingEnabled" name="batching-chunking" style="width: 10%">
+</div>
+<!--    chunkingEnabled-->
+<div class="form-row">
+
+</div>
 <!--    batchingMaxPublishDelayMs-->
     <div class="form-row">
-        <label for="node-input-batchingMaxPublishDelayMs"><i class="fa fa-cogs"></i> Batching Max Publish Delay</label>
+        <label for="node-input-batchingMaxPublishDelayMs" style="width: 70%"><i class="fa fa-cogs"></i> Batching Max Publish Delay</label>
         <input type="text" id="node-input-batchingMaxPublishDelayMs">
         <input type="hidden" id="node-input-batchingMaxPublishDelayMs-type">
     </div>
 <!--    batchingMaxMessages-->
     <div class="form-row">
-        <label for="node-input-batchingMaxMessages"><i class="fa fa-cogs"></i> Batching Max Messages</label>
+        <label for="node-input-batchingMaxMessages" style="width: 70%"><i class="fa fa-cogs"></i> Batching Max Messages</label>
         <input type="text" id="node-input-batchingMaxMessages">
         <input type="hidden" id="node-input-batchingMaxMessages-type">
     </div>
 <!--    properties-->
     <div class="form-row">
-        <label for="node-input-properties"><i class="fa fa-cogs"></i> Properties</label>
-        <input type="text" id="node-input-properties">
+        <label for="node-input-properties" style="width: 70%"><i class="fa fa-cogs"></i> Properties</label>
+        <input type="text" id="node-input-properties" style="width: 52%">
         <input type="hidden" id="node-input-properties-type">
     </div>
 <!--    publicKeyPath-->
     <div class="form-row">
-        <label for="node-input-publicKeyPath"><i class="fa fa-cogs"></i> Public Key Path</label>
-        <input type="text" id="node-input-publicKeyPath">
+        <label for="node-input-publicKeyPath" style="width: 40%"><i class="fa fa-cogs"></i> Public Key Path</label>
+        <input type="text" id="node-input-publicKeyPath" style="width: 52%">
         <input type="hidden" id="node-input-publicKeyPath-type">
     </div>
 <!--    encryptionKey-->
     <div class="form-row">
-        <label for="node-input-encryptionKey"><i class="fa fa-cogs"></i> Encryption Key</label>
-        <input type="text" id="node-input-encryptionKey">
+        <label for="node-input-encryptionKey" style="width: 40%"><i class="fa fa-cogs"></i> Encryption Key</label>
+        <input type="text" id="node-input-encryptionKey" style="width: 52%">
         <input type="hidden" id="node-input-encryptionKey-type">
     </div>
 <!--    cryptoFailureAction-->
     <div class="form-row">
-        <label for="node-input-cryptoFailureAction"><i class="fa fa-cogs"></i> Crypto Failure Action</label>
-        <input type="text" id="node-input-cryptoFailureAction">
+        <label for="node-input-cryptoFailureAction" style="width: 40%"><i class="fa fa-cogs"></i> Crypto Failure Action</label>
+        <input type="text" id="node-input-cryptoFailureAction" style="width: 52%">
         <input type="hidden" id="node-input-cryptoFailureAction-type">
-    </div>
-<!--    chunkingEnabled-->
-    <div class="form-row">
-        <label for="node-input-chunkingEnabled"><i class="fa fa-cogs"></i> Chunking Enabled</label>
-        <input type="text" id="node-input-chunkingEnabled">
-        <input type="hidden" id="node-input-chunkingEnabled-type">
     </div>
 <!--    accessMode-->
     <div class="form-row">
-        <label for="node-input-accessMode"><i class="fa fa-cogs"></i> Access Mode</label>
-        <input type="text" id="node-input-accessMode">
+        <label for="node-input-accessMode" style="width: 40%"><i class="fa fa-cogs"></i> Access Mode</label>
+        <input type="text" id="node-input-accessMode" style="width: 52%">
         <input type="hidden" id="node-input-accessMode-type">
     </div>
 </script>

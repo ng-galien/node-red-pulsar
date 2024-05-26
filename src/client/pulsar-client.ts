@@ -89,8 +89,7 @@ function resolveAuthentication(node?: NodeRED.Node<AuthenticationImpl>): ClientA
  */
 function createClient(node: NodeRED.Node<Client>, clientConfig: ClientConfig): Client | undefined {
     try {
-        node.log('Creating pulsar client')
-        node.log('Client config: ' + JSON.stringify(clientConfig))
+        node.debug('Creating pulsar client, config: ' + JSON.stringify(clientConfig))
         return new Client(clientConfig)
     }
     catch (e) {

@@ -42,10 +42,9 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
             {name: 'maxPendingMessages', type: 'num'},
             {name: 'maxPendingMessagesAcrossPartitions', type: 'num'},
             {name: 'blockIfQueueFull', type: 'bool'},
-            {name: 'batchingEnabled', type: 'bool'},
             {name: 'batchingMaxPublishDelayMs', type: 'num'},
             {name: 'batchingMaxMessages', type: 'num'},
-            {name: 'chunkingEnabled', type: 'bool'}
+            {name: 'properties', type: 'json'},
         ]
         configureTypedFields(false, fields)
         type MessageRoutingMode = import("pulsar-client").MessageRoutingMode
@@ -58,6 +57,10 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         configureEnumField<CryptoFailureAction>(false, 'cryptoFailureAction', ['FAIL', 'SEND'])
         type AccessMode = import("pulsar-client").ProducerAccessMode
         configureEnumField<AccessMode>(false, 'accessMode', ['Shared', 'Exclusive', 'WaitForExclusive', 'ExclusiveWithFencing'])
+        const propertiesInput = $('#node-input-properties')
+        if(propertiesInput.typedInput('value') === ''){
+            propertiesInput.typedInput('value', '{}')
+        }
     }
 })
 

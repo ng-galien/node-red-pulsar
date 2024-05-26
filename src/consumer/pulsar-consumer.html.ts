@@ -33,6 +33,9 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
     label: function (this: EditorNode) {
         return this.name || this.topic || 'pulsar-consumer'
     },
+    outputLabels: function(i) {
+        return i === 0 ? "Message" : "Status"
+    },
     oneditprepare: function () {
         const fields: TypedField[] = [
             {name: 'ackTimeoutMs', type: 'num'},

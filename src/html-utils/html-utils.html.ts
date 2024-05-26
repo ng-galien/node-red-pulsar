@@ -22,7 +22,7 @@ function configureEnumField<T extends string>(isConfig: boolean, name: string, o
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureMandatoryEnumField<T extends string>(isConfig: boolean, name: string, options: T[]): void {
-    configureOptionalEnumField(isConfig, true, name, options)
+    configureOptionalEnumField(isConfig, false, name, options)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

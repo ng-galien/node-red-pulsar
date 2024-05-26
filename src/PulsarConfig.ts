@@ -14,6 +14,7 @@ import {
     RegexSubscriptionMode,
     SubscriptionType
 } from "pulsar-client";
+import {jsonStringToProperties} from "./Properties";
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -166,7 +167,7 @@ export function consumerConfig(config: PulsarConsumerConfig): ConsumerConfig {
 }
 
 export function producerConfig(config: PulsarProducerConfig): ProducerConfig {
-    return {
+    const result = {
         topic: config.topic,
         producerName: parseNonEmptyString(config.producerName),
         sendTimeoutMs: parseNumber(config.sendTimeoutMs),
@@ -180,13 +181,17 @@ export function producerConfig(config: PulsarProducerConfig): ProducerConfig {
         batchingEnabled: parseBoolean(config.batchingEnabled),
         batchingMaxPublishDelayMs: parseNumber(config.batchingMaxPublishDelayMs),
         batchingMaxMessages: parseNumber(config.batchingMaxMessages),
-        properties: undefined,
+        properties: jsonStringToProperties(config.properties),
         publicKeyPath: parseNonEmptyString(config.publicKeyPath),
         encryptionKey: parseNonEmptyString(config.encryptionKey),
         cryptoFailureAction: parseChoice<ProducerCryptoFailureAction>(['FAIL', 'SEND'], config.cryptoFailureAction),
         chunkingEnabled: parseBoolean(config.chunkingEnabled),
         accessMode: parseChoice<ProducerAccessMode>(['Shared', 'Exclusive', 'ExclusiveWithFencing', 'WaitForExclusive'], config.accessMode)
     }
+    if(result.chunkingEnabled && result.batchingEnabled){
+        throw new Error('Chunking and batching cannot be enabled at the same time')
+    }
+    return result
 }
 
 export function readerPosition(start: StartMessage): MessageId {

@@ -41,23 +41,29 @@ export = (RED: NodeRED.NodeAPI): void => {
                 return
             }
             const readerConfig = createConfig(config, this)
-            client.createReader(readerConfig).then(reader => {
-                this.credentials = reader
-                this.log('Reader created: ' + JSON.stringify(reader))
-                this.status({fill: "green", shape: "dot", text: "connected"})
-                const message = {
-                    topic: 'pulsar',
-                    payload: {
-                        type: 'reader',
-                        status: 'ready',
-                        topic: config.topic
-                    }
-                };
-                this.send([null, message]);
-            }).catch(e => {
+            try {
+                this.debug('Creating reader: ' + JSON.stringify(readerConfig))
+                client.createReader(readerConfig).then(reader => {
+                    this.credentials = reader
+                    this.log('Reader created: ' + JSON.stringify(reader))
+                    this.status({fill: "green", shape: "dot", text: "connected"})
+                    const message = {
+                        topic: 'pulsar',
+                        payload: {
+                            type: 'reader',
+                            status: 'ready',
+                            topic: config.topic
+                        }
+                    };
+                    this.send([null, message]);
+                }).catch(e => {
+                    this.error('Error creating reader: ' + e)
+                    this.status({fill: "red", shape: "dot", text: "Connection error"})
+                })
+            } catch (e) {
                 this.error('Error creating reader: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
-            })
+            }
             this.on('input', (msg) => {
                 if (msg.topic === 'seek') {
                     const seekPosition = parseSeekPosition(msg.payload)

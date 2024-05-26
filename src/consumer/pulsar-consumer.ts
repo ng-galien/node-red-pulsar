@@ -56,25 +56,31 @@ export = (RED: NodeRED.NodeAPI): void => {
             }
             const consumerConfig = setupListener(config, this)
             consumerConfig.schema = requireSchema(RED, config)
-            requirement.subscribe(consumerConfig).then(consumer => {
-                this.credentials = consumer
-                this.log('Consumer created')
-                this.status({fill: "green", shape: "dot", text: "connected"})
-                const message = {
-                    topic: 'pulsar',
-                    payload: {
-                        type: 'consumer',
-                        status: 'ready',
-                        topic: config.topic,
-                        subscription: config.subscription,
-                        subscriptionType: config.subscriptionType
-                    }
-                };
-                this.send([null, message]);
-            }).catch(e => {
+            try {
+                this.debug('Creating consumer: ' + JSON.stringify(consumerConfig))
+                requirement.subscribe(consumerConfig).then(consumer => {
+                    this.credentials = consumer
+                    this.log('Consumer created')
+                    this.status({fill: "green", shape: "dot", text: "connected"})
+                    const message = {
+                        topic: 'pulsar',
+                        payload: {
+                            type: 'consumer',
+                            status: 'ready',
+                            topic: config.topic,
+                            subscription: config.subscription,
+                            subscriptionType: config.subscriptionType
+                        }
+                    };
+                    this.send([null, message]);
+                }).catch(e => {
+                    this.error('Error creating consumer: ' + e)
+                    this.status({fill: "red", shape: "dot", text: "Connection error"})
+                })
+            } catch (e) {
                 this.error('Error creating consumer: ' + e)
                 this.status({fill: "red", shape: "dot", text: "Connection error"})
-            })
+            }
         }
     )
 }
