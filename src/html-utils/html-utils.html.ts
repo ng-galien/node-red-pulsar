@@ -1,8 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function configureTypedFields(isConfig: boolean, fields: TypedField[]) {
+function configureTypedFields(isConfig: boolean, fields: TypedField[]): void {
     fields.forEach(function (field) {
         const id = (isConfig ? "node-config-input-" : "node-input-") + field.name
         const input = $("#" + id);
@@ -19,18 +16,30 @@ function configureTypedFields(isConfig: boolean, fields: TypedField[]) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function configureEnumField<T extends string>(isConfig: boolean, name: string, options: T[]) {
-    configureOptionalEnumField(isConfig, false, name, options)
+function configureEnumField<T extends string>(isConfig: boolean, name: string, options: T[]): void {
+    configureOptionalEnumField(isConfig, true, name, options)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function configureOptionalEnumField<T extends string>(isConfig: boolean, optional: boolean, name: string, options: T[]) {
+function configureMandatoryEnumField<T extends string>(isConfig: boolean, name: string, options: T[]): void {
+    configureOptionalEnumField(isConfig, true, name, options)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function configureOptionalEnumField<T extends string>(isConfig: boolean, optional: boolean, name: string, options: T[]): void {
     const id = (isConfig ? "node-config-input-" : "node-input-") + name
+    let optionsCopy = options.map(v => {
+        return {value: v, label: v}
+    })
+    if(optional) {
+        //Insert blank option
+        optionsCopy.unshift({value: 'Default' as T, label: '' as T})
+    }
     $("#" + id).typedInput({
-        default: optional ? undefined : options[0],
+        default: optionsCopy[0].value,
         types: [{
-            value: options[0],
-            options: options.map(value => ({value, label: value}))
+            value: optionsCopy[0].value,
+            options: optionsCopy
         }]
     })
 }

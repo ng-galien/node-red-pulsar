@@ -2,14 +2,22 @@ import * as NodeRED from "node-red";
 import {Message, Reader, ReaderConfig} from "pulsar-client";
 import {requireClient} from "../PulsarNode";
 import {
-    PulsarReaderConfig, PulsarReaderId, readPulsarMessage, StartMessage
+    PulsarReaderConfig, PulsarReaderId, readPulsarMessage
 } from "../PulsarDefinition";
-import {parseChoice, readerConfig, readerPosition} from "../PulsarConfig";
+import {readerConfig} from "../PulsarConfig";
+import {parseSeekPosition, SeekPosition} from "../Seek";
 
 type ReaderNode = NodeRED.Node<Reader>
 
+/**
+ * Creates a ReaderConfig object based on the provided PulsarReaderConfig and ReaderNode.
+ *
+ * @param {PulsarReaderConfig} config - The PulsarReaderConfig object containing the configuration settings for the reader.
+ * @param {ReaderNode} node - The ReaderNode object representing the reader node.
+ * @returns {ReaderConfig} - The ReaderConfig object containing the listener function and other configuration settings.
+ */
 function createConfig(config: PulsarReaderConfig, node: ReaderNode): ReaderConfig {
-    const listener = (message: Message) => {
+    const listener = function (message: Message): void {
         node.debug('Received message: ' + JSON.stringify(message))
         const nodeMessage = readPulsarMessage(message)
         node.send([nodeMessage, null])
@@ -52,12 +60,11 @@ export = (RED: NodeRED.NodeAPI): void => {
             })
             this.on('input', (msg) => {
                 if (msg.topic === 'seek') {
-                    if(isRightSeekPayloadPosition(msg.payload)) {
-                        seekPosition(this, msg.payload as StartMessage)
-                    } else if (isRightSeekPayloadTimestamp(msg.payload)) {
-                        seekTimestamp(this, msg.payload as number)
+                    const seekPosition = parseSeekPosition(msg.payload)
+                    if(seekPosition) {
+                        seek(this, seekPosition)
                     } else {
-                        this.error('Invalid seek payload: ' + msg.payload + ' type: ' + typeof msg.payload)
+                        this.warn('Invalid seek payload: ' + msg.payload + ' type: ' + typeof msg.payload)
                     }
                 } else {
                     this.error('Invalid input: ' + JSON.stringify(msg))
@@ -67,28 +74,21 @@ export = (RED: NodeRED.NodeAPI): void => {
     )
 }
 
-function isRightSeekPayloadPosition(payload: any): boolean {
-    return typeof payload === 'string' && parseChoice<StartMessage>(['Earliest', 'Latest'], payload) !== undefined
-}
-
-function isRightSeekPayloadTimestamp(payload: any): boolean {
-    return typeof payload === 'number' && payload >= 0
-}
-
-function seekPosition(node: ReaderNode, value: StartMessage) {
+/**
+ * Seek to a specific position in the node.
+ *
+ * @param {ReaderNode} node - The ReaderNode object to seek.
+ * @param position
+ *                                           object or a number representing the timestamp.
+ * @return {void}
+ */
+function seek(node: ReaderNode, position: SeekPosition): void {
     const reader = node.credentials as Reader
-    reader.seek(readerPosition(value)).then(() => {
-        node.log('Seeked to: ' + value)
+    const seekingProcess = position.id ? reader.seek(position.id) : reader.seekTimestamp(position.timestamp)
+    seekingProcess.then(() => {
+        node.log('Seeked to: ' + JSON.stringify(position))
     }).catch(e => {
         node.error('Error seeking: ' + e)
     })
 }
 
-function seekTimestamp(node: ReaderNode, value: number) {
-    const reader = node.credentials as Reader
-    reader.seekTimestamp(value).then(() => {
-        node.log('Seeked to timestamp: ' + value)
-    }).catch(e => {
-        node.error('Error seeking: ' + e)
-    })
-}

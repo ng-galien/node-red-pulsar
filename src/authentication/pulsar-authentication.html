@@ -60,6 +60,28 @@
     </fieldset>
 </script>
 
-<script type="text/html" data-help-name="pulsar-authentication">
-    <p>Configure the connection to a Pulsar service. This configuration node is required by pulsar-consumer and pulsar-producer nodes.</p>
+<script type="text/markdown" data-help-name="pulsar-authentication">
+![Pulsar Logo](https://upload.wikimedia.org/wikipedia/commons/c/cb/Apache-pulsar-blue-logo.svg)
+
+Configure the authentication to a **Pulsar** service.
+
+### Configuration Properties
+
+- **Name**: The name of the configuration.
+- **Authentication Type**: The type of authentication to use.
+- **JWT Token**: A token used for Jwt authentication, can be a string, a file starting with `file://`, a URL starting with `http://` or `https://` or an environment variable starting with `env:`.
+- **OAuth Type**: The type of Oauth to use.
+- **OAuth Issuer URL**: The URL of the Oauth issuer.
+- **OAuth Client ID**: The ID for the Oauth client.
+- **OAuth Client Secret**: The client secret for Oauth.
+- **OAuth Private Key**: The private key for the Oauth client.
+- **OAuth Audience**: The Oauth audience.
+- **OAuth Scope**: The scope of the Oauth client.
+- **TLS Certificate Path**: The path to the TLS certificate.
+- **TLS Private Key Path**: The path to the TLS private key.
+
+**Note**: For OAuth and JWT, ensure the server supports these authentication methods.
+
+### References
+- [Pulsar documentation](https://pulsar.apache.org/docs)
 </script>

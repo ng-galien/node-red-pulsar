@@ -14,7 +14,7 @@ function validatePulsarUrl(this: EditorNodeInstance, value: string): boolean {
  * Function to display TLS fields.
  * @param {boolean} show - Whether to show the fields or not.
  */
-function displayTlsFields(show: boolean) {
+function displayTlsFields(show: boolean): void {
     $(".tls").toggle(show)
 }
 

@@ -3,7 +3,7 @@ type PulsarSchemaEditorConfig = import("../PulsarDefinition").PulsarSchemaEditor
 RED.nodes.registerType<PulsarSchemaEditorConfig>(SCHEMA_ID, {
     category: 'config',
     color: '#188fff',
-    icon: "font-awesome/fa-puzzle-piece",
+    icon: "font-awesome/fa-id-card",
     defaults: {
         schemaName: {value: '', required: false, validate: RED.validators.regex(/^[a-zA-Z0-9_]+$/)},
         schemaType: {value: 'None', required: true},
@@ -35,7 +35,7 @@ RED.nodes.registerType<PulsarSchemaEditorConfig>(SCHEMA_ID, {
     }
 });
 
-function schemaTypeOptions() {
+function schemaTypeOptions(): { value: string, label: string }[] {
     return [
         { value: "None", label: "None"},
         { value: "String", label: "String"},

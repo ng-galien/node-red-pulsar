@@ -35,16 +35,16 @@ RED.nodes.registerType<PulsarAuthenticationEditorConfig>(AUTHENTICATION_ID, {
         return this.name || 'pulsar-authentication'
     },
     oneditprepare: function () {
-        function updateJwtToken(show: boolean) {
+        function updateJwtToken(show: boolean): void {
             $(".jwt-token").toggle(show)
         }
-        function updateOauth(show: boolean) {
+        function updateOauth(show: boolean): void {
             $(".oauth").toggle(show)
         }
-        function updateTls(show: boolean) {
+        function updateTls(show: boolean): void {
             $(".tls").toggle(show)
         }
-        function updateOauthType() {
+        function updateOauthType(): void {
             const type = $("#node-config-input-oauth-type").val()
             switch (type) {
             case "None":

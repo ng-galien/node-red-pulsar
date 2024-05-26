@@ -46,7 +46,7 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         ]
         configureTypedFields(false, fields)
         type SubscriptionType = import("pulsar-client").SubscriptionType
-        configureEnumField<SubscriptionType>(false, 'subscriptionType', ['Shared', 'Exclusive', 'Failover', 'KeyShared'])
+        configureMandatoryEnumField<SubscriptionType>(false, 'subscriptionType', ['Shared', 'Exclusive', 'Failover', 'KeyShared'])
         type SubscriptionInitialPosition = import("pulsar-client").InitialPosition
         configureEnumField<SubscriptionInitialPosition>(false, 'subscriptionInitialPosition', ['Latest', 'Earliest'])
         type RegexSubscriptionMode = import("pulsar-client").RegexSubscriptionMode

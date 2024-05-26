@@ -1,12 +1,13 @@
 import * as NodeRED from "node-red";
 import {AuthenticationImpl, PulsarAuthentication, PulsarAuthenticationId} from "../PulsarDefinition";
 import {AuthenticationOauth2, AuthenticationTls, AuthenticationToken} from "pulsar-client";
+import {loadToken, parseToken} from "../Token";
 
 
 export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarAuthenticationId,
         function (this: NodeRED.Node<AuthenticationImpl>, config: PulsarAuthentication): void {
-            function resolveAuthentication(config: PulsarAuthentication) {
+            async function resolveAuthentication(config: PulsarAuthentication): Promise<AuthenticationImpl> {
                 switch (config.authType) {
                 case 'none':
                     return {}
@@ -14,7 +15,8 @@ export = (RED: NodeRED.NodeAPI): void => {
                     if(!config.jwtToken) {
                         return {}
                     }
-                    return new AuthenticationToken({token: config.jwtToken})
+                    const token = parseToken(config.jwtToken)
+                    return new AuthenticationToken({token: await loadToken(token)})
                 case 'oauth2':
                     if(!config.oauthType || !config.oauthIssuerUrl) {
                         return {}
@@ -38,7 +40,14 @@ export = (RED: NodeRED.NodeAPI): void => {
                     })
                 }
             }
-            this.credentials = resolveAuthentication(config)
+            resolveAuthentication(config).then(
+                (auth) => {
+                    this.credentials = auth
+                },
+                (error) => {
+                    this.error(error)
+                }
+            )
         }
     )
 }

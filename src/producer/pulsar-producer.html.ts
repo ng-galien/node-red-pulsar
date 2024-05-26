@@ -45,8 +45,7 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
             {name: 'batchingEnabled', type: 'bool'},
             {name: 'batchingMaxPublishDelayMs', type: 'num'},
             {name: 'batchingMaxMessages', type: 'num'},
-            {name: 'chunkingEnabled', type: 'bool'},
-            {name: 'accessMode', type: 'num'},
+            {name: 'chunkingEnabled', type: 'bool'}
         ]
         configureTypedFields(false, fields)
         type MessageRoutingMode = import("pulsar-client").MessageRoutingMode
