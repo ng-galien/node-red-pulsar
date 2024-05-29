@@ -153,7 +153,7 @@ export function consumerConfig(config: PulsarConsumerConfig): ConsumerConfig {
         receiverQueueSize: parseNumber(config.receiverQueueSize),
         receiverQueueSizeAcrossPartitions: parseNumber(config.receiverQueueSizeAcrossPartitions),
         consumerName: config.consumerName || 'consumer-' + uuidv4(),
-        properties: undefined,
+        properties: jsonStringToProperties(config.properties),
         readCompacted: parseBoolean(config.readCompacted),
         privateKeyPath: parseNonEmptyString(config.privateKeyPath),
         cryptoFailureAction: parseChoice<ConsumerCryptoFailureAction>(['FAIL', 'DISCARD', 'CONSUME'], config.cryptoFailureAction),
