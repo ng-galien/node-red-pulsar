@@ -12,6 +12,10 @@ export function jsonStringToProperties(json: string|undefined): Properties | und
                         properties[key] = keyVal
                     }
                 }
+                //If properties is empty, return undefined
+                if (Object.keys(properties).length === 0) {
+                    return undefined
+                }
                 return properties
             }
         } catch (e) {

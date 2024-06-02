@@ -41,6 +41,11 @@ describe('Properties', () => {
             expect(result).to.be.undefined;
         });
 
+        it('should return undefined when JSON string is empty object', () => {
+            const result = jsonStringToProperties('{}');
+            expect(result).to.be.undefined;
+        });
+
         it('should return undefined when JSON string is an array', () => {
             const result = jsonStringToProperties('[]');
             expect(result).to.be.undefined;
