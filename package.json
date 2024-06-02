@@ -17,7 +17,10 @@
     "format": "eslint --max-warnings=0 --fix src/**/*.ts",
     "lint": "eslint src/**/*.ts",
     "deploy": "PROJECT_DIR=$(pwd) && cd ~/.node-red && npm install $PROJECT_DIR",
-    "test": "ts-mocha --exit -p tsconfig.json test/**/*.spec.ts"
+    "start-node-red": "node-red",
+    "stop-node-red": "killall node-red || true",
+    "test": "ts-mocha --exit -p tsconfig.json test/**/*.spec.ts",
+    "test-node-red": "npm run stop-node-red && npm run deploy && npm run start-node-red"
   },
   "node-red": {
     "nodes": {
