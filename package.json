@@ -20,7 +20,7 @@
     "start-node-red": "node-red",
     "stop-node-red": "killall node-red || true",
     "test": "ts-mocha --exit -p tsconfig.json test/**/*.spec.ts",
-    "test-node-red": "npm run stop-node-red && npm run deploy && npm run start-node-red"
+    "test-node-red": "npm run stop-node-red&& npm run build && npm run deploy && npm run start-node-red"
   },
   "node-red": {
     "nodes": {
