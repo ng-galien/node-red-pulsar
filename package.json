@@ -1,6 +1,6 @@
 {
   "name": "@ng-galien/node-red-pulsar",
-  "version": "1.1.0-rc.2",
+  "version": "1.1.0.rc4",
   "description": "Node-RED nodes for Apache Pulsar",
   "repository": {
     "type": "git",
@@ -11,6 +11,7 @@
     "access": "public"
   },
   "scripts": {
+    "prepare": "npm run build",
     "release": "standard-version",
     "build": "tsc && cpx 'src/**/*.html' dist --preserve && cpx 'dist/**/*.html.js' resources && rm -rf dist/**/*.html.js && cp dist/PulsarDefinition.js resources",
     "clean": "rm -f *.tsbuildinfo && rm -rf dist resources && rm -f *.tgz",
