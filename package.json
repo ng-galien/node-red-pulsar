@@ -1,6 +1,6 @@
 {
   "name": "@ng-galien/node-red-pulsar",
-  "version": "1.1.0.rc4",
+  "version": "1.1.0-rc.4",
   "description": "Node-RED nodes for Apache Pulsar",
   "repository": {
     "type": "git",
