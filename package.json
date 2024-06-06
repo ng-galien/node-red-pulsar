@@ -1,6 +1,6 @@
 {
   "name": "@ng-galien/node-red-pulsar",
-  "version": "1.0.2",
+  "version": "1.1.0-rc.0",
   "description": "Node-RED nodes for Apache Pulsar",
   "repository": {
     "type": "git",
@@ -11,37 +11,65 @@
     "access": "public"
   },
   "scripts": {
+    "release": "standard-version",
+    "build": "tsc && cpx 'src/**/*.html' dist --preserve && cpx 'dist/**/*.html.js' resources && rm -rf dist/**/*.html.js && cp dist/PulsarDefinition.js resources",
+    "clean": "rm -f *.tsbuildinfo && rm -rf dist resources && rm -f *.tgz",
+    "format": "eslint --max-warnings=0 --fix src/**/*.ts",
+    "lint": "eslint src/**/*.ts",
     "deploy": "PROJECT_DIR=$(pwd) && cd ~/.node-red && npm install $PROJECT_DIR",
-    "test": "mocha test/*.spec.js",
-    "lint": "eslint src/*.js test/*.js"
+    "start-node-red": "node-red",
+    "stop-node-red": "killall node-red || true",
+    "test": "ts-mocha --exit -p tsconfig.json test/**/*.spec.ts",
+    "test-node-red": "npm run stop-node-red&& npm run build && npm run deploy && npm run start-node-red"
   },
   "node-red": {
     "nodes": {
-      "pulsar-config": "src/pulsar-config.js",
-      "pulsar-consumer": "src/pulsar-consumer.js",
-      "pulsar-producer": "src/pulsar-producer.js",
-      "pulsar-schema": "src/pulsar-schema.js"
+      "pulsar-client": "dist/client/pulsar-client.js",
+      "pulsar-authentication": "dist/authentication/pulsar-authentication.js",
+      "pulsar-schema": "dist/schema/pulsar-schema.js",
+      "pulsar-consumer": "dist/consumer/pulsar-consumer.js",
+      "pulsar-reader": "dist/reader/pulsar-reader.js",
+      "pulsar-producer": "dist/producer/pulsar-producer.js"
     }
   },
-  "keywords": [ "node-red" ],
+  "keywords": [
+    "node-red",
+    "pulsar",
+    "apache",
+    "streaming",
+    "messaging"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/uuid": "^9.0.8",
     "avsc": "^5.7.7",
-    "pulsar-client": "^1.9.0",
+    "pulsar-client": "^1.11.0",
     "save-dev": "^0.0.1-security",
+    "tslog": "^4.9.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/node-red": "^1.3.4",
+    "@types/chai": "^4.3.14",
+    "@types/mocha": "^10.0.6",
+    "@types/node-red": "^1.3.5",
+    "@types/node-red-node-test-helper": "^0.3.4",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
     "axios": "^1.6.3",
-    "chai": "^5.1.0",
+    "chai": "^4.4.1",
     "chai-wait-for": "^2.0.2",
+    "cpx": "^1.5.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
-    "mocha": "^10.2.0",
-    "node-red": "^3.1.3",
+    "mocha": "^10.4.0",
+    "node-red": "^3.1.9",
     "node-red-node-test-helper": "^0.3.3",
-    "testcontainers": "^10.4.0",
-    "tus-js-client": "^4.0.1"
+    "sinon": "^18.0.0",
+    "standard-version": "^9.5.0",
+    "testcontainers": "^10.9.0",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   }
 }

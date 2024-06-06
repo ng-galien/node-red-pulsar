@@ -1,0 +1,233 @@
+<script type="text/javascript">
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/producer/pulsar-producer.html.js')
+</script>
+
+<script type="text/html" data-template-name="pulsar-producer">
+<!--    name-->
+    <div class="form-row">
+        <label for="node-input-name" style="width: 25%">
+            <i class="fa fa-tag"></i>
+            Node Name
+        </label>
+        <input type="text" id="node-input-name" style="width: 67%">
+    </div>
+<!--    clientNodeId-->
+    <div class="form-row">
+        <label for="node-input-clientNodeId" style="width: 25%">
+            <i class="fa fa-cogs"></i>
+            Config
+        </label>
+        <input type="text" id="node-input-clientNodeId" style="width: 67%">
+    </div>
+<!--    schemaNodeId-->
+    <div class="form-row">
+        <label for="node-input-schemaNodeId" style="width: 25%">
+            <i class="fa fa-puzzle-piece"></i>
+            Schema
+        </label>
+        <input type="text" id="node-input-schemaNodeId" style="width: 67%">
+    </div>
+<!--    topic-->
+    <div class="form-row">
+        <label for="node-input-topic" style="width: 25%">
+            <i class="fa fa-comments"></i>
+            Topic
+        </label>
+        <input type="text" id="node-input-topic" style="width: 67%">
+    </div>
+<!--    producerName-->
+    <div class="form-row">
+        <label for="node-input-producerName" style="width: 25%">
+            <i class="fa fa-id-badge"></i>
+            Producer Name
+        </label>
+        <input type="text" id="node-input-producerName" style="width: 67%">
+    </div>
+<!--    sendTimeoutMs-->
+    <div class="form-row">
+        <label for="node-input-sendTimeoutMs" style="width: 70%">
+            <i class="fa fa-clock-o"></i>
+            Send Timeout
+        </label>
+        <input type="text" id="node-input-sendTimeoutMs">
+        <input type="hidden" id="node-input-sendTimeoutMs-type">
+    </div>
+<!--    initialSequenceId-->
+    <div class="form-row">
+        <label for="node-input-initialSequenceId" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Initial Sequence ID
+        </label>
+        <input type="text" id="node-input-initialSequenceId">
+        <input type="hidden" id="node-input-initialSequenceId-type">
+    </div>
+<!--    maxPendingMessages-->
+    <div class="form-row">
+        <label for="node-input-maxPendingMessages" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Max Pending Messages
+        </label>
+        <input type="text" id="node-input-maxPendingMessages">
+        <input type="hidden" id="node-input-maxPendingMessages-type">
+    </div>
+<!--    maxPendingMessagesAcrossPartitions-->
+    <div class="form-row">
+        <label for="node-input-maxPendingMessagesAcrossPartitions" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Max Pending Messages Across Partitions
+        </label>
+        <input type="text" id="node-input-maxPendingMessagesAcrossPartitions">
+        <input type="hidden" id="node-input-maxPendingMessagesAcrossPartitions-type">
+    </div>
+<!--    blockIfQueueFull-->
+    <div class="form-row">
+        <label for="node-input-blockIfQueueFull" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Block If Queue Full
+        </label>
+        <input type="text" id="node-input-blockIfQueueFull">
+        <input type="hidden" id="node-input-blockIfQueueFull-type">
+    </div>
+<!--    messageRoutingMode-->
+    <div class="form-row">
+        <label for="node-input-messageRoutingMode" style="width: 40%">
+            <i class="fa fa-cogs"></i>
+            Message Routing Mode
+        </label>
+        <input type="text" id="node-input-messageRoutingMode" style="width: 52%">
+        <input type="hidden" id="node-input-messageRoutingMode-type">
+    </div>
+<!--    hashingScheme-->
+    <div class="form-row">
+        <label for="node-input-hashingScheme" style="width: 40%">
+            <i class="fa fa-cogs"></i>
+            Hashing Scheme
+        </label>
+        <input type="text" id="node-input-hashingScheme" style="width: 52%">
+        <input type="hidden" id="node-input-hashingScheme-type">
+    </div>
+<!--    compressionType-->
+    <div class="form-row">
+        <label for="node-input-compressionType" style="width: 40%">
+            <i class="fa fa-cogs"></i>
+            Compression Type
+        </label>
+        <input type="text" id="node-input-compressionType" style="width: 52%">
+        <input type="hidden" id="node-input-compressionType-type">
+    </div>
+<!--    batchingEnabled-->
+<div class="form-row">
+    <label for="node-input-batchingEnabled" style="width: 35%">
+        <i class="fa fa-cogs"></i>
+        Batching Enabled
+    </label>
+    <input type="radio" id="node-input-batchingEnabled" name="batching-chunking" checked style="width: 10%">
+    <label for="node-input-chunkingEnabled" style="width: 35%">
+        <i class="fa fa-cogs"></i>
+        Chunking Enabled
+    </label>
+    <input type="radio" id="node-input-chunkingEnabled" name="batching-chunking" style="width: 10%">
+</div>
+<!--    chunkingEnabled-->
+<div class="form-row">
+
+</div>
+<!--    batchingMaxPublishDelayMs-->
+    <div class="form-row">
+        <label for="node-input-batchingMaxPublishDelayMs" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Batching Max Publish Delay
+        </label>
+        <input type="text" id="node-input-batchingMaxPublishDelayMs">
+        <input type="hidden" id="node-input-batchingMaxPublishDelayMs-type">
+    </div>
+<!--    batchingMaxMessages-->
+    <div class="form-row">
+        <label for="node-input-batchingMaxMessages" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Batching Max Messages
+        </label>
+        <input type="text" id="node-input-batchingMaxMessages">
+        <input type="hidden" id="node-input-batchingMaxMessages-type">
+    </div>
+<!--    properties-->
+    <div class="form-row">
+        <label for="node-input-properties" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Properties
+        </label>
+        <input type="text" id="node-input-properties" style="width: 52%">
+        <input type="hidden" id="node-input-properties-type">
+    </div>
+<!--    publicKeyPath-->
+    <div class="form-row">
+        <label for="node-input-publicKeyPath" style="width: 40%">
+            <i class="fa fa-cogs"></i>
+            Public Key Path
+        </label>
+        <input type="text" id="node-input-publicKeyPath" style="width: 52%">
+        <input type="hidden" id="node-input-publicKeyPath-type">
+    </div>
+<!--    encryptionKey-->
+    <div class="form-row">
+        <label for="node-input-encryptionKey" style="width: 40%">
+            <i class="fa fa-cogs"></i>
+            Encryption Key
+        </label>
+        <input type="text" id="node-input-encryptionKey" style="width: 52%">
+        <input type="hidden" id="node-input-encryptionKey-type">
+    </div>
+<!--    cryptoFailureAction-->
+    <div class="form-row">
+        <label for="node-input-cryptoFailureAction" style="width: 40%">
+            <i class="fa fa-cogs"></i>
+            Crypto Failure Action
+        </label>
+        <input type="text" id="node-input-cryptoFailureAction" style="width: 52%">
+        <input type="hidden" id="node-input-cryptoFailureAction-type">
+    </div>
+<!--    accessMode-->
+    <div class="form-row">
+        <label for="node-input-accessMode" style="width: 40%">
+            <i class="fa fa-cogs"></i>
+            Access Mode
+        </label>
+        <input type="text" id="node-input-accessMode" style="width: 52%">
+        <input type="hidden" id="node-input-accessMode-type">
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="pulsar-producer">
+![Pulsar Logo](https://upload.wikimedia.org/wikipedia/commons/c/cb/Apache-pulsar-blue-logo.svg)
+
+Configure a Pulsar Producer node to produce messages to a Pulsar topic.
+
+### Configuration Properties
+
+- `Name`: The name of the node.
+- `Config`: The configuration for the producer. It should contain information like client node ID.
+- `Topic`: The topic from which the producer will produce messages.
+- `Producer Name`: The name of the producer.
+- `Schema`: The schema for the producer. This can be used to validate the messages the producer sends
+- `Send Timeout`: The timeout for send operations. If a send is not completed within this time, an error is returned.
+- `Initial Sequence ID`: The initial sequence ID for messages produced by the producer.
+- `Max Pending Messages`: The maximum number of pending messages for the producer. If this limit is reached, new messages are rejected.
+- `Max Pending Messages Across Partitions`: Similar to Max Pending Messages, but applied across all partitions.
+- `Block If Queue Full`: Whether to block production if the message queue is full.
+- `Message Routing Mode`: The message routing mode for the producer.
+- `Hashing Scheme`: The scheme used to hash messages for routing.
+- `Compression Type`: The type of compression for messages produced by the producer.
+- `Batching Enabled`: Whether batching is enabled for the producer.
+- `Batching Max Publish Delay`: The maximum delay for batching of messages.
+- `Batching Max Messages`: The maximum number of messages in a batch.
+- `Properties`: Additional properties for messages produced by the producer.
+- `Public Key Path`: If encryption is enabled, this is the path to the public key.
+- `Encryption Key`: The key used for message encryption.
+- `Crypto Failure Action`: The action to take if there is a failure in message encryption.
+- `Chunking Enabled`: Whether chunking is enabled for the producer.
+- `Access Mode`: The access mode for messages produced by the producer. This determines who can access the messages.
+
+### References
+- [Pulsar documentation](https://pulsar.apache.org/docs)
+</script>

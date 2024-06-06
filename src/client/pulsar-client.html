@@ -1,0 +1,124 @@
+<script type="text/javascript">
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/client/pulsar-client.html.js')
+</script>
+
+<script type="text/html" data-template-name="pulsar-client">
+    <fieldset>
+        <legend>
+            <small><i class="fa fa-globe"></i> Server</small>
+        </legend>
+        <div class="form-row">
+            <div>
+                <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+                <input type="text" id="node-config-input-name">
+            </div>
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-authenticationNodeId">Auth</label>
+            <input type="text" id="node-config-input-authenticationNodeId">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-serviceUrl">Broker URL</label>
+            <input type="text" id="node-config-input-serviceUrl" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-adminUrl">Admin URL</label>
+            <input type="text" id="node-config-input-adminUrl" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-useTls"><i class="fa fa-lock"></i> Use TLS</label>
+            <input type="text" id="node-config-input-useTls" data-typed-input="true">
+            <input type="hidden" id="node-config-input-useTls-type">
+        </div>
+    </fieldset>
+
+    <!-- TLS settings -->
+    <fieldset class="tls">
+        <legend>
+            <small><i class="fa fa-lock"></i> Tls Configuration</small>
+        </legend>
+        <div class="form-row">
+            <label for="node-config-input-tlsTrustCertsFilePath">Certs Path</label>
+            <input type="text" id="node-config-input-tlsTrustCertsFilePath" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <!-- Inline numeric inputs for TLS settings -->
+            <div style="display: flex">
+                <div style="width: 45%">
+                    <label for="node-config-input-tlsValidateHostname">Validate Hostname</label>
+                    <input type="text" id="node-config-input-tlsValidateHostname" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-tlsValidateHostname-type">
+                </div>
+                <div style="width: 45%">
+                    <label for="node-config-input-tlsAllowInsecureConnection">Insecure Connection</label>
+                    <input type="text" id="node-config-input-tlsAllowInsecureConnection" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-tlsAllowInsecureConnection-type">
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <!-- Runtime settings -->
+    <fieldset>
+        <legend>
+            <small><i class="fa fa-cogs"></i> Runtime Settings</small>
+        </legend>
+        <div class="form-row">
+            <label for="node-config-input-listenerName">Listener Name</label>
+            <input type="text" id="node-config-input-listenerName" data-typed-input="true">
+        </div>
+        <div class="form-row">
+            <div style="display: flex">
+                <div style="width: 45%">
+                    <label for="node-config-input-operationTimeoutSeconds">Timeout (s)</label>
+                    <input type="text" id="node-config-input-operationTimeoutSeconds" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-operationTimeoutSeconds-type">
+                </div>
+                <div style="width: 45%">
+                    <label for="node-config-input-ioThreads">IO Threads</label>
+                    <input type="text" id="node-config-input-ioThreads" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-ioThreads-type">
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div style="display: flex">
+                <div style="width: 45%">
+                    <label for="node-config-input-messageListenerThreads">Listener Threads</label>
+                    <input type="text" id="node-config-input-messageListenerThreads" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-messageListenerThreads-type">
+                </div>
+                <div style="width: 45%">
+                    <label for="node-config-input-concurrentLookupRequest">Lookup Requests</label>
+                    <input type="text" id="node-config-input-concurrentLookupRequest" data-typed-input="true">
+                    <input type="hidden" id="node-config-input-concurrentLookupRequest-type">
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</script>
+
+
+<script type="text/markdown" data-help-name="pulsar-client">
+![Pulsar Logo](https://upload.wikimedia.org/wikipedia/commons/c/cb/Apache-pulsar-blue-logo.svg)
+
+Configure the connection to a **Pulsar** service.
+This configuration node is required by `pulsar-consumer`, `pulsar-producer` and `pulsar-reader` nodes.
+
+### Configuration Properties
+
+- `Service URL`: The URL of the Pulsar broker, e.g., `pulsar://localhost:6650`.
+- `Authentication`: Authentication credentials if required (JSON format).
+- `Operation Timeout Seconds`: The operation timeout in seconds.
+- `IO Threads`: The number of threads to use for handling incoming/outgoing messages.
+- `Message Listener Threads`: The number of threads to use for message listeners.
+- `Concurrent Lookup Request`: The number of concurrent lookup requests that can be sent to the Pulsar broker.
+- `Use TLS`: Whether to use TLS encryption for the connection.
+- `TLS Trust Certs File Path`: The file path to the TLS trust certificate.
+- `TLS Validate Hostname`: Whether to validate the hostname in the certificate.
+- `TLS Allow Insecure Connection`: Whether to allow insecure TLS connections.
+- `Stats Interval In Seconds`: The interval in seconds for stats to be reported.
+
+### References
+- [Pulsar documentation](https://pulsar.apache.org/docs)
+</script>

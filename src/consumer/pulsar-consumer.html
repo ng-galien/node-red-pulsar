@@ -1,0 +1,157 @@
+<script type="text/javascript">
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/consumer/pulsar-consumer.html.js')
+</script>
+
+<script type="text/html" data-template-name="pulsar-consumer">
+    <!--name-->
+    <div class="form-row">
+        <label for="node-input-name" style="width: 25%">
+            <i class="fa fa-tag"></i>
+            Node Name
+        </label>
+        <input type="text" id="node-input-name" style="width: 67%">
+    </div>
+    <!--clientNodeId-->
+    <div class="form-row">
+        <label for="node-input-clientNodeId" style="width: 25%">
+            <i class="fa fa-cogs"></i>
+            Client
+        </label>
+        <input type="text" id="node-input-clientNodeId" style="width: 67%">
+    </div>
+    <!--schemaNodeId-->
+    <div class="form-row">
+        <label for="node-input-schemaNodeId" style="width: 25%">
+            <i class="fa fa-puzzle-piece"></i>
+            Schema
+        </label>
+        <input type="text" id="node-input-schemaNodeId" style="width: 67%">
+    </div>
+    <!--topic-->
+    <div class="form-row">
+        <label for="node-input-topic" style="width: 25%">
+            <i class="fa fa-comments"></i>
+            Topic
+        </label>
+        <input type="text" id="node-input-topic" style="width: 67%">
+    </div>
+    <!--topicPattern-->
+    <div class="form-row">
+        <label for="node-input-topicsPattern" style="width: 25%">
+            <i class="fa fa-comments"></i>
+            Topic Pattern
+        </label>
+        <input type="text" id="node-input-topicsPattern" style="width: 67%">
+    </div>
+    <!--subscription-->
+    <div class="form-row">
+        <label for="node-input-subscription" style="width: 25%">
+            <i class="fa fa-id-badge"></i>
+            Subscription
+        </label>
+        <input type="text" id="node-input-subscription" style="width: 67%">
+    </div>
+    <!--subscriptionType-->
+    <div class="form-row">
+        <label for="node-input-subscriptionType" style="width: 25%">
+            <i class="fa fa-exchange "></i>
+            Type</label>
+        <input type="text" id="node-input-subscriptionType" style="width: 67%">
+    </div>
+    <!--subscriptionInitialPosition-->
+    <div class="form-row">
+        <label for="node-input-subscriptionInitialPosition" style="width: 25%">
+            <i class="fa fa-exchange "></i>
+            Initial Position
+        </label>
+        <input type="text" id="node-input-subscriptionInitialPosition" style="width: 67%">
+    </div>
+    <!--ackTimeoutMs-->
+    <div class="form-row">
+        <label for="node-input-ackTimeoutMs" style="width: 70%">
+            <i class="fa fa-clock-o"></i>
+            Ack Timeout
+        </label>
+        <input type="text" id="node-input-ackTimeoutMs">
+        <input type="hidden" id="node-input-ackTimeoutMs-type">
+    </div>
+    <!--nAckRedeliverTimeoutMs-->
+    <div class="form-row">
+        <label for="node-input-nAckRedeliverTimeoutMs" style="width: 70%">
+            <i class="fa fa-clock-o"></i>
+            Nack Redelivery Delay</label>
+        <input type="text" id="node-input-nAckRedeliverTimeoutMs">
+        <input type="hidden" id="node-input-nAckRedeliverTimeoutMs-type">
+    </div>
+    <!--receiverQueueSize-->
+    <div class="form-row">
+        <label for="node-input-receiverQueueSize" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Receiver Queue Size
+        </label>
+        <input type="text" id="node-input-receiverQueueSize">
+        <input type="hidden" id="node-input-receiverQueueSize-type">
+    </div>
+    <!--maxTotalReceiverQueueSizeAcrossPartitions-->
+    <div class="form-row">
+        <label for="node-input-receiverQueueSizeAcrossPartitions" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Receiver Queue Size Across Partitions
+        </label>
+        <input type="text" id="node-input-receiverQueueSizeAcrossPartitions">
+        <input type="hidden" id="node-input-receiverQueueSizeAcrossPartitions-type">
+    </div>
+    <!--consumerName-->
+    <div class="form-row">
+        <label for="node-input-consumerName" style="width: 30%">
+            <i class="fa fa-tag"></i>
+            Consumer Name
+        </label>
+        <input type="text" id="node-input-consumerName" style="width: 62%">
+    </div>
+    <!--readCompacted-->
+    <div class="form-row">
+        <label for="node-input-readCompacted" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Read Compacted
+        </label>
+        <input type="text" id="node-input-readCompacted">
+        <input type="hidden" id="node-input-readCompacted-type">
+    </div>
+    <!--privateKeyPath-->
+    <div class="form-row">
+        <label for="node-input-privateKeyPath" style="width: 30%">
+            <i class="fa fa-key"></i>
+            Private Key Path
+        </label>
+        <input type="text" id="node-input-privateKeyPath" style="width: 62%">
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="pulsar-consumer">
+![Pulsar Logo](https://upload.wikimedia.org/wikipedia/commons/c/cb/Apache-pulsar-blue-logo.svg)
+
+Configure the topic consumer to a **Pulsar** service.
+
+### Configuration Properties
+
+- `Name`: The name of the configuration.
+- `Client`: The reference to the client configuration.
+- `Schema`: The reference to the schema configuration.
+- `Topic`: The topic to be consumed.
+- `Topic Pattern`: The pattern of the topic(s) to be consumed.
+- `Subscription`: Subscription name for the topic.
+- `Type`: Type of the subscription.
+- `Initial Position`: The initial position for the subscription.
+- `Ack Timeout`: Timeout for the acknowledgment.
+- `Nack Redelivery Delay`: Delay for negative acknowledgement redelivery.
+- `Receiver Queue Size`: Size of the receiver queue.
+- `Max Total Receiver Queue Size Across Partitions`: Maximum total size of receiver queues across partitions.
+- `Consumer Name`: Name of the consumer.
+- `Read Compacted`: Whether to read compacted messages or not.
+- `Private Key Path`: Path to the private key file.
+
+### References
+- [Pulsar documentation](https://pulsar.apache.org/docs)
+</script>

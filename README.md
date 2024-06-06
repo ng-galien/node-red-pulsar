@@ -1,8 +1,24 @@
 # node-red-contrib-pulsar
 
-Add producer and consumer nodes to your Node-RED flow to send and receive messages from Apache Pulsar.
+Add Apache Pulsar support to Node-RED.  
 
-> At the moment it authentication is not supported, working on it.
+This package provides a set of nodes that allow you to send and receive messages from Apache Pulsar in your Node-RED flow.
+
+## Features
+
+- **Pulsar Producer**: Send messages to a Pulsar topic.
+- **Pulsar Consumer**: Receive messages from a Pulsar topic.
+- **Pulsar Reader**: Read messages from a Pulsar topic.
+
+These nodes use some configuration nodes:
+
+- **Pulsar Client**: Configure the connection settings for the Pulsar client.
+- **Pulsar Authentication**: Configure the authentication settings for the Pulsar client.
+- **Pulsar Schema**: Configure the schema settings for producing and consuming messages.
+
+![img.png](assets/all-nodes.png)
+
+These nodes are based on the [Pulsar Node.js client](https://github.com/apache/pulsar-client-node).
 
 ## Install
 
@@ -11,3 +27,6 @@ Add producer and consumer nodes to your Node-RED flow to send and receive messag
 ```bash
 npm i @ng-galien/node-red-pulsar
 ```
+
+## Sample Flow
+

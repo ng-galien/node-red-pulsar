@@ -1,0 +1,119 @@
+<script type="text/javascript">
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/reader/pulsar-reader.html.js')
+</script>
+
+<script type="text/html" data-template-name="pulsar-reader">
+    <!--name-->
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <!--clientNodeId-->
+    <div class="form-row">
+        <label for="node-input-clientNodeId"><i class="fa fa-cogs"></i> Client</label>
+        <input type="text" id="node-input-clientNodeId">
+    </div>
+    <!--schemaNodeId-->
+    <div class="form-row">
+        <label for="node-input-schemaNodeId"><i class="fa fa-puzzle-piece"></i> Schema</label>
+        <input type="text" id="node-input-schemaNodeId">
+    </div>
+    <!--topic-->
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-comments"></i> Topic</label>
+        <input type="text" id="node-input-topic">
+    </div>
+    <!--startMessage-->
+    <div class="form-row">
+        <label for="node-input-startMessage"><i class="fa fa-comments"></i> Topic Pattern</label>
+        <input type="text" id="node-input-startMessage">
+    </div>
+    <!--receiverQueueSize-->
+    <div class="form-row">
+        <label for="node-input-receiverQueueSize"><i class="fa fa-cogs"></i> Receiver Queue Size</label>
+        <input type="text" id="node-input-receiverQueueSize">
+        <input type="hidden" id="node-input-receiverQueueSize-type">
+    </div>
+    <!--readerName-->
+    <div class="form-row">
+        <label for="node-input-readerName"><i class="fa fa-exchange "></i> Type</label>
+        <input type="text" id="node-input-readerName">
+    </div>
+    <!--readCompacted-->
+    <div class="form-row">
+        <label for="node-input-readCompacted"><i class="fa fa-cogs"></i> Read Compacted</label>
+        <input type="text" id="node-input-readCompacted">
+        <input type="hidden" id="node-input-readCompacted-type">
+    </div>
+    <!--subscriptionRolePrefix-->
+    <div class="form-row">
+        <label for="node-input-subscriptionRolePrefix"><i class="fa fa-exchange "></i> Initial Position</label>
+        <input type="text" id="node-input-subscriptionRolePrefix">
+    </div>
+    <!--privateKeyPath-->
+    <div class="form-row">
+        <label for="node-input-privateKeyPath"><i class="fa fa-key"></i> Private Key Path</label>
+        <input type="text" id="node-input-privateKeyPath">
+    </div>
+    <!--cryptoFailureAction-->
+    <div class="form-row">
+        <label for="node-input-cryptoFailureAction"><i class="fa fa-cogs"></i> Crypto Failure Action</label>
+        <input type="text" id="node-input-cryptoFailureAction">
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="pulsar-reader">
+![Pulsar Logo](https://upload.wikimedia.org/wikipedia/commons/c/cb/Apache-pulsar-blue-logo.svg)
+
+Configure a Pulsar Reader node to read messages from a Pulsar topic.
+
+### Configuration Properties
+
+- `Name`: The name of the node.
+- `Client`: The Pulsar Client node to use.
+- `Schema`: The Pulsar Schema node to use.
+- `Topic`: The topic to read messages from.
+- `Start Message`: The message to start reading from.
+- `Receiver Queue Size`: The size of the receiver queue.
+- `Reader Name`: The name of the reader.
+- `Read Compacted`: Whether to read compacted messages.
+- `Subscription Role Prefix`: The subscription role prefix.
+- `Private Key Path`: The path to the private key.
+- `Crypto Failure Action`: The action to take on crypto failure.
+
+### Input
+
+You can send a message to the input port to change the seek position of the reader.
+
+The message should have its topic set to `seek` and the payload can be as follows:
+
+- `Earliest` (string): Seek to the earliest message
+- `Latest` (string): Seek to the latest message
+- `Timestamp` (number): Seek to the message with the given timestamp
+
+### Output
+
+The node as two output ports, `Message` and `Status`.
+
+#### Message
+
+The node will output messages as they are read from the topic, if the message is a valid JSON object it will be parsed and the parsed object will be sent to the output port.
+
+#### Status
+
+The node will output a status message when its initialization is complete at startup.
+
+```json
+{
+    "topic": "pulsar",
+    "payload": {
+        type: 'reader',
+        status: 'ready',
+        topic: '{topic}',
+    }
+}
+
+### References
+- [Pulsar documentation](https://pulsar.apache.org/docs)
+</script>
