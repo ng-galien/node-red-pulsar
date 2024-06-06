@@ -1,4 +1,5 @@
-**
-!dist/**
-dist/**/*.html.js
-!resources/**
+node_modules/
+tsconfig.json
+src/
+docker/
+.github/
