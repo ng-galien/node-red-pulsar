@@ -1,3 +1,6 @@
-**
-!dist
-!resources
+node_modules/
+tsconfig.json
+src/
+test/
+docker/
+.github/
