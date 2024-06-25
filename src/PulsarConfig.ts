@@ -84,6 +84,10 @@ export function parseNonEmptyObject(value?: string): string | undefined {
         try {
             const object = JSON.parse(value)
             if (typeof object === 'object' && !Array.isArray(object)) {
+                //If the object has no keys, return undefined
+                if (Object.keys(object).length === 0) {
+                    return undefined
+                }
                 return value
             }
         } catch (e) {

@@ -20,6 +20,11 @@ describe('PulsarConfig', () => {
       expect(result).to.be.undefined;
     });
 
+    it('Should return undefined when value is an array', () => {
+      const result = parseNonEmptyObject('{}');
+      expect(result).to.be.undefined;
+    });
+
     it('Should return the string of the object when value is a non-empty object', () => {
       const expectedObject = '{"key":"value"}';
       const result = parseNonEmptyObject(expectedObject);
