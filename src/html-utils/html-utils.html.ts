@@ -44,10 +44,19 @@ function configureOptionalEnumField<T extends string>(isConfig: boolean, optiona
     })
 }
 
+function configureJsonStringField(isConfig: boolean, name: string): void {
+    const propertiesInput = $('#' + (isConfig ? 'node-config-input-' : 'node-input-') + name)
+    if(propertiesInput.typedInput('value') === ''){
+        propertiesInput.typedInput('value', '{}')
+    }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PULSAR_COLOR = '#188fff'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PULSAR_CATEGORY = "pulsar"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const PULSAR_CONFIG = "config"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CLIENT_ID = "pulsar-client"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

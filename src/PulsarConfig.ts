@@ -1,4 +1,10 @@
-import {PulsarConsumerConfig, PulsarProducerConfig, PulsarReaderConfig, StartMessage} from "./PulsarDefinition";
+import {
+    PulsarConsumerConfig,
+    PulsarProducerConfig,
+    PulsarReaderConfig,
+    PulsarSchemaConfig,
+    StartMessage
+} from "./PulsarDefinition";
 import {
     CompressionType,
     ConsumerConfig,
@@ -11,7 +17,7 @@ import {
     ProducerConfig,
     ProducerCryptoFailureAction,
     ReaderConfig,
-    RegexSubscriptionMode,
+    RegexSubscriptionMode, SchemaInfo,
     SubscriptionType
 } from "pulsar-client";
 import {jsonStringToProperties} from "./Properties";
@@ -71,6 +77,21 @@ export function parseChoice<T extends string>(choices: T[], value?: string): T |
         return value as T
     }
     return undefined
+}
+
+export function parseNonEmptyObject(value?: string): string | undefined {
+    if (value) {
+        try {
+            const object = JSON.parse(value)
+            if (typeof object === 'object' && !Array.isArray(object)) {
+                return value
+            }
+        } catch (e) {
+            return undefined
+        }
+    }
+    return undefined
+
 }
 
 /**
@@ -208,5 +229,14 @@ export function readerConfig(config: PulsarReaderConfig): ReaderConfig {
         readCompacted: parseBoolean(config.readCompacted),
         privateKeyPath: parseNonEmptyString(config.privateKeyPath),
         cryptoFailureAction: parseChoice<ConsumerCryptoFailureAction>(['FAIL', 'DISCARD', 'CONSUME'], config.cryptoFailureAction)
+    }
+}
+
+export function schemaConfig(config: PulsarSchemaConfig): SchemaInfo {
+    return {
+        name: config.name,
+        schemaType: config.schemaType,
+        schema: parseNonEmptyObject(config.schema),
+        properties: jsonStringToProperties(config.properties)
     }
 }
