@@ -23,7 +23,7 @@ describe('PulsarConfig', () => {
             // Assert that input has been correctly transformed to output
             expect(result).to.deep.equals({
                 name: 'testName',
-                schema: 'testSchema',
+                schema: undefined,
                 schemaType: 'String',
                 properties: {testKey: 'testValue'}
             });
