@@ -1,6 +1,6 @@
 {
   "name": "@ng-galien/node-red-pulsar",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Node-RED nodes for Apache Pulsar",
   "repository": {
     "type": "git",
@@ -48,7 +48,8 @@
     "pulsar-client": "^1.11.0",
     "save-dev": "^0.0.1-security",
     "tslog": "^4.9.2",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "axios": "^1.6.3"
   },
   "devDependencies": {
     "@types/chai": "^4.3.14",
@@ -57,7 +58,6 @@
     "@types/node-red-node-test-helper": "^0.3.4",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
-    "axios": "^1.6.3",
     "chai": "^4.4.1",
     "chai-wait-for": "^2.0.2",
     "cpx": "^1.5.0",
