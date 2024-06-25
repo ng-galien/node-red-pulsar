@@ -6,7 +6,7 @@ import {AuthenticationOauth2, AuthenticationTls, AuthenticationToken, Message, S
 
 
 //Authentication
-type PulsarAuthenticationType = 'none' | 'token' | 'oauth2' | 'tls'
+export type PulsarAuthenticationType = 'Token' | 'Oauth2' | 'TLS'
 
 interface PulsarAuthenticationProperties {
     authType: PulsarAuthenticationType
@@ -50,17 +50,17 @@ export interface PulsarClientEditorConfig extends PulsarClientProperties, Editor
 export interface PulsarClientConfig extends PulsarClientProperties, NodeRED.NodeDef { }
 
 //Schema
-export interface SchemaProperties {
+export interface PulsarSchemaProperties {
     schemaType: SchemaType
     schemaName?: string
     schema?: string
-    properties?: String
+    properties?: string
 }
 
-export interface PulsarSchemaConfig extends SchemaProperties, NodeRED.NodeDef {
+export interface PulsarSchemaConfig extends PulsarSchemaProperties, NodeRED.NodeDef {
 }
 
-export interface PulsarSchemaEditorConfig extends SchemaProperties, EditorClient.NodeProperties {
+export interface PulsarSchemaEditorConfig extends PulsarSchemaProperties, EditorClient.NodeProperties {
 }
 
 //Consumer

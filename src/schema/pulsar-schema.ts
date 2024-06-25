@@ -1,7 +1,8 @@
 import * as NodeRED from 'node-red'
 import {PulsarSchemaConfig, PulsarSchemaId} from "../PulsarDefinition";
 import {SchemaInfo, SchemaType} from "pulsar-client";
-import {parseMandatoryChoice} from "../PulsarConfig";
+import {parseMandatoryChoice, parseNonEmptyObject} from "../PulsarConfig";
+import {jsonStringToProperties} from "../Properties";
 
 const SchemaTypeChoice: SchemaType[] = [
     'None',
@@ -40,8 +41,8 @@ function createSchemaInfo(config: PulsarSchemaConfig): SchemaInfo {
     return {
         name: config.schemaName,
         schemaType: parseMandatoryChoice<SchemaType>(SchemaTypeChoice, config.schemaType),
-        schema: config.schema,
-        properties: undefined
+        schema: parseNonEmptyObject(config.schema),
+        properties: jsonStringToProperties(config.properties)
     }
 }
 

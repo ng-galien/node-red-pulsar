@@ -1,57 +1,47 @@
 type PulsarSchemaEditorConfig = import("../PulsarDefinition").PulsarSchemaEditorConfig
+type PulsarSchemaType = import("pulsar-client").SchemaType
+
+const schemas: PulsarSchemaType[] = [
+    'None',
+    'String',
+    'Json',
+    'Protobuf',
+    'Avro',
+    'Boolean',
+    'Int8',
+    'Int16',
+    'Int32',
+    'Int64',
+    'Float32',
+    'Float64',
+    'KeyValue',
+    'Bytes',
+    'AutoConsume',
+    'AutoPublish'
+]
 
 RED.nodes.registerType<PulsarSchemaEditorConfig>(SCHEMA_ID, {
-    category: 'config',
-    color: '#188fff',
+    category: PULSAR_CONFIG,
+    color: PULSAR_COLOR,
     icon: "font-awesome/fa-id-card",
     defaults: {
-        schemaName: {value: '', required: false, validate: RED.validators.regex(/^[a-zA-Z0-9_]+$/)},
+        schemaName: {value: '', required: false, validate: RED.validators.regex(/^[a-zA-Z0-9_-]+$/)},
         schemaType: {value: 'None', required: true},
         schema: {value: "", required: false },
         properties: {value: "", required: false }
     },
     label: function() {
-        return this.name || "pulsar-schema";
+        return this.schemaName || "pulsar-schema";
     },
     oneditprepare: function() {
-        $("#node-config-input-schemaType").typedInput({
-            types: [
-                {
-                    value: "None",
-                    options: schemaTypeOptions()
-                }
-            ]
-        })
-        $("#node-config-input-schema").typedInput({
-            default: 'json',
-            types: ['json'],
-            typeField: '#node-config-input-schema-type'
-        });
-        $("#node-config-input-properties").typedInput({
-            default: 'json',
-            types: ['json'],
-            typeField: '#node-config-input-properties-type'
-        });
+        const fields: TypedField[] = [
+            {name: 'schema', type: 'json'},
+            {name: 'properties', type: 'json'}
+        ]
+        configureTypedFields(true, fields)
+        configureEnumField<PulsarSchemaType>(true, 'schemaType', schemas)
+        configureJsonStringField(true, 'schema')
+        configureJsonStringField(true, 'properties')
     }
 });
 
-function schemaTypeOptions(): { value: string, label: string }[] {
-    return [
-        { value: "None", label: "None"},
-        { value: "String", label: "String"},
-        { value: "Json", label: "Json"},
-        { value: "Protobuf", label: "Protobuf"},
-        { value: "Avro", label: "Avro"},
-        { value: "Boolean", label: "Boolean"},
-        { value: "Int8", label: "Int8"},
-        { value: "Int16", label: "Int16"},
-        { value: "Int32", label: "Int32"},
-        { value: "Int64", label: "Int64"},
-        { value: "Float32", label: "Float32"},
-        { value: "Float64", label: "Float64"},
-        { value: "KeyValue", label: "KeyValue"},
-        { value: "Bytes", label: "Bytes"},
-        { value: "AutoConsume", label: "AutoConsume"},
-        { value: "AutoPublish", label: "AutoPublish"}
-    ]
-}

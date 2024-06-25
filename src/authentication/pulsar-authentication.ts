@@ -9,15 +9,13 @@ export = (RED: NodeRED.NodeAPI): void => {
         function (this: NodeRED.Node<AuthenticationImpl>, config: PulsarAuthentication): void {
             async function resolveAuthentication(config: PulsarAuthentication): Promise<AuthenticationImpl> {
                 switch (config.authType) {
-                case 'none':
-                    return {}
-                case 'token':
+                case 'Token':
                     if(!config.jwtToken) {
                         return {}
                     }
                     const token = parseToken(config.jwtToken)
                     return new AuthenticationToken({token: await loadToken(token)})
-                case 'oauth2':
+                case 'Oauth2':
                     if(!config.oauthType || !config.oauthIssuerUrl) {
                         return {}
                     }
@@ -30,7 +28,7 @@ export = (RED: NodeRED.NodeAPI): void => {
                         audience: config.oauthAudience,
                         scope: config.oauthScope
                     })
-                case 'tls':
+                case 'TLS':
                     if(!config.tlsCertificatePath || !config.tlsPrivateKeyPath) {
                         return {}
                     }

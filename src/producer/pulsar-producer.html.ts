@@ -57,10 +57,7 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         configureEnumField<CryptoFailureAction>(false, 'cryptoFailureAction', ['FAIL', 'SEND'])
         type AccessMode = import("pulsar-client").ProducerAccessMode
         configureEnumField<AccessMode>(false, 'accessMode', ['Shared', 'Exclusive', 'WaitForExclusive', 'ExclusiveWithFencing'])
-        const propertiesInput = $('#node-input-properties')
-        if(propertiesInput.typedInput('value') === ''){
-            propertiesInput.typedInput('value', '{}')
-        }
+        configureJsonStringField(false, 'properties')
     }
 })
 
