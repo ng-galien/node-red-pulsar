@@ -6,60 +6,93 @@
 <script type="text/html" data-template-name="pulsar-reader">
     <!--name-->
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name">
+        <label for="node-input-name" style="width: 25%">
+            <i class="fa fa-tag"></i>
+            Name
+        </label>
+        <input type="text" id="node-input-name" style="width: 67%">
     </div>
     <!--clientNodeId-->
     <div class="form-row">
-        <label for="node-input-clientNodeId"><i class="fa fa-cogs"></i> Client</label>
-        <input type="text" id="node-input-clientNodeId">
+        <label for="node-input-clientNodeId" style="width: 25%">
+            <i class="fa fa-cogs"></i>
+            Client
+        </label>
+        <input type="text" id="node-input-clientNodeId" style="width: 67%">
     </div>
     <!--schemaNodeId-->
     <div class="form-row">
-        <label for="node-input-schemaNodeId"><i class="fa fa-puzzle-piece"></i> Schema</label>
-        <input type="text" id="node-input-schemaNodeId">
+        <label for="node-input-schemaNodeId" style="width: 25%">
+            <i class="fa fa-puzzle-piece"></i>
+            Schema
+        </label>
+        <input type="text" id="node-input-schemaNodeId" style="width: 67%">
     </div>
     <!--topic-->
     <div class="form-row">
-        <label for="node-input-topic"><i class="fa fa-comments"></i> Topic</label>
-        <input type="text" id="node-input-topic">
+        <label for="node-input-topic" style="width: 25%">
+            <i class="fa fa-comments"></i>
+            Topic
+        </label>
+        <input type="text" id="node-input-topic" style="width: 67%">
     </div>
     <!--startMessage-->
     <div class="form-row">
-        <label for="node-input-startMessage"><i class="fa fa-comments"></i> Topic Pattern</label>
-        <input type="text" id="node-input-startMessage">
+        <label for="node-input-startMessage" style="width: 35%">
+            <i class="fa fa-comments"></i>
+            Start Message
+        </label>
+        <input type="text" id="node-input-startMessage" style="width: 57%">
     </div>
     <!--receiverQueueSize-->
     <div class="form-row">
-        <label for="node-input-receiverQueueSize"><i class="fa fa-cogs"></i> Receiver Queue Size</label>
-        <input type="text" id="node-input-receiverQueueSize">
+        <label for="node-input-receiverQueueSize" style="width: 35%">
+            <i class="fa fa-cogs"></i>
+            Receiver Queue Size
+        </label>
+        <input type="text" id="node-input-receiverQueueSize" style="width: 57%">
         <input type="hidden" id="node-input-receiverQueueSize-type">
     </div>
     <!--readerName-->
     <div class="form-row">
-        <label for="node-input-readerName"><i class="fa fa-exchange "></i> Type</label>
-        <input type="text" id="node-input-readerName">
+        <label for="node-input-readerName" style="width: 35%">
+            <i class="fa fa-exchange "></i>
+            Reader Name
+        </label>
+        <input type="text" id="node-input-readerName" style="width: 57%">
     </div>
     <!--readCompacted-->
     <div class="form-row">
-        <label for="node-input-readCompacted"><i class="fa fa-cogs"></i> Read Compacted</label>
-        <input type="text" id="node-input-readCompacted">
+        <label for="node-input-readCompacted" style="width: 35%">
+            <i class="fa fa-cogs"></i>
+            Read Compacted
+        </label>
+        <input type="text" id="node-input-readCompacted" style="width: 57%">
         <input type="hidden" id="node-input-readCompacted-type">
     </div>
     <!--subscriptionRolePrefix-->
     <div class="form-row">
-        <label for="node-input-subscriptionRolePrefix"><i class="fa fa-exchange "></i> Initial Position</label>
-        <input type="text" id="node-input-subscriptionRolePrefix">
+        <label for="node-input-subscriptionRolePrefix" style="width: 35%">
+            <i class="fa fa-exchange "></i>
+            Sub. Role Prefix
+        </label>
+        <input type="text" id="node-input-subscriptionRolePrefix" style="width: 57%">
     </div>
     <!--privateKeyPath-->
     <div class="form-row">
-        <label for="node-input-privateKeyPath"><i class="fa fa-key"></i> Private Key Path</label>
-        <input type="text" id="node-input-privateKeyPath">
+        <label for="node-input-privateKeyPath" style="width: 35%">
+            <i class="fa fa-key"></i>
+            Private Key Path
+        </label>
+        <input type="text" id="node-input-privateKeyPath" style="width: 57%">
     </div>
     <!--cryptoFailureAction-->
     <div class="form-row">
-        <label for="node-input-cryptoFailureAction"><i class="fa fa-cogs"></i> Crypto Failure Action</label>
-        <input type="text" id="node-input-cryptoFailureAction">
+        <label for="node-input-cryptoFailureAction" style="width: 35%">
+            <i class="fa fa-cogs"></i>
+            Crypto Failure Action
+        </label>
+        <input type="text" id="node-input-cryptoFailureAction" style="width: 57%">
     </div>
 </script>
 
@@ -78,7 +111,7 @@ Configure a Pulsar Reader node to read messages from a Pulsar topic.
 - `Receiver Queue Size`: The size of the receiver queue.
 - `Reader Name`: The name of the reader.
 - `Read Compacted`: Whether to read compacted messages.
-- `Subscription Role Prefix`: The subscription role prefix.
+- `Sub. Role Prefix`: The subscription role prefix.
 - `Private Key Path`: The path to the private key.
 - `Crypto Failure Action`: The action to take on crypto failure.
 
