@@ -32,5 +32,11 @@ npm i @ng-galien/node-red-pulsar
 
 A [sample](examples/pulsar-nodes.json) flow is provided in the `example` directory. You can import it into your Node-RED instance.
 
+At first a standalone Pulsar instance is required.
+
+```bash
+docker run -it -p 6650:6650  -p 8080:8080 apachepulsar/pulsar bin/pulsar standalone
+```
+
 ![img.png](assets/sample.png)
 
