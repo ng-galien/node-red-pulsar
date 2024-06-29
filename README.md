@@ -28,5 +28,9 @@ These nodes are based on the [Pulsar Node.js client](https://github.com/apache/p
 npm i @ng-galien/node-red-pulsar
 ```
 
-## Sample Flow
+## Example Flow
+
+A [sample](examples/pulsar-nodes.json) flow is provided in the `example` directory. You can import it into your Node-RED instance.
+
+![img.png](assets/sample.png)
 
