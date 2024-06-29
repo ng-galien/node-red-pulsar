@@ -1,6 +1,6 @@
 {
   "name": "@ng-galien/node-red-pulsar",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Node-RED nodes for Apache Pulsar",
   "repository": {
     "type": "git",
@@ -9,6 +9,9 @@
   "publishConfig": {
     "@ng-galien:registry": "https://registry.npmjs.org/",
     "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "scripts": {
     "prepare": "npm run build",
@@ -31,7 +34,8 @@
       "pulsar-consumer": "dist/consumer/pulsar-consumer.js",
       "pulsar-reader": "dist/reader/pulsar-reader.js",
       "pulsar-producer": "dist/producer/pulsar-producer.js"
-    }
+    },
+    "version": ">=3.0.0"
   },
   "keywords": [
     "node-red",
@@ -40,14 +44,11 @@
     "streaming",
     "messaging"
   ],
-  "author": "",
+  "author": "Alexandre Boyer",
   "license": "ISC",
   "dependencies": {
     "@types/uuid": "^9.0.8",
-    "avsc": "^5.7.7",
     "pulsar-client": "^1.11.0",
-    "save-dev": "^0.0.1-security",
-    "tslog": "^4.9.2",
     "uuid": "^9.0.1",
     "axios": "^1.6.3"
   },
@@ -71,6 +72,7 @@
     "testcontainers": "^10.9.0",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "tslog": "^4.9.3"
   }
 }
