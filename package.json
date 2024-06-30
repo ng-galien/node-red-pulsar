@@ -1,10 +1,10 @@
 {
   "name": "@ng-galien/node-red-pulsar",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Node-RED nodes for Apache Pulsar",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ng-galien/node-red-contrib-pulsar.git"
+    "url": "git+https://github.com/ng-galien/node-red-pulsar.git"
   },
   "publishConfig": {
     "@ng-galien:registry": "https://registry.npmjs.org/",
@@ -47,29 +47,29 @@
   "author": "Alexandre Boyer",
   "license": "ISC",
   "dependencies": {
-    "@types/uuid": "^9.0.8",
+    "@types/uuid": "^10.0.0",
     "pulsar-client": "^1.11.0",
-    "uuid": "^9.0.1",
-    "axios": "^1.6.3"
+    "uuid": "^10.0.0",
+    "axios": "^1.7.2"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.14",
-    "@types/mocha": "^10.0.6",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.7",
     "@types/node-red": "^1.3.5",
     "@types/node-red-node-test-helper": "^0.3.4",
-    "@typescript-eslint/eslint-plugin": "^7.7.1",
-    "@typescript-eslint/parser": "^7.7.1",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.14.1",
     "chai": "^4.4.1",
     "chai-wait-for": "^2.0.2",
     "cpx": "^1.5.0",
     "cross-env": "^7.0.3",
-    "eslint": "^8.56.0",
-    "mocha": "^10.4.0",
-    "node-red": "^3.1.9",
-    "node-red-node-test-helper": "^0.3.3",
+    "eslint": "^8.57.0",
+    "mocha": "^10.5.2",
+    "node-red": "^3.1.11",
+    "node-red-node-test-helper": "^0.3.4",
     "sinon": "^18.0.0",
     "standard-version": "^9.5.0",
-    "testcontainers": "^10.9.0",
+    "testcontainers": "^10.10.0",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
