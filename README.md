@@ -1,4 +1,4 @@
-# node-red-contrib-pulsar
+# node-red-pulsar
 
 Add Apache Pulsar support to Node-RED.  
 
