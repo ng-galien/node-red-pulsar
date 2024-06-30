@@ -9,6 +9,7 @@ updates:
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    versioning-strategy: "increase"
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     target-branch: "develop"
