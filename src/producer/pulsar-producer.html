@@ -203,6 +203,20 @@
 
 Configure a Pulsar Producer node to produce messages to a Pulsar topic.
 
+The input payload is serialized to string and sent as the message body.
+
+Additional properties can be set for the message:
+
+- `properties`: A map of properties to set on the message (key-value pairs).
+- `eventTimestamp`: The event timestamp for the message (in milliseconds).
+- `sequenceId`: The sequence ID for the message (a long).
+- `partitionKey`: The partition key for the message (a string).
+- `orderingKey`: The ordering key for the message (a string).
+- `replicationClusters`: The replication clusters for the message (a list of strings).
+- `deliverAfter`: To delay the delivery of the message (in milliseconds).
+- `deliverAt`: The delivery time for the message (in milliseconds).
+- `disableReplication`: Whether to disable replication for the message (a boolean).
+
 ### Configuration Properties
 
 - `Name`: The name of the node.

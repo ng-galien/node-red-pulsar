@@ -3,9 +3,10 @@ import {
     PulsarProducerConfig,
     PulsarProducerId
 } from "../PulsarDefinition";
-import {Producer, ProducerConfig,} from "pulsar-client";
+import {Producer, ProducerConfig, ProducerMessage,} from "pulsar-client";
 import {requireClient, requireSchema} from "../PulsarNode";
 import {producerConfig} from "../PulsarConfig";
+import {anyToBoolean, anyToNumber, anyToProperties, anyToString, anyToStringArray} from "../Properties";
 
 type ProducerNode = NodeRED.Node<Producer>
 
@@ -14,6 +15,25 @@ function setupProducer(RED: NodeRED.NodeAPI, config: PulsarProducerConfig): Prod
         schema: requireSchema(RED, config),
         ... producerConfig(config)
     }
+}
+
+function nodeMessageToPulsarMessage(msg: NodeRED.NodeMessage): ProducerMessage {
+    const str = JSON.stringify(msg.payload)
+    const buffer = Buffer.from(str)
+    const anyMsg = msg as any
+    return  {
+        data: buffer,
+        properties: anyToProperties(anyMsg),
+        eventTimestamp: anyToNumber(anyMsg.eventTimestamp),
+        sequenceId: anyToNumber(anyMsg.sequenceId),
+        partitionKey: anyToString(anyMsg.partitionKey),
+        orderingKey: anyToString(anyMsg.orderingKey),
+        replicationClusters: anyToStringArray(anyMsg.replicationClusters),
+        deliverAfter: anyToNumber(anyMsg.deliverAfter),
+        deliverAt: anyToNumber(anyMsg.deliverAt),
+        disableReplication: anyToBoolean(anyMsg.disableReplication)
+    }
+
 }
 
 export = (RED: NodeRED.NodeAPI): void => {
@@ -66,9 +86,8 @@ export = (RED: NodeRED.NodeAPI): void => {
                     const buffer = Buffer.from(str)
                     try {
                         this.debug('Sending message: ' + buffer)
-                        pulsarProducer.send({
-                            data: buffer
-                        }).then(() => {
+                        const pulsarMessage = nodeMessageToPulsarMessage(msg)
+                        pulsarProducer.send(pulsarMessage).then(() => {
                             node.status({fill: "green", shape: "dot", text: "connected"})
                         }).catch(e => {
                             node.error('Error sending message: ' + e)
