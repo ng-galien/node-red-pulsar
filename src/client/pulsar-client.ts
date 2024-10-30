@@ -1,8 +1,5 @@
 import * as NodeRED from 'node-red'
 import {
-    AuthenticationOauth2,
-    AuthenticationTls,
-    AuthenticationToken,
     Client,
     ClientConfig,
     LogLevel
@@ -15,16 +12,15 @@ import {
 } from "../PulsarDefinition";
 import {parseBoolean, parseNumber, parseNonEmptyString} from "../PulsarConfig";
 
-type ClientAuthentication = AuthenticationToken | AuthenticationOauth2 | AuthenticationTls | undefined
+
 
 type RuntimeNode = NodeRED.Node<Client>
 
-type AuthenticationNode = NodeRED.Node<AuthenticationImpl>
 
-function createPulsarConfigNode(auth: AuthenticationNode, config: PulsarClientConfig): ClientConfig {
+function createPulsarConfigNode(auth: AuthenticationImpl | undefined, config: PulsarClientConfig): ClientConfig {
     return {
         serviceUrl: config.serviceUrl,
-        authentication: resolveAuthentication(auth),
+        authentication: auth,
         operationTimeoutSeconds: parseNumber(config.operationTimeoutSeconds),
         ioThreads: parseNumber(config.ioThreads),
         messageListenerThreads: parseNumber(config.messageListenerThreads),
@@ -34,16 +30,17 @@ function createPulsarConfigNode(auth: AuthenticationNode, config: PulsarClientCo
         tlsValidateHostname: parseBoolean(config.tlsValidateHostname),
         tlsAllowInsecureConnection: parseBoolean(config.tlsAllowInsecureConnection),
         statsIntervalInSeconds: parseNumber(config.statsIntervalInSeconds),
-        listenerName: parseNonEmptyString(config.listenerName)
+        listenerName: parseNonEmptyString(config.listenerName),
     }
 }
 
 export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarClientId,
         function (this: RuntimeNode, config: PulsarClientConfig): void {
-            const authNode = RED.nodes.getNode(config.authenticationNodeId) as NodeRED.Node<AuthenticationImpl>
             RED.nodes.createNode(this, config)
-            const client = createClient(this, createPulsarConfigNode(authNode, config))
+            this.debug('Creating pulsar client')
+            const authentication = getAuthentication(RED, config)
+            const client = createClient(this, createPulsarConfigNode(authentication, config))
             if(client) {
                 this.credentials = client
                 mapClientLoginToNode(this)
@@ -57,19 +54,16 @@ export = (RED: NodeRED.NodeAPI): void => {
     )
 }
 
-
-/**
- * Resolves the authentication based on the provided Node.
- *
- * @param {NodeRED.Node<AuthenticationImpl>} [node] - The Node containing the authentication information.
- * @return {ClientAuthentication} - The resolved ClientAuthentication. Returns undefined if no authentication is provided or if the authentication is NoAuthentication.
- */
-function resolveAuthentication(node?: NodeRED.Node<AuthenticationImpl>): ClientAuthentication {
-    if(!node) {
+function getAuthentication(RED: NodeRED.NodeAPI, config: PulsarClientConfig): AuthenticationImpl | undefined {
+    if(!config.authenticationNodeId) {
         return undefined
     }
-    const auth = node.credentials
-    //If the authentication is NoAuthentication, return undefined
+
+    const authNode = RED.nodes.getNode(config.authenticationNodeId) as NodeRED.Node<AuthenticationImpl>
+    if(!authNode) {
+        return undefined
+    }
+    const auth = authNode.credentials
     if((auth as NoAuthentication).blank) {
         return undefined
     }
@@ -107,6 +101,10 @@ function createClient(node: NodeRED.Node<Client>, clientConfig: ClientConfig): C
  * @return {void}
  */
 function closeClient(node: NodeRED.Node<Client>, done: () => void): void {
+    if(!node) {
+        done()
+        return
+    }
     const client = node.credentials
     if (client) {
         client.close().then(() => {

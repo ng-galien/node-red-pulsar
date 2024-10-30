@@ -22,7 +22,7 @@ function displayTlsFields(show: boolean): void {
  * Registration of the 'pulsar-client' type with its configuration.
  */
 RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_ID, {
-    category: 'config',
+    category: PULSAR_CONFIG,
     icon: 'font-awesome/fa-server',
     color: PULSAR_COLOR,
     defaults: {

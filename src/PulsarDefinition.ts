@@ -28,7 +28,7 @@ export interface NoAuthentication { blank: true }
 
 export type AuthenticationImpl = AuthenticationToken | AuthenticationOauth2 | AuthenticationTls | NoAuthentication
 
-export interface PulsarAuthentication extends PulsarAuthenticationProperties, NodeRED.NodeDef { }
+export interface PulsarAuthenticationConfig extends PulsarAuthenticationProperties, NodeRED.NodeDef { }
 
 //Client
 export interface PulsarClientProperties  {
