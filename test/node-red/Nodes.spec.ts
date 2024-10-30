@@ -1,13 +1,18 @@
+// @ts-ignore
 import helper, {TestFlowsItem} from "node-red-node-test-helper";
 import pulsarClientNode from "../../src/client/pulsar-client";
+import pulsarAuthenticationNode from "../../src/authentication/pulsar-authentication";
 import pulsarSchemaNode from "../../src/schema/pulsar-schema";
 import pulsarProducerNode from "../../src/producer/pulsar-producer";
 import pulsarConsumerNode from "../../src/consumer/pulsar-consumer";
 import pulsarReaderNode from "../../src/reader/pulsar-reader";
-import Pulsar, {Client, SchemaInfo} from 'pulsar-client';
+import Pulsar, {AuthenticationToken, Client, SchemaInfo} from 'pulsar-client';
 import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
 // @ts-ignore
 import {
+    AuthenticationImpl,
+    PulsarAuthenticationConfig,
+    PulsarAuthenticationId,
     PulsarClientConfig,
     PulsarClientId,
     PulsarConsumerConfig, PulsarConsumerId,
@@ -23,6 +28,10 @@ import axios from "axios";
 import {expect} from "chai";
 
 const logger = new Logger();
+
+
+const jwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
+
 
 describe('Pulsar Integration Test', function () {
 
@@ -55,6 +64,17 @@ describe('Pulsar Integration Test', function () {
             helper.stopServer(resolve);
         })
     });
+
+    it('Authentication should be loaded',  async function () {
+        await helper.load([pulsarAuthenticationNode], [authenticationConf()]);
+        const node = helper.getNode("authentication") as Node<AuthenticationImpl>;
+        node.should.not.be.null;
+        const auth: AuthenticationImpl = node.credentials;
+        auth.should.not.be.null;
+        expect(auth).to.be.an.instanceOf(AuthenticationToken);
+        const expectedAuth: AuthenticationToken = new AuthenticationToken({token: jwtToken});
+        expect(expectedAuth).to.be.eql(auth);
+    })
 
     it('Schema should be loaded',  async function () {
         await helper.load([pulsarSchemaNode], [schemaConf()]);
@@ -183,6 +203,7 @@ describe('Pulsar Integration Test', function () {
 
 });
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 async function createPulsarContainer() {
     logger.info("Starting pulsar container")
     return new GenericContainer("apachepulsar/pulsar")
@@ -192,11 +213,13 @@ async function createPulsarContainer() {
         .start()
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 async function stopPulsarContainer(container: StartedTestContainer) {
     console.log("Stopping pulsar container")
     return container.stop()
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 async function createTopic(broker: StartedTestContainer, topic: string) {
     const config = {
         headers: {
@@ -217,12 +240,21 @@ const jsonSchema = {
 
 helper.init(require.resolve('node-red'));
 
-// @ts-ignore
 function clientConf(broker: StartedTestContainer): TestFlowsItem<PulsarClientConfig> {
     return {
         id: "client",
         type: PulsarClientId,
-        serviceUrl: brokerUrl(broker)
+        serviceUrl: brokerUrl(broker),
+        authenticationNodeId: "authentication",
+    }
+}
+
+function authenticationConf(): TestFlowsItem<PulsarAuthenticationConfig> {
+    return {
+        id: "authentication",
+        type: PulsarAuthenticationId,
+        authType: "Token",
+        jwtToken: jwtToken
     }
 }
 
