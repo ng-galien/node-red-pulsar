@@ -43,14 +43,6 @@ describe('Token functions', function () {
         expect(result).to.deep.equal(expected);
     });
 
-    it('Parse url type token', function() {
-        const input = 'http://my_url';
-        const expected: Token = { url: 'http://my_url' };
-
-        const result = parseToken(input);
-
-        expect(result).to.deep.equal(expected);
-    });
 
     it('Parse string type token', function() {
         const input = 'my_string';
@@ -65,7 +57,9 @@ describe('Token functions', function () {
         const input: Token = parseToken('file://my_file')
         const expected = fileJwtToken;
 
-        const result = await loadToken(input);
+        const result = loadToken(input, (error: string) => {
+            expect.fail('Error loading token: ' + error);
+        });
 
         expect(result).to.equal(expected);
     });
@@ -74,34 +68,21 @@ describe('Token functions', function () {
         const input: Token = parseToken('env:my_env')
         const expected = envJwtToken;
 
-        const result = await loadToken(input);
+        const result = loadToken(input, (error: string) => {
+            expect.fail('Error loading token: ' + error);
+        });
 
         expect(result).to.equal(expected);
     });
 
-    it('Load url type token for http', async function() {
-        const input: Token = parseToken('http://my_url')
-        const expected = httpJwtToken;
-
-        const result = await loadToken(input);
-
-        expect(result).to.equal(expected);
-    });
-
-    it('Load url type token for https', async function() {
-        const input: Token = parseToken('https://my_url')
-        const expected = httpJwtToken;
-
-        const result = await loadToken(input);
-
-        expect(result).to.equal(expected);
-    });
 
     it('Load string type token', async function() {
         const input: Token = parseToken('my_string')
         const expected = 'my_string';
 
-        const result = await loadToken(input);
+        const result = loadToken(input, (error: string) => {
+            expect.fail('Error loading token: ' + error);
+        });
 
         expect(result).to.equal(expected);
     });

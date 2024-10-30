@@ -38,8 +38,9 @@ export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarClientId,
         function (this: RuntimeNode, config: PulsarClientConfig): void {
             RED.nodes.createNode(this, config)
-            this.debug('Creating pulsar client')
-            const authentication = getAuthentication(RED, config)
+            this.debug('Getting authentication [config: ' + JSON.stringify(config) + ']')
+            const authentication = getAuthentication(this, RED, config)
+            this.debug('Creating pulsar client with authentication: ' + JSON.stringify(authentication))
             const client = createClient(this, createPulsarConfigNode(authentication, config))
             if(client) {
                 this.credentials = client
@@ -54,17 +55,20 @@ export = (RED: NodeRED.NodeAPI): void => {
     )
 }
 
-function getAuthentication(RED: NodeRED.NodeAPI, config: PulsarClientConfig): AuthenticationImpl | undefined {
+function getAuthentication(node: RuntimeNode, RED: NodeRED.NodeAPI, config: PulsarClientConfig): AuthenticationImpl | undefined {
     if(!config.authenticationNodeId) {
+        node.debug('No authentication node id provided')
         return undefined
     }
-
+    node.trace('Getting authentication node with id: ' + config.authenticationNodeId)
     const authNode = RED.nodes.getNode(config.authenticationNodeId) as NodeRED.Node<AuthenticationImpl>
     if(!authNode) {
+        node.error('No authentication node found with id: ' + config.authenticationNodeId)
         return undefined
     }
     const auth = authNode.credentials
     if((auth as NoAuthentication).blank) {
+        node.debug('No authentication provided')
         return undefined
     }
     return auth

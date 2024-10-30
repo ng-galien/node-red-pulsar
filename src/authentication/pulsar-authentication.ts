@@ -9,25 +9,21 @@ export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarAuthenticationId,
         function (this: RuntimeNode, config: PulsarAuthenticationConfig): void {
             RED.nodes.createNode(this, config)
-            resolveAuthentication(config).then(
-                (auth) => {
-                    this.credentials = auth
-                },
-                (error) => {
-                    this.error(error)
-                }
-            )
+            this.debug('Resolving authentication [config: ' + JSON.stringify(config) + ']')
+            this.credentials = resolveAuthentication(config, (error: string) => {
+                this.error(error)
+            })
         }
     )
 }
 
-async function resolveAuthentication(config: PulsarAuthenticationConfig): Promise<AuthenticationImpl> {
+function resolveAuthentication(config: PulsarAuthenticationConfig, errorHandler: (error: string) => void): AuthenticationImpl {
     switch (config.authType) {
     case 'Token':
-        return createAuthenticationToken(config)
+        return createAuthenticationToken(config, errorHandler)
     case 'Oauth2':
         if(!config.oauthType || !config.oauthIssuerUrl) {
-            return {}
+            return noAuthentication()
         }
         return new AuthenticationOauth2({
             type: config.oauthType,
@@ -40,7 +36,7 @@ async function resolveAuthentication(config: PulsarAuthenticationConfig): Promis
         })
     case 'TLS':
         if(!config.tlsCertificatePath || !config.tlsPrivateKeyPath) {
-            return {}
+            return noAuthentication()
         }
         return new AuthenticationTls({
             certificatePath: config.tlsCertificatePath,
@@ -49,11 +45,20 @@ async function resolveAuthentication(config: PulsarAuthenticationConfig): Promis
     }
 }
 
-async function createAuthenticationToken(config: PulsarAuthenticationConfig): Promise<AuthenticationImpl> {
+function createAuthenticationToken(config: PulsarAuthenticationConfig, errorHandler: (error: string) => void): AuthenticationImpl {
     if(!config.jwtToken) {
-        return {}
+        return noAuthentication()
     }
     const token = parseToken(config.jwtToken)
-    const tokenContent = await loadToken(token)
+    const tokenContent = loadToken(token, errorHandler)
+    if(!tokenContent) {
+        return noAuthentication()
+    }
     return new AuthenticationToken({token: tokenContent})
+}
+
+function noAuthentication(): AuthenticationImpl {
+    return {
+        blank: true
+    }
 }

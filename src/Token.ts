@@ -1,5 +1,4 @@
 import * as fs from "node:fs";
-import axios from 'axios';
 
 type TokenFile = {
     file: string
@@ -7,13 +6,10 @@ type TokenFile = {
 type TokenEnv = {
     env: string
 }
-type TokenUrl = {
-    url: string
-}
 type TokenString = {
     string: string
 }
-export type Token = TokenFile | TokenEnv | TokenUrl | TokenString
+export type Token = TokenFile | TokenEnv | TokenString
 
 /**
  * Parses the given token and returns a Token object based on its type.
@@ -26,8 +22,6 @@ export function parseToken(token: string): Token {
         return {file: token.substring(7)}
     } else if (token.startsWith('env:')) {
         return {env: token.substring(4)}
-    } else if (token.startsWith('http://') || token.startsWith('https://')) {
-        return {url: token}
     } else {
         return {string: token}
     }
@@ -37,17 +31,20 @@ export function parseToken(token: string): Token {
  * Loads the token from the given Token object.
  *
  * @param {Token} token - The Token object.
+ * @param {(error: string) => void} errorHandler - The error handler function.
  * @return {string} - The token string.
  */
-export async function loadToken(token: Token): Promise<string> {
-    if ((token as TokenFile).file) {
-        return fs.readFileSync((token as TokenFile).file, 'utf8')
-    } else if ((token as TokenEnv).env) {
-        return process.env[(token as TokenEnv).env] || ''
-    } else if ((token as TokenUrl).url) {
-        const response = await axios.get((token as TokenUrl).url).then(response => response.data)
-        return response.toString()
-    } else {
-        return (token as TokenString).string
+export function loadToken(token: Token, errorHandler: (error: string) => void): string | undefined {
+    try {
+        if ((token as TokenFile).file) {
+            return fs.readFileSync((token as TokenFile).file, 'utf8')
+        } else if ((token as TokenEnv).env) {
+            return process.env[(token as TokenEnv).env] || ''
+        } else {
+            return (token as TokenString).string
+        }
+    } catch (error) {
+        errorHandler(`Error loading token: ${error}`);
+        return undefined;
     }
 }

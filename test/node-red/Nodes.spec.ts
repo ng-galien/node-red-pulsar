@@ -101,6 +101,16 @@ describe('Pulsar Integration Test', function () {
         logger.info("Client loaded")
     });
 
+    it('Client with credential should initialize',  async function () {
+        await helper.load([pulsarClientNode, pulsarAuthenticationNode], [clientConf(container), authenticationConf()]);
+        const node = helper.getNode("client") as Node<Client>;
+        node.should.not.be.null;
+        const client: Client = node.credentials;
+        client.should.not.be.null;
+        client.should.be.an.instanceOf(Pulsar.Client);
+        logger.info("Client loaded")
+    });
+
     it('Producer should be loaded',  async function () {
         const producerName = "test-producer-" + v4()
         const flow = [
