@@ -5,7 +5,7 @@
 # Ignore all markdown files
 *.md
 
-# Igonre html files
+# Ingore html files
 *.html
 
 # Prettier configuration file
