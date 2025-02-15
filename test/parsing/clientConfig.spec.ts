@@ -7,8 +7,8 @@ import {clientConfig} from "../../src/PulsarConfig";
 import {Node} from "node-red";
 
 
-describe("producerConfig", () => {
-    const node = {} as Node<{}>;
+describe("clientConfig", () => {
+    const node = {} as Node;
     const mockPulsarClientConfig: PulsarClientConfig = {
         id: "",
         name: "",
