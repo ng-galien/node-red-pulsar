@@ -1,59 +1,76 @@
-import * as NodeRED from 'node-red'
-import {
-    Client,
-    ClientConfig,
-    LogLevel
-} from "pulsar-client";
+import * as NodeRED from 'node-red';
+import { Client, ClientConfig, LogLevel } from 'pulsar-client';
 import {
     AuthenticationImpl,
     NoAuthentication,
     PulsarClientConfig,
-    PulsarClientId
-} from "../PulsarDefinition";
-import {clientConfig} from "../PulsarConfig";
+    PulsarClientId,
+} from '../PulsarDefinition';
+import { clientConfig } from '../PulsarConfig';
 
-type RuntimeNode = NodeRED.Node<Client>
+type RuntimeNode = NodeRED.Node<Client>;
 
 export = (RED: NodeRED.NodeAPI): void => {
-    RED.nodes.registerType(PulsarClientId,
+    RED.nodes.registerType(
+        PulsarClientId,
         function (this: RuntimeNode, config: PulsarClientConfig): void {
-            RED.nodes.createNode(this, config)
-            this.debug('Getting authentication [config: ' + JSON.stringify(config) + ']')
-            const authentication = getAuthentication(this, RED, config)
-            this.debug('Creating pulsar client with authentication: ' + JSON.stringify(authentication))
-            const client = createClient(this, clientConfig(this, authentication, config))
-            if(client) {
-                this.credentials = client
-                mapClientLoginToNode(this)
+            RED.nodes.createNode(this, config);
+            this.debug(
+                'Getting authentication [config: ' +
+                    JSON.stringify(config) +
+                    ']',
+            );
+            const authentication = getAuthentication(this, RED, config);
+            this.debug(
+                'Creating pulsar client with authentication: ' +
+                    JSON.stringify(authentication),
+            );
+            const client = createClient(
+                this,
+                clientConfig(this, authentication, config),
+            );
+            if (client) {
+                this.credentials = client;
+                mapClientLoginToNode(this);
             }
-            this.on('close', (removed: boolean, done:() => void) => {
+            this.on('close', (removed: boolean, done: () => void) => {
                 if (!removed) {
-                    closeClient(this, done)
+                    closeClient(this, done);
                 }
-            })
-        }
-    )
-}
+            });
+        },
+    );
+};
 
-function getAuthentication(node: RuntimeNode, RED: NodeRED.NodeAPI, config: PulsarClientConfig): AuthenticationImpl | undefined {
-    if(!config.authenticationNodeId) {
-        node.debug('No authentication node id provided')
-        return undefined
+function getAuthentication(
+    node: RuntimeNode,
+    RED: NodeRED.NodeAPI,
+    config: PulsarClientConfig,
+): AuthenticationImpl | undefined {
+    if (!config.authenticationNodeId) {
+        node.debug('No authentication node id provided');
+        return undefined;
     }
-    node.trace('Getting authentication node with id: ' + config.authenticationNodeId)
-    const authNode = RED.nodes.getNode(config.authenticationNodeId) as NodeRED.Node<AuthenticationImpl>
-    if(!authNode) {
-        node.error('No authentication node found with id: ' + config.authenticationNodeId)
-        return undefined
+    node.trace(
+        'Getting authentication node with id: ' + config.authenticationNodeId,
+    );
+    const authNode = RED.nodes.getNode(
+        config.authenticationNodeId,
+    ) as NodeRED.Node<AuthenticationImpl>;
+    if (!authNode) {
+        node.error(
+            'No authentication node found with id: ' +
+                config.authenticationNodeId,
+        );
+        return undefined;
     }
-    const auth = authNode.credentials
-    if((auth as NoAuthentication).blank) {
-        node.debug('No authentication provided')
-        return undefined
+    const auth = authNode.credentials;
+    if ((auth as NoAuthentication).blank) {
+        node.debug('No authentication provided');
+        return undefined;
     }
-    return auth
+    return auth;
 }
-
 
 /**
  * Creates a new Pulsar client and sets it as credentials for the provided NodeRED node.
@@ -65,17 +82,20 @@ function getAuthentication(node: RuntimeNode, RED: NodeRED.NodeAPI, config: Puls
  *
  * @throws {Error} If there is an error creating the Pulsar client.
  */
-function createClient(node: NodeRED.Node<Client>, clientConfig: ClientConfig): Client | undefined {
+function createClient(
+    node: NodeRED.Node<Client>,
+    clientConfig: ClientConfig,
+): Client | undefined {
     try {
-        node.debug('Creating pulsar client, config: ' + JSON.stringify(clientConfig))
-        return new Client(clientConfig)
-    }
-    catch (e) {
-        node.error('Error creating pulsar client: ' + e)
-        return undefined
+        node.debug(
+            'Creating pulsar client, config: ' + JSON.stringify(clientConfig),
+        );
+        return new Client(clientConfig);
+    } catch (e) {
+        node.error('Error creating pulsar client: ' + e);
+        return undefined;
     }
 }
-
 
 /**
  * Closes the client associated with the given NodeRED node.
@@ -85,20 +105,23 @@ function createClient(node: NodeRED.Node<Client>, clientConfig: ClientConfig): C
  * @return {void}
  */
 function closeClient(node: NodeRED.Node<Client>, done: () => void): void {
-    if(!node) {
-        done()
-        return
+    if (!node) {
+        done();
+        return;
     }
-    const client = node.credentials
+    const client = node.credentials;
     if (client) {
-        client.close().then(() => {
-            done()
-        }).catch((e) => {
-            node.error(e)
-            done()
-        })
+        client
+            .close()
+            .then(() => {
+                done();
+            })
+            .catch((e) => {
+                node.error(e);
+                done();
+            });
     } else {
-        done()
+        done();
     }
 }
 
@@ -109,18 +132,18 @@ function closeClient(node: NodeRED.Node<Client>, done: () => void): void {
 function mapClientLoginToNode(node: NodeRED.Node): void {
     Client.setLogHandler((level, _file, _line, message) => {
         switch (level) {
-        case LogLevel.DEBUG:
-            node.debug(message)
-            break
-        case LogLevel.INFO:
-            node.log(message)
-            break
-        case LogLevel.WARN:
-            node.warn(message)
-            break
-        case LogLevel.ERROR:
-            node.error(message)
-            break
+            case LogLevel.DEBUG:
+                node.debug(message);
+                break;
+            case LogLevel.INFO:
+                node.log(message);
+                break;
+            case LogLevel.WARN:
+                node.warn(message);
+                break;
+            case LogLevel.ERROR:
+                node.error(message);
+                break;
         }
     });
 }

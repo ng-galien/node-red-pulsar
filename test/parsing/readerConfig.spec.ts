@@ -1,18 +1,17 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import {PulsarReaderConfig} from "../../src/PulsarDefinition";
-import {MessageId, ReaderConfig} from "pulsar-client";
-import {readerConfig} from "../../src/PulsarConfig";
-import {Node} from "node-red";
+import { PulsarReaderConfig } from '../../src/PulsarDefinition';
+import { MessageId, ReaderConfig } from 'pulsar-client';
+import { readerConfig } from '../../src/PulsarConfig';
+import { Node } from 'node-red';
 
-describe('readerConfig', function() {
-
+describe('readerConfig', function () {
     it('should correctly configure reader with given config', function () {
         const node = {} as Node<{}>;
         const mockPulsarReaderConfig: PulsarReaderConfig = {
-            clientNodeId: "",
-            schemaNodeId: "",
-            z: "",
+            clientNodeId: '',
+            schemaNodeId: '',
+            z: '',
             id: 'node-red',
             type: 'pulsar-reader',
             name: 'test-node',
@@ -24,7 +23,7 @@ describe('readerConfig', function() {
             subscriptionRolePrefix: 'test-role',
             readCompacted: 'true',
             privateKeyPath: '/path/to/key',
-            cryptoFailureAction: 'FAIL'
+            cryptoFailureAction: 'FAIL',
         };
         const config: ReaderConfig = readerConfig(node, mockPulsarReaderConfig);
         expect(config).to.be.an('object');

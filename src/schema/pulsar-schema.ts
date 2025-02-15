@@ -1,8 +1,8 @@
-import * as NodeRED from 'node-red'
-import {PulsarSchemaConfig, PulsarSchemaId} from "../PulsarDefinition";
-import {SchemaInfo, SchemaType} from "pulsar-client";
-import {parseMandatoryChoice, parseNonEmptyObject} from "../PulsarConfig";
-import {jsonStringToProperties} from "../Properties";
+import * as NodeRED from 'node-red';
+import { PulsarSchemaConfig, PulsarSchemaId } from '../PulsarDefinition';
+import { SchemaInfo, SchemaType } from 'pulsar-client';
+import { parseMandatoryChoice, parseNonEmptyObject } from '../PulsarConfig';
+import { jsonStringToProperties } from '../Properties';
 
 const SchemaTypeChoice: SchemaType[] = [
     'None',
@@ -20,8 +20,8 @@ const SchemaTypeChoice: SchemaType[] = [
     'KeyValue',
     'Bytes',
     'AutoConsume',
-    'AutoPublish'
-]
+    'AutoPublish',
+];
 
 /**
  * Creates a schema information object from the provided configuration.
@@ -40,10 +40,13 @@ const SchemaTypeChoice: SchemaType[] = [
 function createSchemaInfo(config: PulsarSchemaConfig): SchemaInfo {
     return {
         name: config.schemaName,
-        schemaType: parseMandatoryChoice<SchemaType>(SchemaTypeChoice, config.schemaType),
+        schemaType: parseMandatoryChoice<SchemaType>(
+            SchemaTypeChoice,
+            config.schemaType,
+        ),
         schema: parseNonEmptyObject(config.schema),
-        properties: jsonStringToProperties(config.properties)
-    }
+        properties: jsonStringToProperties(config.properties),
+    };
 }
 
 /**
@@ -53,11 +56,14 @@ function createSchemaInfo(config: PulsarSchemaConfig): SchemaInfo {
  * @return {void} - No return value.
  */
 export = (RED: NodeRED.NodeAPI): void => {
-    RED.nodes.registerType(PulsarSchemaId,
-        function (this: NodeRED.Node<SchemaInfo>, config: PulsarSchemaConfig): void {
-            RED.nodes.createNode(this, config)
-            this.credentials = createSchemaInfo(config)
-        }
-    )
-}
-
+    RED.nodes.registerType(
+        PulsarSchemaId,
+        function (
+            this: NodeRED.Node<SchemaInfo>,
+            config: PulsarSchemaConfig,
+        ): void {
+            RED.nodes.createNode(this, config);
+            this.credentials = createSchemaInfo(config);
+        },
+    );
+};

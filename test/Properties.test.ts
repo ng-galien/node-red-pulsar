@@ -5,13 +5,12 @@ import {
     Properties,
     anyToNumber,
     anyToBoolean,
-    anyToString, anyToStringArray
+    anyToString,
+    anyToStringArray,
 } from '../src/Properties';
 
 describe('Properties', () => {
-
     describe('jsonStringToProperties function', () => {
-
         /**
          * This function is responsible for converting a JSON string to a Properties object.
          * A Properties object is a simple key-value object where both key and value are strings.
@@ -26,13 +25,14 @@ describe('Properties', () => {
         });
 
         it('should return undefined when given an invalid JSON string', () => {
-            const invalidJson = "not a json string";
+            const invalidJson = 'not a json string';
             const result = jsonStringToProperties(invalidJson);
             expect(result).to.be.undefined;
         });
 
         it('should skip non-string values in the JSON string', () => {
-            const jsonWithNonStringValues = '{"key1": 1, "key2": true, "key3": "value3"}';
+            const jsonWithNonStringValues =
+                '{"key1": 1, "key2": true, "key3": "value3"}';
             const expected: Properties = { key3: 'value3' };
             const result = jsonStringToProperties(jsonWithNonStringValues);
             expect(result).to.eql(expected);
@@ -59,28 +59,27 @@ describe('Properties', () => {
         });
 
         it('should return undefined when JSON string is a String object', () => {
-            const result = jsonStringToProperties("test");
+            const result = jsonStringToProperties('test');
             expect(result).to.be.undefined;
         });
 
         it('should return undefined when JSON string is a Number object', () => {
-            const result = jsonStringToProperties("123");
+            const result = jsonStringToProperties('123');
             expect(result).to.be.undefined;
         });
 
         it('should return undefined when JSON string is a Boolean object', () => {
-            const result = jsonStringToProperties("true");
+            const result = jsonStringToProperties('true');
             expect(result).to.be.undefined;
         });
     });
 
     describe('anyToProperties function', () => {
-
         /**
-        * This function is responsible for converting any object to a Properties object.
-        * A Properties object is a simple key-value object where both key and value are strings.
-        * If any key or value is not a string, the function converts it to a string.
-        */
+         * This function is responsible for converting any object to a Properties object.
+         * A Properties object is a simple key-value object where both key and value are strings.
+         * If any key or value is not a string, the function converts it to a string.
+         */
 
         it('should return a Properties object when given a valid object', () => {
             const obj = { key1: 'value1', key2: 'value2' };
@@ -90,8 +89,16 @@ describe('Properties', () => {
         });
 
         it('should return a Properties object when given an object with non-string values', () => {
-            const objWithNonStringValues = { key1: 1, key2: true, key3: 'value3' };
-            const expected: Properties = { key1: '1', key2: 'true', key3: 'value3' };
+            const objWithNonStringValues = {
+                key1: 1,
+                key2: true,
+                key3: 'value3',
+            };
+            const expected: Properties = {
+                key1: '1',
+                key2: 'true',
+                key3: 'value3',
+            };
             const result = anyToProperties(objWithNonStringValues);
             expect(result).to.eql(expected);
         });
@@ -130,11 +137,9 @@ describe('Properties', () => {
             const result = anyToProperties([]);
             expect(result).to.be.undefined;
         });
-
     });
 
     describe('anyToNumber function', () => {
-
         /**
          * This function is responsible for converting any object to a number.
          * If the object can't be converted to a number, the function should return undefined.
@@ -152,7 +157,7 @@ describe('Properties', () => {
             expect(result).to.eql(123);
         });
 
-        it('should return undefined when given a string that can\'t be converted to a number', () => {
+        it("should return undefined when given a string that can't be converted to a number", () => {
             const str = 'not a number';
             const result = anyToNumber(str);
             expect(result).to.be.undefined;
@@ -175,7 +180,7 @@ describe('Properties', () => {
         });
 
         it('should return undefined when given an object', () => {
-            const obj = {key: 'value'};
+            const obj = { key: 'value' };
             const result = anyToNumber(obj);
             expect(result).to.be.undefined;
         });
@@ -188,11 +193,10 @@ describe('Properties', () => {
     });
 
     describe('anyToBoolean function', () => {
-
         /**
-        * This function is responsible for converting any object to a boolean.
-        * If the object can't be converted to a boolean, the function should return undefined.
-        */
+         * This function is responsible for converting any object to a boolean.
+         * If the object can't be converted to a boolean, the function should return undefined.
+         */
 
         it('should return a boolean when given a boolean', () => {
             const bool = true;
@@ -206,7 +210,7 @@ describe('Properties', () => {
             expect(result).to.eql(true);
         });
 
-        it('should return undefined when given a string that can\'t be converted to a boolean', () => {
+        it("should return undefined when given a string that can't be converted to a boolean", () => {
             const str = 'not a boolean';
             const result = anyToBoolean(str);
             expect(result).to.be.undefined;
@@ -229,7 +233,7 @@ describe('Properties', () => {
         });
 
         it('should return undefined when given an object', () => {
-            const obj = {key: 'value'};
+            const obj = { key: 'value' };
             const result = anyToBoolean(obj);
             expect(result).to.be.undefined;
         });
@@ -242,11 +246,10 @@ describe('Properties', () => {
     });
 
     describe('anyToString function', () => {
-
         /**
-        * This function is responsible for converting any object to a string.
-        * If the object can't be converted to a string, the function should return undefined.
-        */
+         * This function is responsible for converting any object to a string.
+         * If the object can't be converted to a string, the function should return undefined.
+         */
 
         it('should return a string when given a string', () => {
             const str = 'test';
@@ -267,7 +270,7 @@ describe('Properties', () => {
         });
 
         it('should return a string when given an object', () => {
-            const obj = {key: 'value'};
+            const obj = { key: 'value' };
             const result = anyToString(obj);
             expect(result).to.be.undefined;
         });
@@ -287,16 +290,14 @@ describe('Properties', () => {
             const result = anyToString(arr);
             expect(result).to.be.undefined;
         });
-
     });
 
     describe('anyToStringArray function', () => {
-
         /**
-        * This function is responsible for converting any object to a string array.
-        * If the object can't be converted to an array, return undefined.
-        * If the object is an array, just return members of the array that are strings.
-        */
+         * This function is responsible for converting any object to a string array.
+         * If the object can't be converted to an array, return undefined.
+         * If the object is an array, just return members of the array that are strings.
+         */
 
         it('should return a string array when given an array of strings', () => {
             const arr = ['test', '123', 'true'];
@@ -317,11 +318,11 @@ describe('Properties', () => {
         });
 
         it('should return undefined when given an array of objects', () => {
-            const arr = [{key: 'value'}, {key: 'value'}];
+            const arr = [{ key: 'value' }, { key: 'value' }];
             const result = anyToStringArray(arr);
             expect(result).to.be.undefined;
         });
-    
+
         it('should return undefined when given an array of mixed types', () => {
             const arr = ['test', 123, true];
             const result = anyToStringArray(arr);
@@ -335,5 +336,4 @@ describe('Properties', () => {
             expect(result).to.be.undefined;
         });
     });
-
 });

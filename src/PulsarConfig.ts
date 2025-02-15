@@ -1,11 +1,12 @@
 import {
-    AuthenticationImpl, PulsarClientConfig,
+    AuthenticationImpl,
+    PulsarClientConfig,
     PulsarConsumerConfig,
     PulsarProducerConfig,
     PulsarReaderConfig,
     PulsarSchemaConfig,
-    StartMessage
-} from "./PulsarDefinition";
+    StartMessage,
+} from './PulsarDefinition';
 import {
     ClientConfig,
     CompressionType,
@@ -19,12 +20,13 @@ import {
     ProducerConfig,
     ProducerCryptoFailureAction,
     ReaderConfig,
-    RegexSubscriptionMode, SchemaInfo,
-    SubscriptionType
-} from "pulsar-client";
-import {jsonStringToProperties} from "./Properties";
-import * as NodeRED from "node-red";
-import {Node} from "node-red";
+    RegexSubscriptionMode,
+    SchemaInfo,
+    SubscriptionType,
+} from 'pulsar-client';
+import { jsonStringToProperties } from './Properties';
+import * as NodeRED from 'node-red';
+import { Node } from 'node-red';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -35,8 +37,8 @@ const { v4: uuidv4 } = require('uuid');
  * @return {number | undefined} - The parsed number or undefined if the input value is not a valid number.
  */
 export function parseNumber(value?: string): number | undefined {
-    const num = Number(value)
-    return isNaN(num) ? undefined : num
+    const num = Number(value);
+    return isNaN(num) ? undefined : num;
 }
 
 /**
@@ -47,12 +49,12 @@ export function parseNumber(value?: string): number | undefined {
  */
 export function parseBoolean(value?: string): boolean | undefined {
     if (value === 'true') {
-        return true
+        return true;
     }
     if (value === 'false') {
-        return false
+        return false;
     }
-    return undefined
+    return undefined;
 }
 
 /**
@@ -64,9 +66,9 @@ export function parseBoolean(value?: string): boolean | undefined {
  */
 export function parseNonEmptyString(value?: string): string | undefined {
     if (value) {
-        return value === '' ? undefined : value
+        return value === '' ? undefined : value;
     }
-    return undefined
+    return undefined;
 }
 
 /**
@@ -76,30 +78,32 @@ export function parseNonEmptyString(value?: string): string | undefined {
  * @param {string} [value] - The user input value to be checked against the choices.
  * @return {string|undefined} - The valid choice if the user input matches any of the choices, otherwise undefined.
  */
-export function parseChoice<T extends string>(choices: T[], value?: string): T | undefined {
+export function parseChoice<T extends string>(
+    choices: T[],
+    value?: string,
+): T | undefined {
     if (value && choices.includes(value as T)) {
-        return value as T
+        return value as T;
     }
-    return undefined
+    return undefined;
 }
 
 export function parseNonEmptyObject(value?: string): string | undefined {
     if (value) {
         try {
-            const object = JSON.parse(value)
+            const object = JSON.parse(value);
             if (typeof object === 'object' && !Array.isArray(object)) {
                 //If the object has no keys, return undefined
                 if (Object.keys(object).length === 0) {
-                    return undefined
+                    return undefined;
                 }
-                return value
+                return value;
             }
         } catch (e) {
-            return undefined
+            return undefined;
         }
     }
-    return undefined
-
+    return undefined;
 }
 
 /**
@@ -114,11 +118,14 @@ export function parseNonEmptyObject(value?: string): string | undefined {
  *
  * @returns {T} - The matching choice value.
  */
-export function parseMandatoryChoice<T extends string>(choices: T[], value?: string): T {
+export function parseMandatoryChoice<T extends string>(
+    choices: T[],
+    value?: string,
+): T {
     if (value && choices.includes(value as T)) {
-        return value as T
+        return value as T;
     }
-    throw new Error('Missing mandatory choice value')
+    throw new Error('Missing mandatory choice value');
 }
 
 /**
@@ -135,7 +142,6 @@ interface PulsarTopic {
     pattern?: string;
 }
 
-
 /**
  * Parses a topic string and returns an object representing the topic structure.
  * The topic string can be a single topic, a list of topics separated by ';', or a pattern with '*'.
@@ -148,33 +154,65 @@ interface PulsarTopic {
 export function parseTopic(topic: string): PulsarTopic {
     //If the topic is unidentified or empty, throw an error
     if (!topic || topic === '') {
-        throw new Error('Missing mandatory topic value')
+        throw new Error('Missing mandatory topic value');
     }
     //If the topic is a string with ; try to split it into an array
     if (topic.includes(';')) {
-        const topics = topic.split(';')
-            .map(t => t.trim())
-            .filter(t => t !== '')
-        if(topics.length === 0){
-            throw new Error('Missing mandatory topic value')
+        const topics = topic
+            .split(';')
+            .map((t) => t.trim())
+            .filter((t) => t !== '');
+        if (topics.length === 0) {
+            throw new Error('Missing mandatory topic value');
         }
-        return {list: topics}
+        return { list: topics };
     }
     //If the topic is a string with * it is a pattern
     if (topic.includes('*')) {
-        return {pattern: topic.trim()}
+        return { pattern: topic.trim() };
     }
     //Otherwise it is a single topic
-    return {single: topic.trim()}
+    return { single: topic.trim() };
 }
 
-export function evaluateProperty(rt: Node<{}>, value: string, type: string): string {
-    return NodeRED.util.evaluateNodeProperty(value, type, rt, {}) as string
+export function evaluateProperty(
+    rt: Node<{}>,
+    value: string,
+    type: string,
+): string {
+    return NodeRED.util.evaluateNodeProperty(value, type, rt, {}) as string;
 }
 
-export function clientConfig(rt: Node<{}>, auth: AuthenticationImpl | undefined, config: PulsarClientConfig): ClientConfig {
+/**
+ * Function to validate the Pulsar URL.
+ * @param {string} value - The URL to be validated.
+ * @returns {boolean} - Returns true if the URL is valid, false otherwise.
+ */
+function validatePulsarUrl(value: string): boolean {
+    return value !== undefined && value.match(/^pulsar:\/\/.+/) !== null;
+}
+
+/**
+ * Creates a new Pulsar client configuration object based on the provided configuration.
+ * @param rt - The NodeRED Node object.
+ * @param auth - The authentication object.
+ * @param config - The configuration object.
+ */
+export function clientConfig(
+    rt: Node<{}>,
+    auth: AuthenticationImpl | undefined,
+    config: PulsarClientConfig,
+): ClientConfig {
+    const pulsarUrl = evaluateProperty(
+        rt,
+        config.serviceUrl,
+        config.serviceUrlTypedInput,
+    );
+    if (!validatePulsarUrl(pulsarUrl)) {
+        throw new Error('Invalid Pulsar service URL');
+    }
     return {
-        serviceUrl: evaluateProperty(rt, config.serviceUrl, config.serviceUrlTypedInput),
+        serviceUrl: pulsarUrl,
         authentication: auth,
         operationTimeoutSeconds: parseNumber(config.operationTimeoutSeconds),
         ioThreads: parseNumber(config.ioThreads),
@@ -183,83 +221,154 @@ export function clientConfig(rt: Node<{}>, auth: AuthenticationImpl | undefined,
         useTls: parseBoolean(config.useTls),
         tlsTrustCertsFilePath: config.tlsTrustCertsFilePath,
         tlsValidateHostname: parseBoolean(config.tlsValidateHostname),
-        tlsAllowInsecureConnection: parseBoolean(config.tlsAllowInsecureConnection),
+        tlsAllowInsecureConnection: parseBoolean(
+            config.tlsAllowInsecureConnection,
+        ),
         statsIntervalInSeconds: parseNumber(config.statsIntervalInSeconds),
         listenerName: parseNonEmptyString(config.listenerName),
-    }
+    };
 }
 
-export function consumerConfig(rt: Node<{}>, config: PulsarConsumerConfig): ConsumerConfig {
-    const typedTopic = evaluateProperty(rt, config.topic, config.topicTypedInput)
-    const topic = parseTopic(typedTopic)
+/**
+ * Creates a new Pulsar consumer configuration object based on the provided configuration.
+ * @param rt - The NodeRED Node object.
+ * @param config - The configuration object.
+ */
+export function consumerConfig(
+    rt: Node<{}>,
+    config: PulsarConsumerConfig,
+): ConsumerConfig {
+    const typedTopic = evaluateProperty(
+        rt,
+        config.topic,
+        config.topicTypedInput,
+    );
+    const topic = parseTopic(typedTopic);
     return {
         topic: topic.single,
         topics: topic.list,
         topicsPattern: topic.pattern,
         subscription: config.subscription || 'consumer-' + uuidv4(),
-        subscriptionType: parseMandatoryChoice<SubscriptionType>(['Exclusive', 'Shared', 'KeyShared', 'Failover'], config.subscriptionType),
-        subscriptionInitialPosition: parseChoice<InitialPosition>(['Latest', 'Earliest'], config.subscriptionInitialPosition),
+        subscriptionType: parseMandatoryChoice<SubscriptionType>(
+            ['Exclusive', 'Shared', 'KeyShared', 'Failover'],
+            config.subscriptionType,
+        ),
+        subscriptionInitialPosition: parseChoice<InitialPosition>(
+            ['Latest', 'Earliest'],
+            config.subscriptionInitialPosition,
+        ),
         ackTimeoutMs: parseNumber(config.ackTimeoutMs),
         nAckRedeliverTimeoutMs: parseNumber(config.nAckRedeliverTimeoutMs),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
-        receiverQueueSizeAcrossPartitions: parseNumber(config.receiverQueueSizeAcrossPartitions),
+        receiverQueueSizeAcrossPartitions: parseNumber(
+            config.receiverQueueSizeAcrossPartitions,
+        ),
         consumerName: config.consumerName || 'consumer-' + uuidv4(),
         properties: jsonStringToProperties(config.properties),
         readCompacted: parseBoolean(config.readCompacted),
         privateKeyPath: parseNonEmptyString(config.privateKeyPath),
-        cryptoFailureAction: parseChoice<ConsumerCryptoFailureAction>(['FAIL', 'DISCARD', 'CONSUME'], config.cryptoFailureAction),
+        cryptoFailureAction: parseChoice<ConsumerCryptoFailureAction>(
+            ['FAIL', 'DISCARD', 'CONSUME'],
+            config.cryptoFailureAction,
+        ),
         maxPendingChunkedMessage: parseNumber(config.maxPendingChunkedMessage),
-        autoAckOldestChunkedMessageOnQueueFull: parseNumber(config.autoAckOldestChunkedMessageOnQueueFull),
+        autoAckOldestChunkedMessageOnQueueFull: parseNumber(
+            config.autoAckOldestChunkedMessageOnQueueFull,
+        ),
         batchIndexAckEnabled: parseBoolean(config.batchIndexAckEnabled),
-        regexSubscriptionMode: parseChoice<RegexSubscriptionMode>(['PersistentOnly', 'NonPersistentOnly', "AllTopics"], config.regexSubscriptionMode),
+        regexSubscriptionMode: parseChoice<RegexSubscriptionMode>(
+            ['PersistentOnly', 'NonPersistentOnly', 'AllTopics'],
+            config.regexSubscriptionMode,
+        ),
         deadLetterPolicy: undefined,
-        batchReceivePolicy: undefined
-    }
+        batchReceivePolicy: undefined,
+    };
 }
 
-export function producerConfig(rt: Node<{}>, config: PulsarProducerConfig): ProducerConfig {
+/**
+ * Creates a new Pulsar producer configuration object based on the provided configuration.
+ * @param rt - The NodeRED Node object.
+ * @param config - The configuration object.
+ */
+export function producerConfig(
+    rt: Node<{}>,
+    config: PulsarProducerConfig,
+): ProducerConfig {
     const result = {
         topic: evaluateProperty(rt, config.topic, config.topicTypedInput),
         producerName: parseNonEmptyString(config.producerName),
         sendTimeoutMs: parseNumber(config.sendTimeoutMs),
         initialSequenceId: parseNumber(config.initialSequenceId),
         maxPendingMessages: parseNumber(config.maxPendingMessages),
-        maxPendingMessagesAcrossPartitions: parseNumber(config.maxPendingMessagesAcrossPartitions),
+        maxPendingMessagesAcrossPartitions: parseNumber(
+            config.maxPendingMessagesAcrossPartitions,
+        ),
         blockIfQueueFull: parseBoolean(config.blockIfQueueFull),
-        messageRoutingMode: parseChoice<MessageRoutingMode>(['UseSinglePartition', 'CustomPartition', 'RoundRobinDistribution'], config.messageRoutingMode),
-        hashingScheme: parseChoice<HashingScheme>(['Murmur3_32Hash', 'BoostHash', 'JavaStringHash'], config.hashingScheme),
-        compressionType: parseChoice<CompressionType>(['Zlib', 'LZ4', 'ZSTD', "SNAPPY"], config.compressionType),
+        messageRoutingMode: parseChoice<MessageRoutingMode>(
+            ['UseSinglePartition', 'CustomPartition', 'RoundRobinDistribution'],
+            config.messageRoutingMode,
+        ),
+        hashingScheme: parseChoice<HashingScheme>(
+            ['Murmur3_32Hash', 'BoostHash', 'JavaStringHash'],
+            config.hashingScheme,
+        ),
+        compressionType: parseChoice<CompressionType>(
+            ['Zlib', 'LZ4', 'ZSTD', 'SNAPPY'],
+            config.compressionType,
+        ),
         batchingEnabled: parseBoolean(config.batchingEnabled),
-        batchingMaxPublishDelayMs: parseNumber(config.batchingMaxPublishDelayMs),
+        batchingMaxPublishDelayMs: parseNumber(
+            config.batchingMaxPublishDelayMs,
+        ),
         batchingMaxMessages: parseNumber(config.batchingMaxMessages),
         properties: jsonStringToProperties(config.properties),
         publicKeyPath: parseNonEmptyString(config.publicKeyPath),
         encryptionKey: parseNonEmptyString(config.encryptionKey),
-        cryptoFailureAction: parseChoice<ProducerCryptoFailureAction>(['FAIL', 'SEND'], config.cryptoFailureAction),
+        cryptoFailureAction: parseChoice<ProducerCryptoFailureAction>(
+            ['FAIL', 'SEND'],
+            config.cryptoFailureAction,
+        ),
         chunkingEnabled: parseBoolean(config.chunkingEnabled),
-        accessMode: parseChoice<ProducerAccessMode>(['Shared', 'Exclusive', 'ExclusiveWithFencing', 'WaitForExclusive'], config.accessMode)
+        accessMode: parseChoice<ProducerAccessMode>(
+            ['Shared', 'Exclusive', 'ExclusiveWithFencing', 'WaitForExclusive'],
+            config.accessMode,
+        ),
+    };
+    if (result.chunkingEnabled && result.batchingEnabled) {
+        throw new Error(
+            'Chunking and batching cannot be enabled at the same time',
+        );
     }
-    if(result.chunkingEnabled && result.batchingEnabled){
-        throw new Error('Chunking and batching cannot be enabled at the same time')
-    }
-    return result
+    return result;
 }
 
+/**
+ * Creates a new Pulsar reader configuration object based on the provided configuration.
+ * @param start - The start message configuration.
+ */
 export function readerPosition(start: StartMessage): MessageId {
-    return start === "Earliest" ? MessageId.earliest() : MessageId.latest()
+    return start === 'Earliest' ? MessageId.earliest() : MessageId.latest();
 }
 
-export function readerConfig(rt: Node<{}>, config: PulsarReaderConfig): ReaderConfig {
+export function readerConfig(
+    rt: Node<{}>,
+    config: PulsarReaderConfig,
+): ReaderConfig {
     return {
         topic: evaluateProperty(rt, config.topic, config.topicTypedInput),
         startMessageId: readerPosition(config.startMessage),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
         readerName: parseNonEmptyString(config.readerName),
-        subscriptionRolePrefix: parseNonEmptyString(config.subscriptionRolePrefix),
+        subscriptionRolePrefix: parseNonEmptyString(
+            config.subscriptionRolePrefix,
+        ),
         readCompacted: parseBoolean(config.readCompacted),
         privateKeyPath: parseNonEmptyString(config.privateKeyPath),
-        cryptoFailureAction: parseChoice<ConsumerCryptoFailureAction>(['FAIL', 'DISCARD', 'CONSUME'], config.cryptoFailureAction)
-    }
+        cryptoFailureAction: parseChoice<ConsumerCryptoFailureAction>(
+            ['FAIL', 'DISCARD', 'CONSUME'],
+            config.cryptoFailureAction,
+        ),
+    };
 }
 
 export function schemaConfig(config: PulsarSchemaConfig): SchemaInfo {
@@ -267,6 +376,6 @@ export function schemaConfig(config: PulsarSchemaConfig): SchemaInfo {
         name: config.name,
         schemaType: config.schemaType,
         schema: parseNonEmptyObject(config.schema),
-        properties: jsonStringToProperties(config.properties)
-    }
+        properties: jsonStringToProperties(config.properties),
+    };
 }

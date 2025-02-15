@@ -1,4 +1,4 @@
-import {Node} from "node-red";
+import { Node } from 'node-red';
 
 export function fakeNode(): Node<{}> {
     return {} as Node<{}>;

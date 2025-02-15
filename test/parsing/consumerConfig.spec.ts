@@ -1,34 +1,39 @@
-import {expect} from 'chai';
-import {consumerConfig} from '../../src/PulsarConfig';
-import {PulsarConsumerConfig} from "../../src/PulsarDefinition";
-import {Node} from "node-red";
+import { expect } from 'chai';
+import { consumerConfig } from '../../src/PulsarConfig';
+import { PulsarConsumerConfig } from '../../src/PulsarDefinition';
+import { Node } from 'node-red';
 
 describe('consumerConfig', () => {
     const node = {} as Node<{}>;
 
     it('should generate a valid ConsumerConfig object given a PulsarConsumerConfig', () => {
         const mockPulsarConsumerConfig: PulsarConsumerConfig = {
-            clientNodeId: "", id: "", name: "", schemaNodeId: "", type: "", z: "",
+            clientNodeId: '',
+            id: '',
+            name: '',
+            schemaNodeId: '',
+            type: '',
+            z: '',
             topic: 'test-topic',
             topicType: 'str',
             subscription: undefined,
             subscriptionType: 'Exclusive',
             subscriptionInitialPosition: 'Latest',
-            ackTimeoutMs: "3000",
-            nAckRedeliverTimeoutMs: "4000",
-            receiverQueueSize: "10",
-            receiverQueueSizeAcrossPartitions: "5",
+            ackTimeoutMs: '3000',
+            nAckRedeliverTimeoutMs: '4000',
+            receiverQueueSize: '10',
+            receiverQueueSizeAcrossPartitions: '5',
             consumerName: 'test-consumer',
             properties: undefined,
-            readCompacted: "true",
+            readCompacted: 'true',
             privateKeyPath: 'path/to/privateKey',
             cryptoFailureAction: 'FAIL',
-            maxPendingChunkedMessage: "10",
-            autoAckOldestChunkedMessageOnQueueFull: "5",
-            batchIndexAckEnabled: "true",
+            maxPendingChunkedMessage: '10',
+            autoAckOldestChunkedMessageOnQueueFull: '5',
+            batchIndexAckEnabled: 'true',
             regexSubscriptionMode: 'AllTopics',
             deadLetterPolicy: undefined,
-            batchReceivePolicy: undefined
+            batchReceivePolicy: undefined,
         };
 
         const config = consumerConfig(node, mockPulsarConsumerConfig);

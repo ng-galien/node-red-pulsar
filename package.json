@@ -58,6 +58,7 @@
     "@types/node-red-node-test-helper": "^0.3.4",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
+    "axios": "1.7.8",
     "chai": "^4.4.1",
     "chai-wait-for": "^2.0.2",
     "cpx": "^1.5.0",
@@ -66,13 +67,13 @@
     "mocha": "^10.5.2",
     "node-red": "^3.1.11",
     "node-red-node-test-helper": "^0.3.4",
+    "prettier": "^3.5.1",
     "sinon": "^18.0.0",
     "standard-version": "^9.5.0",
     "testcontainers": "^10.10.3",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5",
     "tslog": "^4.9.3",
-    "axios": "1.7.8"
+    "typescript": "^5.4.5"
   }
 }

@@ -1,158 +1,194 @@
-import * as NodeRED from 'node-red'
-import {NodeMessage} from 'node-red'
-import * as EditorClient from '@node-red/editor-client'
-import {AuthenticationOauth2, AuthenticationTls, AuthenticationToken, Message, SchemaType} from 'pulsar-client'
+import * as NodeRED from 'node-red';
+import { NodeMessage } from 'node-red';
+import * as EditorClient from '@node-red/editor-client';
+import {
+    AuthenticationOauth2,
+    AuthenticationTls,
+    AuthenticationToken,
+    Message,
+    SchemaType,
+} from 'pulsar-client';
 
 //Authentication
-export type PulsarAuthenticationType = 'Token' | 'Oauth2' | 'TLS'
+export type PulsarAuthenticationType = 'Token' | 'Oauth2' | 'TLS';
 
 interface PulsarAuthenticationProperties {
-    authType: PulsarAuthenticationType
-    jwtToken?: string
-    oauthType?: string
-    oauthIssuerUrl?: string
-    oauthClientId?: string
-    oauthClientSecret?: string
-    oauthPrivateKey?: string
-    oauthAudience?: string
-    oauthScope?: string
-    tlsCertificatePath?: string
-    tlsPrivateKeyPath?: string
+    authType: PulsarAuthenticationType;
+    jwtToken?: string;
+    oauthType?: string;
+    oauthIssuerUrl?: string;
+    oauthClientId?: string;
+    oauthClientSecret?: string;
+    oauthPrivateKey?: string;
+    oauthAudience?: string;
+    oauthScope?: string;
+    tlsCertificatePath?: string;
+    tlsPrivateKeyPath?: string;
 }
 
-export interface PulsarAuthenticationEditorConfig extends PulsarAuthenticationProperties, EditorClient.NodeProperties { }
+export interface PulsarAuthenticationEditorConfig
+    extends PulsarAuthenticationProperties,
+        EditorClient.NodeProperties {}
 
-export interface NoAuthentication { blank: true }
+export interface NoAuthentication {
+    blank: true;
+}
 
-export type AuthenticationImpl = AuthenticationToken | AuthenticationOauth2 | AuthenticationTls | NoAuthentication
+export type AuthenticationImpl =
+    | AuthenticationToken
+    | AuthenticationOauth2
+    | AuthenticationTls
+    | NoAuthentication;
 
-export interface PulsarAuthenticationConfig extends PulsarAuthenticationProperties, NodeRED.NodeDef { }
+export interface PulsarAuthenticationConfig
+    extends PulsarAuthenticationProperties,
+        NodeRED.NodeDef {}
 
 //Client
-export interface PulsarClientProperties  {
-    authenticationNodeId: string
-    serviceUrl: string
-    serviceUrlTypedInput: string
-    operationTimeoutSeconds?: string
-    ioThreads?: string
-    messageListenerThreads?: string
-    concurrentLookupRequest?: string
-    useTls?: string
-    tlsTrustCertsFilePath?: string
-    tlsValidateHostname?: string
-    tlsAllowInsecureConnection?: string
-    statsIntervalInSeconds?: string
-    listenerName?: string
+export interface PulsarClientProperties {
+    authenticationNodeId: string;
+    serviceUrl: string;
+    serviceUrlTypedInput: string;
+    operationTimeoutSeconds?: string;
+    ioThreads?: string;
+    messageListenerThreads?: string;
+    concurrentLookupRequest?: string;
+    useTls?: string;
+    tlsTrustCertsFilePath?: string;
+    tlsValidateHostname?: string;
+    tlsAllowInsecureConnection?: string;
+    statsIntervalInSeconds?: string;
+    listenerName?: string;
 }
-export interface PulsarClientEditorConfig extends PulsarClientProperties, EditorClient.NodeProperties {}
+export interface PulsarClientEditorConfig
+    extends PulsarClientProperties,
+        EditorClient.NodeProperties {}
 
-export interface PulsarClientConfig extends PulsarClientProperties, NodeRED.NodeDef { }
+export interface PulsarClientConfig
+    extends PulsarClientProperties,
+        NodeRED.NodeDef {}
 
 //Schema
 export interface PulsarSchemaProperties {
-    schemaType: SchemaType
-    schemaName?: string
-    schema?: string
-    properties?: string
+    schemaType: SchemaType;
+    schemaName?: string;
+    schema?: string;
+    properties?: string;
 }
 
-export interface PulsarSchemaConfig extends PulsarSchemaProperties, NodeRED.NodeDef {
-}
+export interface PulsarSchemaConfig
+    extends PulsarSchemaProperties,
+        NodeRED.NodeDef {}
 
-export interface PulsarSchemaEditorConfig extends PulsarSchemaProperties, EditorClient.NodeProperties {
-}
+export interface PulsarSchemaEditorConfig
+    extends PulsarSchemaProperties,
+        EditorClient.NodeProperties {}
 
 //Consumer
 export interface PulsarConsumerProperties {
-    clientNodeId: string
-    schemaNodeId: string
-    topic: string,
-    topicTypedInput: string
-    subscription?: string
-    subscriptionType: string
-    subscriptionInitialPosition?: string
-    ackTimeoutMs?: string
-    nAckRedeliverTimeoutMs?: string
-    receiverQueueSize?: string
-    receiverQueueSizeAcrossPartitions?: string
-    consumerName?: string
-    properties?: string
-    readCompacted?: string
-    privateKeyPath?: string
-    cryptoFailureAction?: string
-    maxPendingChunkedMessage?: string
-    autoAckOldestChunkedMessageOnQueueFull?: string
-    batchIndexAckEnabled?: string
-    regexSubscriptionMode?: string
-    deadLetterPolicy?: string
-    batchReceivePolicy?: string
+    clientNodeId: string;
+    schemaNodeId: string;
+    topic: string;
+    topicTypedInput: string;
+    subscription?: string;
+    subscriptionType: string;
+    subscriptionInitialPosition?: string;
+    ackTimeoutMs?: string;
+    nAckRedeliverTimeoutMs?: string;
+    receiverQueueSize?: string;
+    receiverQueueSizeAcrossPartitions?: string;
+    consumerName?: string;
+    properties?: string;
+    readCompacted?: string;
+    privateKeyPath?: string;
+    cryptoFailureAction?: string;
+    maxPendingChunkedMessage?: string;
+    autoAckOldestChunkedMessageOnQueueFull?: string;
+    batchIndexAckEnabled?: string;
+    regexSubscriptionMode?: string;
+    deadLetterPolicy?: string;
+    batchReceivePolicy?: string;
 }
 
-export interface PulsarConsumerConfig extends PulsarConsumerProperties, NodeRED.NodeDef {}
+export interface PulsarConsumerConfig
+    extends PulsarConsumerProperties,
+        NodeRED.NodeDef {}
 
-export interface PulsarConsumerEditorConfig extends PulsarConsumerProperties, EditorClient.NodeProperties {}
+export interface PulsarConsumerEditorConfig
+    extends PulsarConsumerProperties,
+        EditorClient.NodeProperties {}
 
 //Producer
 export interface PulsarProducerProperties {
-    clientNodeId: string
-    schemaNodeId: string
-    topic: string
-    topicTypedInput: string
-    producerName?: string
-    sendTimeoutMs?: string
-    initialSequenceId?: string
-    maxPendingMessages?: string
-    maxPendingMessagesAcrossPartitions?: string
-    blockIfQueueFull?: string
-    messageRoutingMode?: string
-    hashingScheme?: string
-    compressionType?: string
-    batchingEnabled?: string
-    batchingMaxPublishDelayMs?: string
-    batchingMaxMessages?: string
-    properties?: any
-    publicKeyPath?: string
-    encryptionKey?: string
-    cryptoFailureAction?: string
-    chunkingEnabled?: string
-    accessMode?: string
+    clientNodeId: string;
+    schemaNodeId: string;
+    topic: string;
+    topicTypedInput: string;
+    producerName?: string;
+    sendTimeoutMs?: string;
+    initialSequenceId?: string;
+    maxPendingMessages?: string;
+    maxPendingMessagesAcrossPartitions?: string;
+    blockIfQueueFull?: string;
+    messageRoutingMode?: string;
+    hashingScheme?: string;
+    compressionType?: string;
+    batchingEnabled?: string;
+    batchingMaxPublishDelayMs?: string;
+    batchingMaxMessages?: string;
+    properties?: any;
+    publicKeyPath?: string;
+    encryptionKey?: string;
+    cryptoFailureAction?: string;
+    chunkingEnabled?: string;
+    accessMode?: string;
 }
 
-export interface PulsarProducerConfig extends PulsarProducerProperties, NodeRED.NodeDef {}
+export interface PulsarProducerConfig
+    extends PulsarProducerProperties,
+        NodeRED.NodeDef {}
 
-export interface PulsarProducerEditorConfig extends PulsarProducerProperties, EditorClient.NodeProperties {}
+export interface PulsarProducerEditorConfig
+    extends PulsarProducerProperties,
+        EditorClient.NodeProperties {}
 
 //Reader
-export type StartMessage = "Earliest" | "Latest"
+export type StartMessage = 'Earliest' | 'Latest';
 
 export interface PulsarReaderProperties {
-    clientNodeId: string
-    schemaNodeId: string
-    topic: string
-    topicTypedInput: string
-    startMessage: StartMessage
-    receiverQueueSize?: string
-    readerName?: string
-    subscriptionRolePrefix?: string
-    readCompacted?: string
-    privateKeyPath?: string
-    cryptoFailureAction?: string
+    clientNodeId: string;
+    schemaNodeId: string;
+    topic: string;
+    topicTypedInput: string;
+    startMessage: StartMessage;
+    receiverQueueSize?: string;
+    readerName?: string;
+    subscriptionRolePrefix?: string;
+    readCompacted?: string;
+    privateKeyPath?: string;
+    cryptoFailureAction?: string;
 }
 
-export interface PulsarReaderConfig extends PulsarReaderProperties, NodeRED.NodeDef {}
+export interface PulsarReaderConfig
+    extends PulsarReaderProperties,
+        NodeRED.NodeDef {}
 
-export interface PulsarReaderEditorConfig extends PulsarReaderProperties, EditorClient.NodeProperties {}
+export interface PulsarReaderEditorConfig
+    extends PulsarReaderProperties,
+        EditorClient.NodeProperties {}
 
-type EditorWidgetTypedInputType = import("node-red").EditorWidgetTypedInputType
+type EditorWidgetTypedInputType = import('node-red').EditorWidgetTypedInputType;
 
 //Editor
-export type FieldDefinition = EditorWidgetTypedInputType | EditorWidgetTypedInputType[]
+export type FieldDefinition =
+    | EditorWidgetTypedInputType
+    | EditorWidgetTypedInputType[];
 
 export interface TypedField {
-    name: string
-    type: FieldDefinition,
-    value?: string,
-    defaultType?: EditorWidgetTypedInputType
+    name: string;
+    type: FieldDefinition;
+    value?: string;
+    defaultType?: EditorWidgetTypedInputType;
 }
 
 /**
@@ -160,59 +196,60 @@ export interface TypedField {
  *
  * @type {string}
  */
-export const PulsarClientId: string = "pulsar-client"
+export const PulsarClientId: string = 'pulsar-client';
 
 /**
  * The identifier for the Pulsar authentication.
  *
  * @type {string}
  */
-export const PulsarAuthenticationId: string = "pulsar-authentication"
+export const PulsarAuthenticationId: string = 'pulsar-authentication';
 
 /**
  * The identifier for the Pulsar schema.
  *
  * @type {string}
  */
-export const PulsarSchemaId: string = "pulsar-schema"
+export const PulsarSchemaId: string = 'pulsar-schema';
 
 /**
  * The identifier for the Pulsar consumer.
  *
  * @type {string}
  */
-export const PulsarConsumerId: string = "pulsar-consumer"
+export const PulsarConsumerId: string = 'pulsar-consumer';
 
 /**
  * The identifier for the Pulsar producer.
  *
  * @type {string}
  */
-export const PulsarProducerId: string = "pulsar-producer"
+export const PulsarProducerId: string = 'pulsar-producer';
 
 /**
  * The identifier for the Pulsar reader.
  *
  * @type {string}
  */
-export const PulsarReaderId: string = "pulsar-reader"
-
+export const PulsarReaderId: string = 'pulsar-reader';
 
 export interface DecodedPulsarMessage extends NodeMessage {
-    topic: string
-    messageId: string
-    publishTimeStamp: number
-    eventTimeStamp: number
-    redeliveryCount: number
-    partitionKey: string
-    properties: Record<string, string>
+    topic: string;
+    messageId: string;
+    publishTimeStamp: number;
+    eventTimeStamp: number;
+    redeliveryCount: number;
+    partitionKey: string;
+    properties: Record<string, string>;
 }
 
-export function readPulsarMessage(pulsarMessage: Message): DecodedPulsarMessage {
-    const data = pulsarMessage.getData().toString("utf-8")
-    let payload: any = data
+export function readPulsarMessage(
+    pulsarMessage: Message,
+): DecodedPulsarMessage {
+    const data = pulsarMessage.getData().toString('utf-8');
+    let payload: any = data;
     try {
-        payload = JSON.parse(data)
+        payload = JSON.parse(data);
     } catch (e) {
         // Ignore
     }
@@ -224,6 +261,6 @@ export function readPulsarMessage(pulsarMessage: Message): DecodedPulsarMessage 
         eventTimeStamp: pulsarMessage.getEventTimestamp(),
         redeliveryCount: pulsarMessage.getRedeliveryCount(),
         partitionKey: pulsarMessage.getPartitionKey(),
-        properties: pulsarMessage.getProperties()
-    }
+        properties: pulsarMessage.getProperties(),
+    };
 }

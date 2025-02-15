@@ -8,31 +8,6 @@
     "env": []
   },
   {
-    "id": "16849d1efa765e73",
-    "type": "pulsar-client",
-    "name": "Pulsar Standalone",
-    "authenticationNodeId": "",
-    "serviceUrl": "pulsar://localhost:6650",
-    "operationTimeoutSeconds": "30",
-    "ioThreads": "1",
-    "messageListenerThreads": "1",
-    "concurrentLookupRequest": "50000",
-    "useTls": "false",
-    "tlsTrustCertsFilePath": "",
-    "tlsValidateHostname": "false",
-    "tlsAllowInsecureConnection": "false",
-    "statsIntervalInSeconds": "60",
-    "listenerName": ""
-  },
-  {
-    "id": "3ee18b73e42befd6",
-    "type": "pulsar-schema",
-    "schemaName": "City",
-    "schemaType": "Json",
-    "schema": "{\"type\":\"record\",\"name\":\"city\",\"fields\":[{\"name\":\"Name\",\"type\":\"string\"},{\"name\":\"population\",\"type\":\"int\"}]}",
-    "properties": "{}"
-  },
-  {
     "id": "27adf10af4f74286",
     "type": "inject",
     "z": "cfa24f481be37bf9",
@@ -57,7 +32,7 @@
     "y": 100,
     "wires": [
       [
-        "c13687c96840c562"
+        "be868649d3b35960"
       ]
     ]
   },
@@ -75,7 +50,7 @@
     "statusVal": "",
     "statusType": "auto",
     "x": 540,
-    "y": 280,
+    "y": 260,
     "wires": []
   },
   {
@@ -92,7 +67,7 @@
     "statusVal": "",
     "statusType": "auto",
     "x": 550,
-    "y": 320,
+    "y": 300,
     "wires": []
   },
   {
@@ -109,7 +84,7 @@
     "statusVal": "",
     "statusType": "auto",
     "x": 540,
-    "y": 140,
+    "y": 160,
     "wires": []
   },
   {
@@ -126,7 +101,7 @@
     "statusVal": "",
     "statusType": "auto",
     "x": 530,
-    "y": 420,
+    "y": 400,
     "wires": []
   },
   {
@@ -171,7 +146,8 @@
     "y": 380,
     "wires": [
       [
-        "89ea0f494da5b4fa"
+        "c47774b11ec24884",
+        "9e9a7016298d3737"
       ]
     ]
   },
@@ -200,7 +176,8 @@
     "y": 440,
     "wires": [
       [
-        "89ea0f494da5b4fa"
+        "c47774b11ec24884",
+        "9e9a7016298d3737"
       ]
     ]
   },
@@ -229,7 +206,8 @@
     "y": 500,
     "wires": [
       [
-        "89ea0f494da5b4fa"
+        "c47774b11ec24884",
+        "9e9a7016298d3737"
       ]
     ]
   },
@@ -258,7 +236,7 @@
     "y": 140,
     "wires": [
       [
-        "c13687c96840c562"
+        "be868649d3b35960"
       ]
     ]
   },
@@ -287,18 +265,54 @@
     "y": 200,
     "wires": [
       [
-        "c13687c96840c562"
+        "cc7a2cf1976bf597"
       ]
     ]
   },
   {
-    "id": "5574625e10bc9d3e",
+    "id": "be868649d3b35960",
+    "type": "pulsar-producer",
+    "z": "cfa24f481be37bf9",
+    "name": "",
+    "clientNodeId": "16849d1efa765e73",
+    "schemaNodeId": "",
+    "topic": "test",
+    "topicTypedInput": "str",
+    "producerName": "",
+    "sendTimeoutMs": "",
+    "initialSequenceId": "",
+    "maxPendingMessages": "",
+    "maxPendingMessagesAcrossPartitions": "",
+    "blockIfQueueFull": "true",
+    "messageRoutingMode": "Default",
+    "hashingScheme": "Default",
+    "compressionType": "Default",
+    "batchingEnabled": "",
+    "batchingMaxPublishDelayMs": "",
+    "batchingMaxMessages": "",
+    "properties": "{}",
+    "publicKeyPath": "",
+    "encryptionKey": "",
+    "cryptoFailureAction": "Default",
+    "chunkingEnabled": "",
+    "accessMode": "Default",
+    "x": 290,
+    "y": 140,
+    "wires": [
+      [
+        "7735035db371684c"
+      ]
+    ]
+  },
+  {
+    "id": "52e469b5d9a1fc38",
     "type": "pulsar-consumer",
     "z": "cfa24f481be37bf9",
-    "name": "Consumer",
+    "name": "",
     "clientNodeId": "16849d1efa765e73",
     "schemaNodeId": "3ee18b73e42befd6",
-    "topic": "city",
+    "topic": "citites",
+    "topicTypedInput": "str",
     "subscription": "test",
     "subscriptionType": "Shared",
     "subscriptionInitialPosition": "Latest",
@@ -314,8 +328,8 @@
     "autoAckOldestChunkedMessageOnQueueFull": "10",
     "batchIndexAckEnabled": "false",
     "regexSubscriptionMode": "AllTopics",
-    "x": 350,
-    "y": 300,
+    "x": 300,
+    "y": 280,
     "wires": [
       [
         "5a53caeafb829a6d"
@@ -326,22 +340,23 @@
     ]
   },
   {
-    "id": "89ea0f494da5b4fa",
+    "id": "c47774b11ec24884",
     "type": "pulsar-reader",
     "z": "cfa24f481be37bf9",
-    "name": "Reader",
+    "name": "",
     "clientNodeId": "16849d1efa765e73",
-    "schemaNodeId": "3ee18b73e42befd6",
-    "topic": "city",
+    "schemaNodeId": "",
+    "topic": "test",
+    "topicTypedInput": "str",
     "startMessage": "Latest",
     "receiverQueueSize": "100",
     "readerName": "",
     "readCompacted": "false",
     "subscriptionRolePrefix": "",
     "privateKeyPath": "",
-    "cryptoFailureAction": "Default",
-    "x": 340,
-    "y": 440,
+    "cryptoFailureAction": "FAIL",
+    "x": 330,
+    "y": 380,
     "wires": [
       [
         "85bb6379ed87dd9a"
@@ -352,13 +367,14 @@
     ]
   },
   {
-    "id": "c13687c96840c562",
+    "id": "cc7a2cf1976bf597",
     "type": "pulsar-producer",
     "z": "cfa24f481be37bf9",
-    "name": "Producer",
+    "name": "",
     "clientNodeId": "16849d1efa765e73",
     "schemaNodeId": "3ee18b73e42befd6",
-    "topic": "city",
+    "topic": "citites",
+    "topicTypedInput": "str",
     "producerName": "",
     "sendTimeoutMs": "",
     "initialSequenceId": "",
@@ -368,21 +384,74 @@
     "messageRoutingMode": "Default",
     "hashingScheme": "Default",
     "compressionType": "Default",
-    "batchingEnabled": "true",
+    "batchingEnabled": "",
     "batchingMaxPublishDelayMs": "",
     "batchingMaxMessages": "",
     "properties": "{}",
     "publicKeyPath": "",
     "encryptionKey": "",
     "cryptoFailureAction": "Default",
-    "chunkingEnabled": "false",
+    "chunkingEnabled": "",
     "accessMode": "Default",
-    "x": 340,
-    "y": 140,
+    "x": 300,
+    "y": 200,
     "wires": [
       [
         "7735035db371684c"
       ]
     ]
+  },
+  {
+    "id": "9e9a7016298d3737",
+    "type": "pulsar-reader",
+    "z": "cfa24f481be37bf9",
+    "name": "",
+    "clientNodeId": "16849d1efa765e73",
+    "schemaNodeId": "",
+    "topic": "citites",
+    "topicTypedInput": "str",
+    "startMessage": "Latest",
+    "receiverQueueSize": "100",
+    "readerName": "",
+    "readCompacted": "false",
+    "subscriptionRolePrefix": "",
+    "privateKeyPath": "",
+    "cryptoFailureAction": "FAIL",
+    "x": 340,
+    "y": 500,
+    "wires": [
+      [
+        "85bb6379ed87dd9a"
+      ],
+      [
+        "952e560bfeb6ae25"
+      ]
+    ]
+  },
+  {
+    "id": "16849d1efa765e73",
+    "type": "pulsar-client",
+    "name": "Pulsar Standalone",
+    "authenticationNodeId": "",
+    "serviceUrl": "pulsar://localhost:6650",
+    "serviceUrlTypedInput": "str",
+    "operationTimeoutSeconds": "30",
+    "ioThreads": "1",
+    "messageListenerThreads": "1",
+    "concurrentLookupRequest": "50000",
+    "useTls": "false",
+    "tlsTrustCertsFilePath": "",
+    "tlsValidateHostname": "false",
+    "tlsAllowInsecureConnection": "false",
+    "statsIntervalInSeconds": "60",
+    "listenerName": ""
+  },
+  {
+    "id": "3ee18b73e42befd6",
+    "type": "pulsar-schema",
+    "schemaName": "City",
+    "schemaType": "Json",
+    "schema": "{\"type\":\"record\",\"name\":\"city\",\"fields\":[{\"name\":\"Name\",\"type\":\"string\"},{\"name\":\"population\",\"type\":\"int\"}]}",
+    "properties": "{}"
   }
 ]

@@ -1,28 +1,30 @@
-export type Properties = { [key: string]: string }
+export type Properties = { [key: string]: string };
 
-export function jsonStringToProperties(json: string|undefined): Properties | undefined {
+export function jsonStringToProperties(
+    json: string | undefined,
+): Properties | undefined {
     if (json) {
         try {
-            const object = JSON.parse(json)
+            const object = JSON.parse(json);
             if (typeof object === 'object' && !Array.isArray(object)) {
-                const properties: Properties = {}
+                const properties: Properties = {};
                 for (const key of Object.keys(object)) {
-                    const keyVal = object[key]
+                    const keyVal = object[key];
                     if (typeof keyVal === 'string') {
-                        properties[key] = keyVal
+                        properties[key] = keyVal;
                     }
                 }
                 //If properties is empty, return undefined
                 if (Object.keys(properties).length === 0) {
-                    return undefined
+                    return undefined;
                 }
-                return properties
+                return properties;
             }
         } catch (e) {
-            return undefined
+            return undefined;
         }
     }
-    return undefined
+    return undefined;
 }
 
 /**
@@ -32,74 +34,74 @@ export function jsonStringToProperties(json: string|undefined): Properties | und
  */
 export function anyToProperties(any?: any): Properties | undefined {
     if (any === undefined || any === null) {
-        return undefined
+        return undefined;
     }
     if (typeof any === 'object' && !Array.isArray(any)) {
-        const properties: Properties = {}
+        const properties: Properties = {};
         for (const key of Object.keys(any)) {
-            const keyVal = any[key]
+            const keyVal = any[key];
             if (typeof keyVal === 'string') {
-                properties[key] = keyVal
+                properties[key] = keyVal;
             } else if (typeof keyVal === 'number') {
-                properties[key] = keyVal.toString()
+                properties[key] = keyVal.toString();
             } else if (typeof keyVal === 'boolean') {
-                properties[key] = keyVal.toString()
+                properties[key] = keyVal.toString();
             } else if (typeof keyVal === 'object') {
-                properties[key] = JSON.stringify(keyVal)
+                properties[key] = JSON.stringify(keyVal);
             }
         }
         //If properties is empty, return undefined
         if (Object.keys(properties).length === 0) {
-            return undefined
+            return undefined;
         }
-        return properties
+        return properties;
     }
-    return undefined
+    return undefined;
 }
 
 export function anyToNumber(any?: any): number | undefined {
-    if(any === undefined || any === null) {
-        return undefined
+    if (any === undefined || any === null) {
+        return undefined;
     }
     if (typeof any === 'number') {
-        return any
+        return any;
     } else if (typeof any === 'string') {
-        const num = Number(any)
+        const num = Number(any);
         if (!isNaN(num)) {
-            return num
+            return num;
         }
     }
-    return undefined
+    return undefined;
 }
 
 export function anyToBoolean(any?: any): boolean | undefined {
     if (any === undefined || any === null) {
-        return undefined
+        return undefined;
     }
     if (any === true || any === false) {
-        return any
+        return any;
     } else if (typeof any === 'string') {
         if (any === 'true') {
-            return true
+            return true;
         } else if (any === 'false') {
-            return false
+            return false;
         }
     }
-    return undefined
+    return undefined;
 }
 
 export function anyToString(any: any): string | undefined {
     if (any === undefined || any === null) {
-        return undefined
+        return undefined;
     }
     if (typeof any === 'string') {
-        return any
+        return any;
     } else if (typeof any === 'number') {
-        return any.toString()
+        return any.toString();
     } else if (typeof any === 'boolean') {
-        return any.toString()
+        return any.toString();
     }
-    return undefined
+    return undefined;
 }
 
 /**
@@ -109,19 +111,18 @@ export function anyToString(any: any): string | undefined {
  */
 export function anyToStringArray(any: any): string[] | undefined {
     if (any === undefined || any === null) {
-        return undefined
+        return undefined;
     }
     if (Array.isArray(any)) {
-        const strings: string[] = []
+        const strings: string[] = [];
         for (const val of any) {
             if (typeof val === 'string') {
-                strings.push(val)
+                strings.push(val);
             }
         }
         if (strings.length > 0) {
-            return strings
+            return strings;
         }
     }
-    return undefined
+    return undefined;
 }
-
