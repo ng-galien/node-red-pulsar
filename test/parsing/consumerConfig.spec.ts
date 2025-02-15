@@ -15,7 +15,7 @@ describe('consumerConfig', () => {
       type: '',
       z: '',
       topic: 'test-topic',
-      topicType: 'str',
+      topicTypedInput: 'str',
       subscription: undefined,
       subscriptionType: 'Exclusive',
       subscriptionInitialPosition: 'Latest',
