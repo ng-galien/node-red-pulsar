@@ -1,4 +1,5 @@
 import {
+    AuthenticationImpl, PulsarClientConfig,
     PulsarConsumerConfig,
     PulsarProducerConfig,
     PulsarReaderConfig,
@@ -6,6 +7,7 @@ import {
     StartMessage
 } from "./PulsarDefinition";
 import {
+    ClientConfig,
     CompressionType,
     ConsumerConfig,
     ConsumerCryptoFailureAction,
@@ -21,6 +23,8 @@ import {
     SubscriptionType
 } from "pulsar-client";
 import {jsonStringToProperties} from "./Properties";
+import * as NodeRED from "node-red";
+import {Node} from "node-red";
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -164,8 +168,30 @@ export function parseTopic(topic: string): PulsarTopic {
     return {single: topic.trim()}
 }
 
-export function consumerConfig(config: PulsarConsumerConfig): ConsumerConfig {
-    const topic = parseTopic(config.topic)
+export function evaluateProperty(rt: Node<{}>, value: string, type: string): string {
+    return NodeRED.util.evaluateNodeProperty(value, type, rt, {}) as string
+}
+
+export function clientConfig(rt: Node<{}>, auth: AuthenticationImpl | undefined, config: PulsarClientConfig): ClientConfig {
+    return {
+        serviceUrl: evaluateProperty(rt, config.serviceUrl, config.serviceUrlTypedInput),
+        authentication: auth,
+        operationTimeoutSeconds: parseNumber(config.operationTimeoutSeconds),
+        ioThreads: parseNumber(config.ioThreads),
+        messageListenerThreads: parseNumber(config.messageListenerThreads),
+        concurrentLookupRequest: parseNumber(config.concurrentLookupRequest),
+        useTls: parseBoolean(config.useTls),
+        tlsTrustCertsFilePath: config.tlsTrustCertsFilePath,
+        tlsValidateHostname: parseBoolean(config.tlsValidateHostname),
+        tlsAllowInsecureConnection: parseBoolean(config.tlsAllowInsecureConnection),
+        statsIntervalInSeconds: parseNumber(config.statsIntervalInSeconds),
+        listenerName: parseNonEmptyString(config.listenerName),
+    }
+}
+
+export function consumerConfig(rt: Node<{}>, config: PulsarConsumerConfig): ConsumerConfig {
+    const typedTopic = evaluateProperty(rt, config.topic, config.topicTypedInput)
+    const topic = parseTopic(typedTopic)
     return {
         topic: topic.single,
         topics: topic.list,
@@ -191,9 +217,9 @@ export function consumerConfig(config: PulsarConsumerConfig): ConsumerConfig {
     }
 }
 
-export function producerConfig(config: PulsarProducerConfig): ProducerConfig {
+export function producerConfig(rt: Node<{}>, config: PulsarProducerConfig): ProducerConfig {
     const result = {
-        topic: config.topic,
+        topic: evaluateProperty(rt, config.topic, config.topicTypedInput),
         producerName: parseNonEmptyString(config.producerName),
         sendTimeoutMs: parseNumber(config.sendTimeoutMs),
         initialSequenceId: parseNumber(config.initialSequenceId),
@@ -223,9 +249,9 @@ export function readerPosition(start: StartMessage): MessageId {
     return start === "Earliest" ? MessageId.earliest() : MessageId.latest()
 }
 
-export function readerConfig(config: PulsarReaderConfig): ReaderConfig {
+export function readerConfig(rt: Node<{}>, config: PulsarReaderConfig): ReaderConfig {
     return {
-        topic: config.topic,
+        topic: evaluateProperty(rt, config.topic, config.topicTypedInput),
         startMessageId: readerPosition(config.startMessage),
         receiverQueueSize: parseNumber(config.receiverQueueSize),
         readerName: parseNonEmptyString(config.readerName),

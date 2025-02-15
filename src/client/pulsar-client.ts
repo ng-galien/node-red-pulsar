@@ -10,29 +10,9 @@ import {
     PulsarClientConfig,
     PulsarClientId
 } from "../PulsarDefinition";
-import {parseBoolean, parseNumber, parseNonEmptyString} from "../PulsarConfig";
-
-
+import {clientConfig} from "../PulsarConfig";
 
 type RuntimeNode = NodeRED.Node<Client>
-
-
-function createPulsarConfigNode(auth: AuthenticationImpl | undefined, config: PulsarClientConfig): ClientConfig {
-    return {
-        serviceUrl: config.serviceUrl,
-        authentication: auth,
-        operationTimeoutSeconds: parseNumber(config.operationTimeoutSeconds),
-        ioThreads: parseNumber(config.ioThreads),
-        messageListenerThreads: parseNumber(config.messageListenerThreads),
-        concurrentLookupRequest: parseNumber(config.concurrentLookupRequest),
-        useTls: parseBoolean(config.useTls),
-        tlsTrustCertsFilePath: config.tlsTrustCertsFilePath,
-        tlsValidateHostname: parseBoolean(config.tlsValidateHostname),
-        tlsAllowInsecureConnection: parseBoolean(config.tlsAllowInsecureConnection),
-        statsIntervalInSeconds: parseNumber(config.statsIntervalInSeconds),
-        listenerName: parseNonEmptyString(config.listenerName),
-    }
-}
 
 export = (RED: NodeRED.NodeAPI): void => {
     RED.nodes.registerType(PulsarClientId,
@@ -41,7 +21,7 @@ export = (RED: NodeRED.NodeAPI): void => {
             this.debug('Getting authentication [config: ' + JSON.stringify(config) + ']')
             const authentication = getAuthentication(this, RED, config)
             this.debug('Creating pulsar client with authentication: ' + JSON.stringify(authentication))
-            const client = createClient(this, createPulsarConfigNode(authentication, config))
+            const client = createClient(this, clientConfig(this, authentication, config))
             if(client) {
                 this.credentials = client
                 mapClientLoginToNode(this)

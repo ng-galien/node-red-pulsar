@@ -12,7 +12,8 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         name: {value: ''},
         clientNodeId: {value: '', type: CLIENT_ID, required: true},
         schemaNodeId: {value: '', type: SCHEMA_ID, required: false},
-        topic: {value: '', required: true, validate: RED.validators.regex(/^[a-zA-Z0-9-_.]+$/)},
+        topic: {value: '', required: true},
+        topicTypedInput: {value: 'str'},
         producerName: {value: '', required: false},
         sendTimeoutMs: {value: undefined, required: false},
         initialSequenceId: {value: undefined, required: false},
@@ -33,18 +34,19 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         accessMode: {value: undefined, required: false},
     },
     label: function () {
-        return this.name || this.topic || 'pulsar-producer'
+        return this.name || this.topic?.length > 0 ? this.topicTypedInput+ ':' + this.topic : 'pulsar-producer'
     },
     oneditprepare: function () {
         const fields : TypedField[] = [
-            {name: 'sendTimeoutMs', type: 'num'},
-            {name: 'initialSequenceId', type: 'num'},
-            {name: 'maxPendingMessages', type: 'num'},
-            {name: 'maxPendingMessagesAcrossPartitions', type: 'num'},
-            {name: 'blockIfQueueFull', type: 'bool'},
-            {name: 'batchingMaxPublishDelayMs', type: 'num'},
-            {name: 'batchingMaxMessages', type: 'num'},
-            {name: 'properties', type: 'json'},
+            {name: 'topic', type: ['str', "env", "flow", "global"], value: this.topic, defaultType: this.topicTypedInput as EditorWidgetTypedInputType},
+            {name: 'sendTimeoutMs', type: 'num', value: this.sendTimeoutMs},
+            {name: 'initialSequenceId', type: 'num', value: this.initialSequenceId},
+            {name: 'maxPendingMessages', type: 'num', value: this.maxPendingMessages},
+            {name: 'maxPendingMessagesAcrossPartitions', type: 'num', value: this.maxPendingMessagesAcrossPartitions},
+            {name: 'blockIfQueueFull', type: 'bool', value: this.blockIfQueueFull},
+            {name: 'batchingMaxPublishDelayMs', type: 'num', value: this.batchingMaxPublishDelayMs},
+            {name: 'batchingMaxMessages', type: 'num', value: this.batchingMaxMessages},
+            {name: 'properties', type: 'json', value: this.properties},
         ]
         configureTypedFields(false, fields)
         type MessageRoutingMode = import("pulsar-client").MessageRoutingMode
@@ -58,6 +60,9 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         type AccessMode = import("pulsar-client").ProducerAccessMode
         configureEnumField<AccessMode>(false, 'accessMode', ['Shared', 'Exclusive', 'WaitForExclusive', 'ExclusiveWithFencing'])
         configureJsonStringField(false, 'properties')
+    },
+    oneditsave: function () {
+        this.topicTypedInput = getPropertyType(false, 'topic')
     }
 })
 

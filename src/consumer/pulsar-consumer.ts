@@ -38,7 +38,7 @@ function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): Consum
     }
     return {
         listener: listener,
-        ...consumerConfig(config)
+        ...consumerConfig(node, config)
     }
 }
 
@@ -67,9 +67,9 @@ export = (RED: NodeRED.NodeAPI): void => {
                         payload: {
                             type: 'consumer',
                             status: 'ready',
-                            topic: config.topic,
-                            subscription: config.subscription,
-                            subscriptionType: config.subscriptionType
+                            topic: consumerConfig.topic,
+                            subscription: consumerConfig.subscription,
+                            subscriptionType: consumerConfig.subscriptionType
                         }
                     };
                     this.send([null, message]);

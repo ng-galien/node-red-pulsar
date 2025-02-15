@@ -3,17 +3,29 @@ function configureTypedFields(isConfig: boolean, fields: TypedField[]): void {
     fields.forEach(function (field) {
         const id = (isConfig ? "node-config-input-" : "node-input-") + field.name
         const input = $("#" + id);
+        const defaultVal = field.defaultType || (Array.isArray(field.type) ? field.type[0] : field.type)
+
+        const types = Array.isArray(field.type) ? field.type : [field.type]
+        console.log('configureTypedFields', id, defaultVal, types)
         input.typedInput({
-            default: field.type,
-            types: [field.type],
+            default: defaultVal,
+            types: types,
             typeField: '#' + id + '-type'
         });
-        input.typedInput('width', '100px');
+        //input.typedInput('width', '100px');
         if (field.value !== undefined) {
             input.typedInput('value', field.value)
         }
     })
 }
+
+function getPropertyType(isConfig: boolean, name: string): string {
+    console.log('getTypedProperty', isConfig, name)
+    const id = (isConfig ? "node-config-input-" : "node-input-") + name
+    const input = $("#" + id)
+    return input.typedInput('type')
+}
+
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureEnumField<T extends string>(isConfig: boolean, name: string, options: T[]): void {

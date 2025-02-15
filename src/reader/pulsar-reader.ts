@@ -24,7 +24,7 @@ function createConfig(config: PulsarReaderConfig, node: ReaderNode): ReaderConfi
     }
     return {
         listener: listener,
-        ... readerConfig(config)
+        ... readerConfig(node, config)
     }
 }
 
@@ -52,7 +52,7 @@ export = (RED: NodeRED.NodeAPI): void => {
                         payload: {
                             type: 'reader',
                             status: 'ready',
-                            topic: config.topic
+                            topic: readerConfig.topic
                         }
                     };
                     this.send([null, message]);

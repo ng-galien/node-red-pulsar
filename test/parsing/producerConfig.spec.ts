@@ -4,9 +4,11 @@ import {describe, it} from "mocha";
 import {PulsarProducerConfig} from "../../src/PulsarDefinition";
 import {ProducerConfig} from "pulsar-client";
 import {producerConfig} from "../../src/PulsarConfig";
+import {Node} from "node-red";
 
 
 describe("producerConfig", () => {
+    const node = {} as Node<{}>;
     const mockPulsarProducerConfig: PulsarProducerConfig = {
         clientNodeId: "",
         id: "",
@@ -15,6 +17,7 @@ describe("producerConfig", () => {
         type: "",
         z: "",
         topic: "test-topic",
+        topicTypedInput: "str",
         producerName: "test-producer",
         sendTimeoutMs: "500",
         initialSequenceId: "1",
@@ -36,7 +39,7 @@ describe("producerConfig", () => {
     };
 
     it("should return a valid producer config", () => {
-        const config: ProducerConfig = producerConfig(mockPulsarProducerConfig);
+        const config: ProducerConfig = producerConfig(node, mockPulsarProducerConfig);
         expect(config).to.be.an("object");
         expect(config.topic).to.equal("test-topic");
         expect(config.producerName).to.equal("test-producer");
