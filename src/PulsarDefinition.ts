@@ -199,6 +199,7 @@ export const PulsarReaderId: string = "pulsar-reader"
 
 
 export interface DecodedPulsarMessage extends NodeMessage {
+    topic: string
     messageId: string
     publishTimeStamp: number
     eventTimeStamp: number
@@ -216,6 +217,7 @@ export function readPulsarMessage(pulsarMessage: Message): DecodedPulsarMessage 
         // Ignore
     }
     return {
+        topic: pulsarMessage.getTopicName(),
         payload: payload,
         messageId: pulsarMessage.getMessageId().toString(),
         publishTimeStamp: pulsarMessage.getPublishTimestamp(),

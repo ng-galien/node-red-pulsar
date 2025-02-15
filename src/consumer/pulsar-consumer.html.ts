@@ -13,7 +13,7 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         clientNodeId: {value: '', required:true, type: CLIENT_ID },
         schemaNodeId: {value: '', required: false, type: SCHEMA_ID },
         topic: {value: '', required: false },
-        topicTypedInput: {value: 'str', required: true},
+        topicTypedInput: {value: 'str'},
         subscription: {value: '', required: true},
         subscriptionType: {value: 'Shared', required: true},
         subscriptionInitialPosition: {value: 'Latest', required: true},
@@ -32,14 +32,14 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         deadLetterPolicy: {value: undefined, required: false},
     },
     label: function (this: EditorNode) {
-        return this.name || this.topic || 'pulsar-consumer'
+        return this.name || this.topic?.length > 0 ? this.topicTypedInput+ ':' + this.topic : 'pulsar-consumer'
     },
     outputLabels: function(i) {
         return i === 0 ? "Message" : "Status"
     },
     oneditprepare: function () {
         const fields: TypedField[] = [
-            {name: 'topic', type: ['str', "env", "flow", "global"], value: this.topicTypedInput, defaultType: this.topicTypedInput as EditorWidgetTypedInputType},
+            {name: 'topic', type: ['str', "env", "flow", "global"], value: this.topic, defaultType: this.topicTypedInput as EditorWidgetTypedInputType},
             {name: 'ackTimeoutMs', type: 'num', value: this.ackTimeoutMs},
             {name: 'nAckRedeliverTimeoutMs', type: 'num', value: this.nAckRedeliverTimeoutMs},
             {name: 'receiverQueueSize', type: 'num', value: this.receiverQueueSize},

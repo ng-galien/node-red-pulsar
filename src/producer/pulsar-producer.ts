@@ -58,8 +58,8 @@ export = (RED: NodeRED.NodeAPI): void => {
                         payload: {
                             type: 'producer',
                             status: 'ready',
-                            topic: config.topic,
-                            producerName: config.producerName
+                            topic: producerConfig.topic,
+                            producerName: producerConfig.producerName
                         }
                     }
                     this.send(message)

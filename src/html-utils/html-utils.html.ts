@@ -3,14 +3,16 @@ function configureTypedFields(isConfig: boolean, fields: TypedField[]): void {
     fields.forEach(function (field) {
         const id = (isConfig ? "node-config-input-" : "node-input-") + field.name
         const input = $("#" + id);
-        const defaultVal = field.defaultType || Array.isArray(field.type) ? field.type[0] : field.type
+        const defaultVal = field.defaultType || (Array.isArray(field.type) ? field.type[0] : field.type)
+
         const types = Array.isArray(field.type) ? field.type : [field.type]
+        console.log('configureTypedFields', id, defaultVal, types)
         input.typedInput({
             default: defaultVal,
             types: types,
             typeField: '#' + id + '-type'
         });
-        input.typedInput('width', '100px');
+        //input.typedInput('width', '100px');
         if (field.value !== undefined) {
             input.typedInput('value', field.value)
         }

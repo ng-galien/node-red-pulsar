@@ -13,7 +13,7 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         clientNodeId: {value: '', type: CLIENT_ID, required: true},
         schemaNodeId: {value: '', type: SCHEMA_ID, required: false},
         topic: {value: '', required: true},
-        topicTypedInput: {value: 'str', required: true},
+        topicTypedInput: {value: 'str'},
         producerName: {value: '', required: false},
         sendTimeoutMs: {value: undefined, required: false},
         initialSequenceId: {value: undefined, required: false},
@@ -34,11 +34,11 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         accessMode: {value: undefined, required: false},
     },
     label: function () {
-        return this.name || this.topic || 'pulsar-producer'
+        return this.name || this.topic?.length > 0 ? this.topicTypedInput+ ':' + this.topic : 'pulsar-producer'
     },
     oneditprepare: function () {
         const fields : TypedField[] = [
-            {name: 'topic', type: ['str', "env", "flow", "global"], value: this.topicTypedInput, defaultType: this.topicTypedInput as EditorWidgetTypedInputType},
+            {name: 'topic', type: ['str', "env", "flow", "global"], value: this.topic, defaultType: this.topicTypedInput as EditorWidgetTypedInputType},
             {name: 'sendTimeoutMs', type: 'num', value: this.sendTimeoutMs},
             {name: 'initialSequenceId', type: 'num', value: this.initialSequenceId},
             {name: 'maxPendingMessages', type: 'num', value: this.maxPendingMessages},

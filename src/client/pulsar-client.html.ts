@@ -27,8 +27,8 @@ RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_ID, {
     defaults: {
         name: {value: ''},
         authenticationNodeId: {value: '', type: AUTHENTICATION_ID, required: false},
-        serviceUrl: {value: '', required: true, validate: validatePulsarUrl},
-        serviceUrlTypedInput: {value: 'str', required: true},
+        serviceUrl: {value: '', required: true},
+        serviceUrlTypedInput: {value: 'str', required: false},
         operationTimeoutSeconds: {value: '30', required: false, validate: RED.validators.number(true)},
         ioThreads: {value: '1', required: false, validate: RED.validators.number(true)},
         messageListenerThreads: {value: '1', required: false, validate: RED.validators.number(true)},
@@ -45,7 +45,7 @@ RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_ID, {
     },
     oneditprepare: function () {
         const fields: TypedField[] = [
-            {name: 'serviceUrl', type: ['str', "env", "flow", "global"], value: this.serviceUrlTypedInput, defaultType: this.serviceUrlTypedInput as EditorWidgetTypedInputType},
+            {name: 'serviceUrl', type: ['str', "env", "flow", "global"], value: this.serviceUrl, defaultType: this.serviceUrlTypedInput as EditorWidgetTypedInputType},
             {name: 'operationTimeoutSeconds', type: 'num', value: this.operationTimeoutSeconds},
             {name: 'ioThreads', type: 'num', value: this.ioThreads},
             {name: 'messageListenerThreads', type: 'num', value: this.messageListenerThreads},
