@@ -7,24 +7,24 @@ import { clientConfig } from '../../src/PulsarConfig';
 import { Node } from 'node-red';
 
 describe('clientConfig', () => {
-    const node = {} as Node;
-    const mockPulsarClientConfig: PulsarClientConfig = {
-        id: '',
-        name: '',
-        type: '',
-        z: '',
-        authenticationNodeId: '',
-        serviceUrl: 'pulsar://localhost:6650',
-        serviceUrlTypedInput: 'str',
-    };
+  const node = {} as Node;
+  const mockPulsarClientConfig: PulsarClientConfig = {
+    id: '',
+    name: '',
+    type: '',
+    z: '',
+    authenticationNodeId: '',
+    serviceUrl: 'pulsar://localhost:6650',
+    serviceUrlTypedInput: 'str',
+  };
 
-    it('should return a valid producer config', () => {
-        const config: ClientConfig = clientConfig(
-            node,
-            undefined,
-            mockPulsarClientConfig,
-        );
-        expect(config).to.be.an('object');
-        expect(config.serviceUrl).to.equal('pulsar://localhost:6650');
-    });
+  it('should return a valid producer config', () => {
+    const config: ClientConfig = clientConfig(
+      node,
+      undefined,
+      mockPulsarClientConfig,
+    );
+    expect(config).to.be.an('object');
+    expect(config.serviceUrl).to.equal('pulsar://localhost:6650');
+  });
 });
