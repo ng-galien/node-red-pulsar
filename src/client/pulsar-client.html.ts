@@ -1,6 +1,5 @@
 type PulsarClientEditorConfig = import("../PulsarDefinition").PulsarClientEditorConfig
 
-
 /**
  * Function to validate the Pulsar URL.
  * @param {string} value - The URL to be validated.
@@ -29,6 +28,7 @@ RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_ID, {
         name: {value: ''},
         authenticationNodeId: {value: '', type: AUTHENTICATION_ID, required: false},
         serviceUrl: {value: '', required: true, validate: validatePulsarUrl},
+        serviceUrlTypedInput: {value: 'str', required: true},
         operationTimeoutSeconds: {value: '30', required: false, validate: RED.validators.number(true)},
         ioThreads: {value: '1', required: false, validate: RED.validators.number(true)},
         messageListenerThreads: {value: '1', required: false, validate: RED.validators.number(true)},
@@ -45,14 +45,15 @@ RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_ID, {
     },
     oneditprepare: function () {
         const fields: TypedField[] = [
-            {name: 'operationTimeoutSeconds', type: 'num', value: '30'},
-            {name: 'ioThreads', type: 'num'},
-            {name: 'messageListenerThreads', type: 'num', value: '1'},
-            {name: 'concurrentLookupRequest', type: 'num', value: '50000'},
-            {name: 'statsIntervalInSeconds', type: 'num', value: '60'},
-            {name: 'useTls', type: 'bool', value: 'false'},
-            {name: 'tlsValidateHostname', type: 'bool', value: 'false'},
-            {name: 'tlsAllowInsecureConnection', type: 'bool', value: 'false'},
+            {name: 'serviceUrl', type: ['str', "env", "flow", "global"], value: this.serviceUrlTypedInput, defaultType: this.serviceUrlTypedInput as EditorWidgetTypedInputType},
+            {name: 'operationTimeoutSeconds', type: 'num', value: this.operationTimeoutSeconds},
+            {name: 'ioThreads', type: 'num', value: this.ioThreads},
+            {name: 'messageListenerThreads', type: 'num', value: this.messageListenerThreads},
+            {name: 'concurrentLookupRequest', type: 'num', value: this.concurrentLookupRequest},
+            {name: 'statsIntervalInSeconds', type: 'num', value: this.statsIntervalInSeconds},
+            {name: 'useTls', type: 'bool', value: this.useTls},
+            {name: 'tlsValidateHostname', type: 'bool', value: this.tlsValidateHostname},
+            {name: 'tlsAllowInsecureConnection', type: 'bool', value: this.tlsAllowInsecureConnection},
         ];
         configureTypedFields(true, fields)
         const useTls = this.useTls === 'true';
@@ -61,5 +62,8 @@ RED.nodes.registerType<PulsarClientEditorConfig>(CLIENT_ID, {
         $("#node-config-input-useTls").on('change', function (event) {
             displayTlsFields($(event.target).val() === 'true');
         })
-    }
+    },
+    oneditsave: function () {
+        this.serviceUrlTypedInput = getPropertyType(true, 'serviceUrl')
+    },
 })

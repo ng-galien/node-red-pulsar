@@ -13,7 +13,8 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         clientNodeId: {value: '', required:true, type: CLIENT_ID },
         schemaNodeId: {value: '', required: false, type: SCHEMA_ID },
         topic: {value: '', required: false },
-        subscription: {value: '', required: true, validate: RED.validators.regex(/^[a-zA-Z0-9_-]+$/)},
+        topicTypedInput: {value: 'str', required: true},
+        subscription: {value: '', required: true},
         subscriptionType: {value: 'Shared', required: true},
         subscriptionInitialPosition: {value: 'Latest', required: true},
         ackTimeoutMs: {value: '10000', required: false, validate: RED.validators.number()},
@@ -38,14 +39,15 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
     },
     oneditprepare: function () {
         const fields: TypedField[] = [
-            {name: 'ackTimeoutMs', type: 'num'},
-            {name: 'nAckRedeliverTimeoutMs', type: 'num'},
-            {name: 'receiverQueueSize', type: 'num'},
-            {name: 'receiverQueueSizeAcrossPartitions', type: 'num'},
-            {name: 'readCompacted', type: 'bool'},
-            {name: 'maxPendingChunkedMessage', type: 'num'},
-            {name: 'autoAckOldestChunkedMessageOnQueueFull', type: 'num'},
-            {name: 'batchIndexAckEnabled', type: 'bool'},
+            {name: 'topic', type: ['str', "env", "flow", "global"], value: this.topicTypedInput, defaultType: this.topicTypedInput as EditorWidgetTypedInputType},
+            {name: 'ackTimeoutMs', type: 'num', value: this.ackTimeoutMs},
+            {name: 'nAckRedeliverTimeoutMs', type: 'num', value: this.nAckRedeliverTimeoutMs},
+            {name: 'receiverQueueSize', type: 'num', value: this.receiverQueueSize},
+            {name: 'receiverQueueSizeAcrossPartitions', type: 'num', value: this.receiverQueueSizeAcrossPartitions},
+            {name: 'readCompacted', type: 'bool', value: this.readCompacted},
+            {name: 'maxPendingChunkedMessage', type: 'num', value: this.maxPendingChunkedMessage},
+            {name: 'autoAckOldestChunkedMessageOnQueueFull', type: 'num', value: this.autoAckOldestChunkedMessageOnQueueFull},
+            {name: 'batchIndexAckEnabled', type: 'bool', value: this.batchIndexAckEnabled},
         ]
         configureTypedFields(false, fields)
         type SubscriptionType = import("pulsar-client").SubscriptionType
@@ -56,5 +58,8 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         configureEnumField<RegexSubscriptionMode>(false, 'regexSubscriptionMode', ['AllTopics', 'PersistentOnly', 'NonPersistentOnly'])
         type CryptoFailureAction = import("pulsar-client").ConsumerCryptoFailureAction
         configureEnumField<CryptoFailureAction>(false, 'cryptoFailureAction', ['FAIL', 'DISCARD'])
+    },
+    oneditsave: function () {
+        this.topicTypedInput = getPropertyType(false, 'topic')
     }
 })

@@ -24,7 +24,7 @@ function createConfig(config: PulsarReaderConfig, node: ReaderNode): ReaderConfi
     }
     return {
         listener: listener,
-        ... readerConfig(config)
+        ... readerConfig(node, config)
     }
 }
 

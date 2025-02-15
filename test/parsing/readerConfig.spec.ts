@@ -3,10 +3,12 @@ import { describe, it } from 'mocha';
 import {PulsarReaderConfig} from "../../src/PulsarDefinition";
 import {MessageId, ReaderConfig} from "pulsar-client";
 import {readerConfig} from "../../src/PulsarConfig";
+import {Node} from "node-red";
 
 describe('readerConfig', function() {
 
     it('should correctly configure reader with given config', function () {
+        const node = {} as Node<{}>;
         const mockPulsarReaderConfig: PulsarReaderConfig = {
             clientNodeId: "",
             schemaNodeId: "",
@@ -16,6 +18,7 @@ describe('readerConfig', function() {
             name: 'test-node',
             startMessage: 'Latest',
             topic: 'test-topic',
+            topicTypedInput: 'str',
             receiverQueueSize: '200',
             readerName: 'test-reader',
             subscriptionRolePrefix: 'test-role',
@@ -23,7 +26,7 @@ describe('readerConfig', function() {
             privateKeyPath: '/path/to/key',
             cryptoFailureAction: 'FAIL'
         };
-        const config: ReaderConfig = readerConfig(mockPulsarReaderConfig);
+        const config: ReaderConfig = readerConfig(node, mockPulsarReaderConfig);
         expect(config).to.be.an('object');
         expect(config.startMessageId).is.instanceof(MessageId);
         expect(config.topic).to.equal('test-topic');

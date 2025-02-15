@@ -3,8 +3,6 @@ import {NodeMessage} from 'node-red'
 import * as EditorClient from '@node-red/editor-client'
 import {AuthenticationOauth2, AuthenticationTls, AuthenticationToken, Message, SchemaType} from 'pulsar-client'
 
-
-
 //Authentication
 export type PulsarAuthenticationType = 'Token' | 'Oauth2' | 'TLS'
 
@@ -34,6 +32,7 @@ export interface PulsarAuthenticationConfig extends PulsarAuthenticationProperti
 export interface PulsarClientProperties  {
     authenticationNodeId: string
     serviceUrl: string
+    serviceUrlTypedInput: string
     operationTimeoutSeconds?: string
     ioThreads?: string
     messageListenerThreads?: string
@@ -67,7 +66,8 @@ export interface PulsarSchemaEditorConfig extends PulsarSchemaProperties, Editor
 export interface PulsarConsumerProperties {
     clientNodeId: string
     schemaNodeId: string
-    topic: string
+    topic: string,
+    topicTypedInput: string
     subscription?: string
     subscriptionType: string
     subscriptionInitialPosition?: string
@@ -97,6 +97,7 @@ export interface PulsarProducerProperties {
     clientNodeId: string
     schemaNodeId: string
     topic: string
+    topicTypedInput: string
     producerName?: string
     sendTimeoutMs?: string
     initialSequenceId?: string
@@ -128,6 +129,7 @@ export interface PulsarReaderProperties {
     clientNodeId: string
     schemaNodeId: string
     topic: string
+    topicTypedInput: string
     startMessage: StartMessage
     receiverQueueSize?: string
     readerName?: string
@@ -142,11 +144,15 @@ export interface PulsarReaderConfig extends PulsarReaderProperties, NodeRED.Node
 export interface PulsarReaderEditorConfig extends PulsarReaderProperties, EditorClient.NodeProperties {}
 
 type EditorWidgetTypedInputType = import("node-red").EditorWidgetTypedInputType
+
 //Editor
+export type FieldDefinition = EditorWidgetTypedInputType | EditorWidgetTypedInputType[]
+
 export interface TypedField {
     name: string
-    type: EditorWidgetTypedInputType,
-    value?: string
+    type: FieldDefinition,
+    value?: string,
+    defaultType?: EditorWidgetTypedInputType
 }
 
 /**

@@ -7,13 +7,14 @@ import {Producer, ProducerConfig, ProducerMessage,} from "pulsar-client";
 import {requireClient, requireSchema} from "../PulsarNode";
 import {producerConfig} from "../PulsarConfig";
 import {anyToBoolean, anyToNumber, anyToProperties, anyToString, anyToStringArray} from "../Properties";
+import {Node} from "node-red";
 
 type ProducerNode = NodeRED.Node<Producer>
 
-function setupProducer(RED: NodeRED.NodeAPI, config: PulsarProducerConfig): ProducerConfig {
+function setupProducer(RED: NodeRED.NodeAPI, rt: Node<{}>, config: PulsarProducerConfig): ProducerConfig {
     return {
         schema: requireSchema(RED, config),
-        ... producerConfig(config)
+        ... producerConfig(rt, config)
     }
 }
 
@@ -45,7 +46,7 @@ export = (RED: NodeRED.NodeAPI): void => {
                 this.error('Client not created')
                 return
             }
-            const producerConfig = setupProducer(RED, config)
+            const producerConfig = setupProducer(RED, this, config)
             try {
                 this.debug('Creating producer: ' + JSON.stringify(producerConfig))
                 client.createProducer(producerConfig).then(producer => {

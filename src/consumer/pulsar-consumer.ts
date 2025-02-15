@@ -38,7 +38,7 @@ function setupListener(config: PulsarConsumerConfig, node: ConsumerNode): Consum
     }
     return {
         listener: listener,
-        ...consumerConfig(config)
+        ...consumerConfig(node, config)
     }
 }
 

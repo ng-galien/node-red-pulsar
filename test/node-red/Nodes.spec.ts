@@ -254,7 +254,7 @@ function clientConf(broker: StartedTestContainer): TestFlowsItem<PulsarClientCon
     return {
         id: "client",
         type: PulsarClientId,
-        serviceUrl: brokerUrl(broker),
+        serviceUrl:  brokerUrl(broker),
         authenticationNodeId: "authentication",
     }
 }

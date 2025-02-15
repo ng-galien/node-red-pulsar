@@ -1,12 +1,16 @@
 import {expect} from 'chai';
 import {consumerConfig} from '../../src/PulsarConfig';
 import {PulsarConsumerConfig} from "../../src/PulsarDefinition";
+import {Node} from "node-red";
 
 describe('consumerConfig', () => {
+    const node = {} as Node<{}>;
+
     it('should generate a valid ConsumerConfig object given a PulsarConsumerConfig', () => {
         const mockPulsarConsumerConfig: PulsarConsumerConfig = {
             clientNodeId: "", id: "", name: "", schemaNodeId: "", type: "", z: "",
             topic: 'test-topic',
+            topicType: 'str',
             subscription: undefined,
             subscriptionType: 'Exclusive',
             subscriptionInitialPosition: 'Latest',
@@ -27,7 +31,7 @@ describe('consumerConfig', () => {
             batchReceivePolicy: undefined
         };
 
-        const config = consumerConfig(mockPulsarConsumerConfig);
+        const config = consumerConfig(node, mockPulsarConsumerConfig);
         expect(config).to.be.an('object');
         expect(config.topic).to.equal('test-topic');
         expect(config.topics).to.be.undefined;

@@ -11,6 +11,7 @@ RED.nodes.registerType<PulsarReaderEditorConfig>(READER_ID, {
         clientNodeId: {value: '', required:true, type: CLIENT_ID },
         schemaNodeId: {value: '', required: false, type: SCHEMA_ID },
         topic: {value: '', required: true },
+        topicTypedInput: {value: 'str', required: true},
         startMessage: {value: 'Latest', required: true },
         receiverQueueSize: {value: '100', required: false, validate: RED.validators.number()},
         readerName: {value: '', required: false},
@@ -30,12 +31,16 @@ RED.nodes.registerType<PulsarReaderEditorConfig>(READER_ID, {
     },
     oneditprepare: function () {
         configureTypedFields(false, [
-            {name: 'receiverQueueSize', type: 'num'},
-            {name: 'readCompacted', type: 'bool'},
+            {name: 'topic', type: ['str', "env", "flow", "global"], value: this.topicTypedInput, defaultType: this.topicTypedInput as EditorWidgetTypedInputType},
+            {name: 'receiverQueueSize', type: 'num', value: this.receiverQueueSize},
+            {name: 'readCompacted', type: 'bool', value: this.readCompacted},
         ])
         type StartMessage = import("../PulsarDefinition").StartMessage
         configureOptionalEnumField<StartMessage>(false, true, 'startMessage', ['Earliest', 'Latest'])
         type CryptoFailureAction = import("pulsar-client").ConsumerCryptoFailureAction
         configureOptionalEnumField<CryptoFailureAction>(false, true, 'cryptoFailureAction', ['FAIL', 'DISCARD'])
+    },
+    oneditsave: function() {
+        this.topicTypedInput = getPropertyType(false, 'topic')
     }
 })
