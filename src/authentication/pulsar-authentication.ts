@@ -28,6 +28,11 @@ export = (RED: NodeRED.NodeAPI): void => {
   );
 };
 
+/**
+ * Resolve the authentication configuration.
+ * @param config
+ * @param errorHandler
+ */
 function resolveAuthentication(
   config: PulsarAuthenticationConfig,
   errorHandler: (error: string) => void,
@@ -59,6 +64,11 @@ function resolveAuthentication(
   }
 }
 
+/**
+ * Create an authentication token from the configuration.
+ * @param config
+ * @param errorHandler
+ */
 function createAuthenticationToken(
   config: PulsarAuthenticationConfig,
   errorHandler: (error: string) => void,
@@ -74,6 +84,9 @@ function createAuthenticationToken(
   return new AuthenticationToken({ token: tokenContent });
 }
 
+/**
+ * Create a blank authentication.
+ */
 function noAuthentication(): AuthenticationImpl {
   return {
     blank: true,

@@ -40,6 +40,12 @@ export = (RED: NodeRED.NodeAPI): void => {
   );
 };
 
+/**
+ * Get the authentication node from the provided NodeRED node.
+ * @param node
+ * @param RED
+ * @param config
+ */
 function getAuthentication(
   node: RuntimeNode,
   RED: NodeRED.NodeAPI,

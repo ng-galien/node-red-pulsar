@@ -1,3 +1,8 @@
+/**
+ * Configure the typed input fields.
+ * @param isConfig
+ * @param fields
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureTypedFields(isConfig: boolean, fields: TypedField[]): void {
   fields.forEach(function (field) {
@@ -20,6 +25,11 @@ function configureTypedFields(isConfig: boolean, fields: TypedField[]): void {
   });
 }
 
+/**
+ * Get the property type.
+ * @param isConfig if the node is a config node
+ * @param name the property name
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getPropertyType(isConfig: boolean, name: string): string {
   const id = (isConfig ? 'node-config-input-' : 'node-input-') + name;
@@ -27,6 +37,12 @@ function getPropertyType(isConfig: boolean, name: string): string {
   return input.typedInput('type');
 }
 
+/**
+ * Configure the enum field.
+ * @param isConfig if the node is a config node
+ * @param name the property name
+ * @param options the enum options
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureEnumField<T extends string>(
   isConfig: boolean,
@@ -36,6 +52,12 @@ function configureEnumField<T extends string>(
   configureOptionalEnumField(isConfig, true, name, options);
 }
 
+/**
+ * Configure the mandatory enum field.
+ * @param isConfig if the node is a config node
+ * @param name the property name
+ * @param options the enum options
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureMandatoryEnumField<T extends string>(
   isConfig: boolean,
@@ -45,6 +67,13 @@ function configureMandatoryEnumField<T extends string>(
   configureOptionalEnumField(isConfig, false, name, options);
 }
 
+/**
+ * Configure the optional enum field.
+ * @param isConfig if the node is a config node
+ * @param optional if the field is optional
+ * @param name the property name
+ * @param options the enum options
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureOptionalEnumField<T extends string>(
   isConfig: boolean,
@@ -71,6 +100,11 @@ function configureOptionalEnumField<T extends string>(
   });
 }
 
+/**
+ * Configure the json string field.
+ * @param isConfig if the node is a config node
+ * @param name the property name
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configureJsonStringField(isConfig: boolean, name: string): void {
   const propertiesInput = $(

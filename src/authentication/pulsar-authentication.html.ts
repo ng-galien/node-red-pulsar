@@ -30,15 +30,20 @@ RED.nodes.registerType<PulsarAuthenticationEditorConfig>(AUTHENTICATION_ID, {
       const input = authType.typedInput('value') as AuthenticationType;
       updateOauthType(input);
     });
+    // eslint-disable-next-line jsdoc/require-jsdoc
     function updateJwtToken(show: boolean): void {
       $('.jwt-token').toggle(show);
     }
+    // eslint-disable-next-line jsdoc/require-jsdoc
     function updateOauth(show: boolean): void {
       $('.oauth').toggle(show);
     }
+    // eslint-disable-next-line jsdoc/require-jsdoc
     function updateTls(show: boolean): void {
       $('.tls').toggle(show);
     }
+
+    // eslint-disable-next-line jsdoc/require-jsdoc
     function updateOauthType(type: AuthenticationType): void {
       switch (type) {
         case 'Token':

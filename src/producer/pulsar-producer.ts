@@ -14,6 +14,12 @@ import { Node } from 'node-red';
 
 type ProducerNode = NodeRED.Node<Producer>;
 
+/**
+ * Set up the producer configuration.
+ * @param RED
+ * @param rt
+ * @param config
+ */
 function setupProducer(
   RED: NodeRED.NodeAPI,
   rt: Node,
@@ -25,6 +31,10 @@ function setupProducer(
   };
 }
 
+/**
+ * Convert the node message to a pulsar message.
+ * @param msg
+ */
 function nodeMessageToPulsarMessage(msg: NodeRED.NodeMessage): ProducerMessage {
   const str = JSON.stringify(msg.payload);
   const buffer = Buffer.from(str);
