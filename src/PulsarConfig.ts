@@ -188,8 +188,10 @@ export function evaluateProperty(
  * @param {string} value - The URL to be validated.
  * @returns {boolean} - Returns true if the URL is valid, false otherwise.
  */
-function validatePulsarUrl(value: string): boolean {
-  return value !== undefined && value.match(/^pulsar:\/\/.+/) !== null;
+export function validatePulsarUrl(value: string): boolean {
+  return (
+    value.match(/^(pulsar:\/\/|pulsar\+ssl:\/\/).+/) !== null
+  );
 }
 
 /**
