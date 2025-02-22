@@ -10,24 +10,25 @@ import {
   anyToString,
   anyToStringArray,
 } from '../Properties';
-import { Node } from 'node-red';
 
 type ProducerNode = NodeRED.Node<Producer>;
 
 /**
  * Set up the producer configuration.
- * @param RED
- * @param rt
- * @param config
+ * @param RED NodeRED
+ * @param node ProducerNode
+ * @param config PulsarProducerConfig
  */
 function setupProducer(
   RED: NodeRED.NodeAPI,
-  rt: Node,
+  node: ProducerNode,
   config: PulsarProducerConfig,
 ): ProducerConfig {
   return {
     schema: requireSchema(RED, config),
-    ...producerConfig(rt, config),
+    ...producerConfig(config, (value, type) => {
+      return NodeRED.util.evaluateNodeProperty(value, type, node, {}) as string;
+    }),
   };
 }
 

@@ -39,7 +39,9 @@ function setupListener(
   };
   return {
     listener: listener,
-    ...consumerConfig(node, config),
+    ...consumerConfig(config, (value, type) => {
+      return NodeRED.util.evaluateNodeProperty(value, type, node, {}) as string;
+    }),
   };
 }
 
