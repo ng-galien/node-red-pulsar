@@ -1,10 +1,8 @@
 import { expect } from 'chai';
 import { consumerConfig } from '../../src/PulsarConfig';
 import { PulsarConsumerConfig } from '../../src/PulsarDefinition';
-import { Node } from 'node-red';
 
 describe('consumerConfig', () => {
-  const node = {} as Node<{}>;
 
   it('should generate a valid ConsumerConfig object given a PulsarConsumerConfig', () => {
     const mockPulsarConsumerConfig: PulsarConsumerConfig = {
@@ -36,7 +34,7 @@ describe('consumerConfig', () => {
       batchReceivePolicy: undefined,
     };
 
-    const config = consumerConfig(node, mockPulsarConsumerConfig);
+    const config = consumerConfig(mockPulsarConsumerConfig, (value) => value);
     expect(config).to.be.an('object');
     expect(config.topic).to.equal('test-topic');
     expect(config.topics).to.be.undefined;
