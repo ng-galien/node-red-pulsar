@@ -10,18 +10,30 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "no-console": "error",
-    "indent": [
+    "prettier/prettier": "error",
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "jsdoc/require-jsdoc": [
       "error",
-      4
+      {
+        "require": {
+          "FunctionDeclaration": true,
+          "MethodDefinition": true,
+          "ClassDeclaration": true,
+          "ArrowFunctionExpression": false,
+          "FunctionExpression": false
+        }
+      }
     ]
   },
   "parserOptions": {
     "ecmaVersion": 2018
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "prettier", "jsdoc"],
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "prettier"
   ]
 }

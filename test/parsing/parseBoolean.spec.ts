@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import {parseBoolean} from "../../src/PulsarConfig";
+import { parseBoolean } from '../../src/PulsarConfig';
 
 describe('parseBoolean', () => {
   /**

@@ -1,7 +1,7 @@
 // Import required dependencies
-import {describe, it} from 'mocha';
-import {expect} from 'chai';
-import {parseNonEmptyObject} from '../../src/PulsarConfig';
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import { parseNonEmptyObject } from '../../src/PulsarConfig';
 
 describe('PulsarConfig', () => {
   describe('.parseNonEmptyObject()', () => {

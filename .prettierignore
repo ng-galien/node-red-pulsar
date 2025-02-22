@@ -1,0 +1,15 @@
+# Ignore all yaml files
+*.yml
+*.yaml
+
+# Ignore all markdown files
+*.md
+
+# Ingore html files
+*.html
+
+# Prettier configuration file
+.prettierrc
+
+# Example directory
+example

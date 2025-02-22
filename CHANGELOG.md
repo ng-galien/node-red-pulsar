@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.1.7
+
+### Enhanced
+
+- Allow to configure Pulsar service URL with typed input
+  - String
+  - Environment variable
+  - Flow or global context
+- Allow to configure topics with typed input
+  - String
+  - Environment variable
+  - Flow or global context
+- Pulsar topic is in the message object
+
+### Maintenance
+
+- Update dependencies
+- Use Prettier for code formatting
+- Use ESLint for code linting
+
 ## 1.1.4
 
 ### Enhanced
@@ -36,7 +56,3 @@ All notable changes to this project will be documented in this file. See [standa
 ### Changed
 
 - Nodes are written in TypeScript
-
-
-
-
