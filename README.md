@@ -1,3 +1,5 @@
+[![.github/workflows/build.yml](https://github.com/ng-galien/node-red-pulsar/actions/workflows/build.yml/badge.svg)](https://github.com/ng-galien/node-red-pulsar/actions/workflows/build.yml)
+
 # node-red-pulsar
 
 Add Apache Pulsar support to Node-RED.
