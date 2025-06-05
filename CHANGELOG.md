@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.2.0](https://github.com/ng-galien/node-red-pulsar/compare/v1.1.0...v1.2.0) (2025-06-05)
+### [1.1.9](https://github.com/ng-galien/node-red-pulsar/compare/v1.2.0...v1.1.9) (2025-06-05)
 
 ## 1.1.7
 
