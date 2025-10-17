@@ -17,7 +17,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
-      - uses: JS-DevTools/npm-publish@v3
+      - uses: JS-DevTools/npm-publish@v4
         if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.NPM_TOKEN }}
