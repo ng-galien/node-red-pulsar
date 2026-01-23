@@ -4,6 +4,15 @@ services:
   pulsar:
     image: apachepulsar/pulsar:3.0.2
     command: ["bin/pulsar", "standalone", "--no-functions-worker", "--no-stream-storage"]
+    ports:
+      - "6650:6650"   # Pulsar binary protocol
+      - "8080:8080"   # Pulsar admin API
+    healthcheck:
+      test: ["CMD", "bin/pulsar-admin", "brokers", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   nodered:
     build: .
@@ -12,6 +21,9 @@ services:
       - "1880:1880"
     volumes:
       - nodered:/data
+    depends_on:
+      pulsar:
+        condition: service_healthy
 
 volumes:
   nodered:

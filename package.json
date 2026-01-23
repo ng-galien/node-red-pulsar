@@ -1,6 +1,6 @@
 {
   "name": "@ng-galien/node-red-pulsar",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "Node-RED nodes for Apache Pulsar",
   "repository": {
     "type": "git",
@@ -13,7 +13,13 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "files": [
+    "dist",
+    "resources",
+    "README.md"
+  ],
   "scripts": {
+    "prepare": "npm run build",
     "release": "standard-version",
     "build": "tsc && cpx 'src/**/*.html' dist --preserve && cpx 'dist/**/*.html.js' resources && rm -rf dist/**/*.html.js && cp dist/PulsarDefinition.js resources",
     "clean": "rm -f *.tsbuildinfo && rm -rf dist resources && rm -f *.tgz",
@@ -23,13 +29,7 @@
     "start-node-red": "node-red",
     "stop-node-red": "killall node-red || true",
     "test": "ts-mocha --exit -p tsconfig.json test/**/*.spec.ts",
-    "test-node-red": "npm run stop-node-red && npm run build && npm run deploy && npm run start-node-red",
-    "version:major": "standard-version --release-as major",
-    "version:minor": "standard-version --release-as minor",
-    "version:patch": "standard-version --release-as patch",
-    "version:first": "standard-version --first-release",
-    "changelog:preview": "standard-version --dry-run",
-    "prepare": "husky install"
+    "test-node-red": "npm run stop-node-red && npm run build && npm run deploy && npm run start-node-red"
   },
   "node-red": {
     "nodes": {
@@ -52,21 +52,21 @@
   "author": "Alexandre Boyer",
   "license": "ISC",
   "dependencies": {
-    "@types/uuid": "10.0.0",
-    "pulsar-client": "1.13.2",
-    "uuid": "10.0.0"
+    "pulsar-client": "^1.12.0",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
-    "@types/chai": "4.3.20",
-    "@types/mocha": "10.0.10",
+    "@commitlint/cli": "20.3.1",
+    "@commitlint/config-conventional": "20.3.1",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.7",
     "@types/node-red": "^1.3.5",
-    "@types/node-red-node-test-helper": "^0.3.4",
-    "@typescript-eslint/eslint-plugin": "^7.14.1",
-    "@typescript-eslint/parser": "^7.14.1",
+    "@types/node-red-node-test-helper": "^0.3.5",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "axios": "1.9.0",
-    "chai": "^4.4.1",
+    "chai": "^4.5.0",
     "chai-wait-for": "^2.0.2",
     "cpx": "^1.5.0",
     "cross-env": "^7.0.3",
@@ -75,19 +75,16 @@
     "eslint-plugin-jsdoc": "50.7.1",
     "eslint-plugin-prettier": "5.4.1",
     "husky": "^8.0.0",
-    "mocha": "^10.5.2",
+    "mocha": "^10.8.2",
     "node-red": "^3.1.11",
-    "node-red-node-test-helper": "^0.3.4",
+    "node-red-node-test-helper": "^0.3.6",
     "prettier": "3.5.3",
-    "sinon": "^18.0.0",
+    "sinon": "^18.0.1",
     "standard-version": "^9.5.0",
-    "testcontainers": "^10.10.3",
-    "ts-mocha": "^10.0.0",
+    "testcontainers": "^10.28.0",
+    "ts-mocha": "^10.1.0",
     "ts-node": "^10.9.2",
-    "tslog": "^4.9.3",
+    "tslog": "^4.10.2",
     "typescript": "5.8.3"
-  },
-  "save-exact": true,
-  "audit": true,
-  "fund": false
+  }
 }
