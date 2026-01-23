@@ -8,11 +8,11 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "esModuleInterop": true,
-    "declaration": false,
+    "declaration": true,
+    "skipLibCheck": true,
 
     // Lint:
     "strict": true,
-    "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,

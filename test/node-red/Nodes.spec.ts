@@ -206,10 +206,12 @@ describe('Pulsar Integration Test', function () {
   });
 
   it('Reader should receive a message', async function () {
+    this.timeout(10000); // Reader needs more time to connect and receive
     const flow = [
       clientConf(container),
       schemaConf(),
       readerConf(topic),
+      statusConf(),
       receiverConf(),
     ];
     await helper.load(
@@ -222,8 +224,16 @@ describe('Pulsar Integration Test', function () {
       name: name,
       age: age,
     };
+    // Set up receiver listener BEFORE sending message to avoid race condition
+    const messagePromise = expectPayload('receiver', message);
+    // Wait for reader to be ready, then send message
+    await expectPayload('status', {
+      type: 'reader',
+      status: 'ready',
+      topic: topic,
+    });
     await sendMsgToBroker(container, topic, message);
-    await expectPayload('receiver', message);
+    await messagePromise;
   });
 
   it('Producer should send a message to consumer', async function () {
@@ -397,7 +407,7 @@ function expectPayload(node: string, payload: {}) {
   return new Promise<void>((resolve, reject) => {
     const timeout = setTimeout(() => {
       reject(new Error('Timeout: No message received'));
-    }, 1000); // 5 seconds timeout
+    }, 5000); // 5 seconds timeout
 
     try {
       n.on('input', function (msg) {
