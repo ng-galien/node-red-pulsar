@@ -42,7 +42,9 @@ jobs:
         with:
           node-version: "20"
           cache: 'npm'
-      - run: npm ci
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci --ignore-scripts
+      - run: npm run build
       - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
