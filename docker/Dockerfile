@@ -1,3 +1,4 @@
 FROM nodered/node-red:latest
 
-RUN npm install ng-galien/node-red-contrib-pulsar#main
+# Install from npm registry (published package with built dist/)
+RUN npm install @ng-galien/node-red-pulsar

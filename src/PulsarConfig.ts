@@ -25,8 +25,6 @@ import {
   SubscriptionType,
 } from 'pulsar-client';
 import { jsonStringToProperties } from './Properties';
-import * as NodeRED from 'node-red';
-import { Node } from 'node-red';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -175,13 +173,15 @@ export function parseTopic(topic: string): PulsarTopic {
   return { single: topic.trim() };
 }
 
-export function evaluateProperty(
-  rt: Node<{}>,
-  value: string,
-  type: string,
-): string {
-  return NodeRED.util.evaluateNodeProperty(value, type, rt, {}) as string;
-}
+// export function evaluateProperty(
+//   rt: Node<{}>,
+//   value: string,
+//   type: string,
+// ): string {
+//   return NodeRED.util.evaluateNodeProperty(value, type, rt, {}) as string;
+// }
+
+export type EvaluateFunction = (value: string, type: string) => string;
 
 /**
  * Function to validate the Pulsar URL.
@@ -196,20 +196,16 @@ export function validatePulsarUrl(value: string): boolean {
 
 /**
  * Creates a new Pulsar client configuration object based on the provided configuration.
- * @param rt - The NodeRED Node object.
  * @param auth - The authentication object.
  * @param config - The configuration object.
+ * @param evaluateProperty - The function to evaluate the property.
  */
 export function clientConfig(
-  rt: Node<{}>,
   auth: AuthenticationImpl | undefined,
   config: PulsarClientConfig,
+  evaluateProperty: EvaluateFunction,
 ): ClientConfig {
-  const pulsarUrl = evaluateProperty(
-    rt,
-    config.serviceUrl,
-    config.serviceUrlTypedInput,
-  );
+  const pulsarUrl = evaluateProperty(config.serviceUrl, config.serviceUrlTypedInput);
   if (!validatePulsarUrl(pulsarUrl)) {
     throw new Error('Invalid Pulsar service URL');
   }
@@ -231,14 +227,14 @@ export function clientConfig(
 
 /**
  * Creates a new Pulsar consumer configuration object based on the provided configuration.
- * @param rt - The NodeRED Node object.
  * @param config - The configuration object.
+ * @param EvaluateFunction - The function to evaluate the property.
  */
 export function consumerConfig(
-  rt: Node<{}>,
   config: PulsarConsumerConfig,
+  EvaluateFunction: EvaluateFunction,
 ): ConsumerConfig {
-  const typedTopic = evaluateProperty(rt, config.topic, config.topicTypedInput);
+  const typedTopic = EvaluateFunction(config.topic, config.topicTypedInput);
   const topic = parseTopic(typedTopic);
   return {
     topic: topic.single,
@@ -283,15 +279,15 @@ export function consumerConfig(
 
 /**
  * Creates a new Pulsar producer configuration object based on the provided configuration.
- * @param rt - The NodeRED Node object.
  * @param config - The configuration object.
+ * @param EvaluateFunction
  */
 export function producerConfig(
-  rt: Node<{}>,
   config: PulsarProducerConfig,
+  EvaluateFunction: EvaluateFunction,
 ): ProducerConfig {
   const result = {
-    topic: evaluateProperty(rt, config.topic, config.topicTypedInput),
+    topic: EvaluateFunction(config.topic, config.topicTypedInput),
     producerName: parseNonEmptyString(config.producerName),
     sendTimeoutMs: parseNumber(config.sendTimeoutMs),
     initialSequenceId: parseNumber(config.initialSequenceId),
@@ -343,11 +339,11 @@ export function readerPosition(start: StartMessage): MessageId {
 }
 
 export function readerConfig(
-  rt: Node<{}>,
   config: PulsarReaderConfig,
+  EvaluateFunction: EvaluateFunction,
 ): ReaderConfig {
   return {
-    topic: evaluateProperty(rt, config.topic, config.topicTypedInput),
+    topic: EvaluateFunction(config.topic, config.topicTypedInput),
     startMessageId: readerPosition(config.startMessage),
     receiverQueueSize: parseNumber(config.receiverQueueSize),
     readerName: parseNonEmptyString(config.readerName),

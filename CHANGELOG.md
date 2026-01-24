@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.2.0
+
+### Fixed
+
+- Fix config node selectors not appearing in editor (issue #98)
+  - Race condition in async script loading caused undefined constants
+  - Chained `$.getScript()` callbacks to ensure proper load order
+
+### Added
+
+- E2E testing setup with Docker (Pulsar + Node-RED)
+- GitHub community health files (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY)
+- Issue and PR templates
+- commitlint for conventional commits enforcement
+
+### Enhanced
+
+- Improved README with badges, table of contents, and better documentation
+- Added LICENSE file (ISC)
+- URL validation supports both `pulsar://` and `pulsar+ssl://` schemes
+
+### Maintenance
+
+- Added husky pre-commit hooks
+- Updated dependencies
+
+### [1.1.9](https://github.com/ng-galien/node-red-pulsar/compare/v1.2.0...v1.1.9) (2025-06-05)
+
 ## 1.1.7
 
 ### Enhanced

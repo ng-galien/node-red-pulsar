@@ -29,7 +29,9 @@ function createConfig(
   };
   return {
     listener: listener,
-    ...readerConfig(node, config),
+    ...readerConfig(config, (value, type) => {
+      return NodeRED.util.evaluateNodeProperty(value, type, node, {}) as string;
+    }),
   };
 }
 

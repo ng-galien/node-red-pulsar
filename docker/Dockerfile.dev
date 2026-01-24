@@ -1,0 +1,10 @@
+FROM nodered/node-red:latest
+
+# Copy pre-built local package tarball
+COPY --chown=node-red:node-red docker/ng-galien-node-red-pulsar-*.tgz /tmp/
+
+# Install the local package (ignore scripts to skip our prepare script)
+# Then rebuild pulsar-client native bindings
+# Use shell to expand the wildcard
+RUN sh -c 'npm install /tmp/ng-galien-node-red-pulsar-*.tgz --ignore-scripts' && \
+    npm rebuild pulsar-client

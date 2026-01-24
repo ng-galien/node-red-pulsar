@@ -1,6 +1,7 @@
 <script type="text/javascript">
-    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js')
-    $.getScript('resources/@ng-galien/node-red-pulsar/consumer/pulsar-consumer.html.js')
+    $.getScript('resources/@ng-galien/node-red-pulsar/html-utils/html-utils.html.js', function() {
+        $.getScript('resources/@ng-galien/node-red-pulsar/consumer/pulsar-consumer.html.js')
+    });
 </script>
 
 <script type="text/html" data-template-name="pulsar-consumer">

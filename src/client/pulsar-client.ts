@@ -25,7 +25,14 @@ export = (RED: NodeRED.NodeAPI): void => {
       );
       const client = createClient(
         this,
-        clientConfig(this, authentication, config),
+        clientConfig(authentication, config, (value, type) => {
+          return NodeRED.util.evaluateNodeProperty(
+            value,
+            type,
+            this,
+            {},
+          ) as string;
+        }),
       );
       if (client) {
         this.credentials = client;

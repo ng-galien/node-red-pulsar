@@ -1,11 +1,33 @@
+# IDE
 .idea/
-node_modules/
-rest/
-docker/
-*.sh
+.vscode/
 
-# TypeScript
+# Dependencies
+node_modules/
+
+# TypeScript build outputs
 *.tsbuildinfo
+tsconfig.tsbuildinfo
 dist/
 resources/
-tsconfig.tsbuildinfo
+
+# npm pack output
+*.tgz
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Shell scripts (if sensitive)
+*.sh
+
+# Misc
+rest/
