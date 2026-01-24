@@ -9,7 +9,7 @@ import {
   AuthenticationTls,
   AuthenticationToken,
 } from 'pulsar-client';
-import { loadToken, parseToken } from '../Token';
+import { createTokenSupplier, parseToken } from '../Token';
 
 type RuntimeNode = NodeRED.Node<AuthenticationImpl>;
 
@@ -66,6 +66,7 @@ function resolveAuthentication(
 
 /**
  * Create an authentication token from the configuration.
+ * Uses token supplier for dynamic token refresh (file:// and env: sources).
  * @param config
  * @param errorHandler
  */
@@ -77,11 +78,11 @@ function createAuthenticationToken(
     return noAuthentication();
   }
   const token = parseToken(config.jwtToken);
-  const tokenContent = loadToken(token, errorHandler);
-  if (!tokenContent) {
+  const tokenSupplier = createTokenSupplier(token, errorHandler);
+  if (!tokenSupplier) {
     return noAuthentication();
   }
-  return new AuthenticationToken({ token: tokenContent });
+  return new AuthenticationToken({ token: tokenSupplier });
 }
 
 /**
