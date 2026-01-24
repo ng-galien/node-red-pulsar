@@ -60,6 +60,24 @@
             Type</label>
         <input type="text" id="node-input-subscriptionType" style="width: 67%">
     </div>
+    <!--keySharedMode-->
+    <div class="form-row">
+        <label for="node-input-keySharedMode" style="width: 40%">
+            <i class="fa fa-key"></i>
+            KeyShared Mode
+        </label>
+        <input type="text" id="node-input-keySharedMode" style="width: 52%">
+        <input type="hidden" id="node-input-keySharedMode-type">
+    </div>
+    <!--keySharedAllowOutOfOrder-->
+    <div class="form-row">
+        <label for="node-input-keySharedAllowOutOfOrder" style="width: 70%">
+            <i class="fa fa-random"></i>
+            KeyShared Allow Out of Order
+        </label>
+        <input type="text" id="node-input-keySharedAllowOutOfOrder">
+        <input type="hidden" id="node-input-keySharedAllowOutOfOrder-type">
+    </div>
     <!--subscriptionInitialPosition-->
     <div class="form-row">
         <label for="node-input-subscriptionInitialPosition" style="width: 25%">
@@ -143,7 +161,9 @@ Configure the topic consumer to a **Pulsar** service.
 - `Topic`: The topic to be consumed.
 - `Topic Pattern`: The pattern of the topic(s) to be consumed.
 - `Subscription`: Subscription name for the topic.
-- `Type`: Type of the subscription.
+- `Type`: Type of the subscription (`Exclusive`, `Shared`, `Failover`, `KeyShared`).
+- `KeyShared Mode`: For KeyShared subscriptions, the mode to use (`AutoSplit` or `Sticky`).
+- `KeyShared Allow Out of Order`: For KeyShared subscriptions, whether to allow out-of-order delivery.
 - `Initial Position`: The initial position for the subscription.
 - `Ack Timeout`: Timeout for the acknowledgment.
 - `Nack Redelivery Delay`: Delay for negative acknowledgement redelivery.

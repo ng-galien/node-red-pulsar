@@ -30,9 +30,12 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
     batchingEnabled: { value: undefined, required: false },
     batchingMaxPublishDelayMs: { value: undefined, required: false },
     batchingMaxMessages: { value: undefined, required: false },
+    batchingType: { value: undefined, required: false },
+    batchingMaxAllowedSizeInBytes: { value: undefined, required: false },
     properties: { value: undefined, required: false },
     publicKeyPath: { value: '', required: false },
     encryptionKey: { value: '', required: false },
+    encryptionKeys: { value: '', required: false },
     cryptoFailureAction: { value: undefined, required: false },
     chunkingEnabled: { value: undefined, required: false },
     accessMode: { value: undefined, required: false },
@@ -81,6 +84,11 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
         type: 'num',
         value: this.batchingMaxMessages,
       },
+      {
+        name: 'batchingMaxAllowedSizeInBytes',
+        type: 'num',
+        value: this.batchingMaxAllowedSizeInBytes,
+      },
       { name: 'properties', type: 'json', value: this.properties },
     ];
     configureTypedFields(false, fields);
@@ -102,6 +110,11 @@ RED.nodes.registerType<PulsarProducerEditorConfig>(PRODUCER_ID, {
       'LZ4',
       'ZSTD',
       'SNAPPY',
+    ]);
+    type BatchType = import('pulsar-client').ProducerBatchType;
+    configureEnumField<BatchType>(false, 'batchingType', [
+      'DefaultBatching',
+      'KeyBasedBatching',
     ]);
     type CryptoFailureAction =
       import('pulsar-client').ProducerCryptoFailureAction;

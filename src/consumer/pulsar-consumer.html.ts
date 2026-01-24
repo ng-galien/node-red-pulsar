@@ -64,6 +64,12 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
     },
     regexSubscriptionMode: { value: 'AllTopics', required: false },
     deadLetterPolicy: { value: undefined, required: false },
+    keySharedMode: { value: undefined, required: false },
+    keySharedAllowOutOfOrder: {
+      value: 'false',
+      required: false,
+      validate: RED.validators.typedInput('bool'),
+    },
   },
   label: function (this: EditorNode) {
     return this.name || this.topic?.length > 0
@@ -113,6 +119,11 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
         type: 'bool',
         value: this.batchIndexAckEnabled,
       },
+      {
+        name: 'keySharedAllowOutOfOrder',
+        type: 'bool',
+        value: this.keySharedAllowOutOfOrder,
+      },
     ];
     configureTypedFields(false, fields);
     type SubscriptionType = import('pulsar-client').SubscriptionType;
@@ -139,6 +150,11 @@ RED.nodes.registerType<PulsarConsumerEditorConfig>(CONSUMER_ID, {
     configureEnumField<CryptoFailureAction>(false, 'cryptoFailureAction', [
       'FAIL',
       'DISCARD',
+    ]);
+    type KeyShareMode = import('pulsar-client').ConsumerKeyShareMode;
+    configureEnumField<KeyShareMode>(false, 'keySharedMode', [
+      'AutoSplit',
+      'Sticky',
     ]);
   },
   oneditsave: function () {

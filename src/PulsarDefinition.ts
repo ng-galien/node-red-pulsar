@@ -108,6 +108,8 @@ export interface PulsarConsumerProperties {
   regexSubscriptionMode?: string;
   deadLetterPolicy?: string;
   batchReceivePolicy?: string;
+  keySharedMode?: string;
+  keySharedAllowOutOfOrder?: string;
 }
 
 export interface PulsarConsumerConfig
@@ -136,9 +138,12 @@ export interface PulsarProducerProperties {
   batchingEnabled?: string;
   batchingMaxPublishDelayMs?: string;
   batchingMaxMessages?: string;
+  batchingType?: string;
+  batchingMaxAllowedSizeInBytes?: string;
   properties?: any;
   publicKeyPath?: string;
   encryptionKey?: string;
+  encryptionKeys?: string;
   cryptoFailureAction?: string;
   chunkingEnabled?: string;
   accessMode?: string;

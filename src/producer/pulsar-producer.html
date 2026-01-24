@@ -152,6 +152,24 @@
         <input type="text" id="node-input-batchingMaxMessages">
         <input type="hidden" id="node-input-batchingMaxMessages-type">
     </div>
+<!--    batchingType-->
+    <div class="form-row">
+        <label for="node-input-batchingType" style="width: 40%">
+            <i class="fa fa-layer-group"></i>
+            Batching Type
+        </label>
+        <input type="text" id="node-input-batchingType" style="width: 52%">
+        <input type="hidden" id="node-input-batchingType-type">
+    </div>
+<!--    batchingMaxAllowedSizeInBytes-->
+    <div class="form-row">
+        <label for="node-input-batchingMaxAllowedSizeInBytes" style="width: 70%">
+            <i class="fa fa-cogs"></i>
+            Batching Max Size (bytes)
+        </label>
+        <input type="text" id="node-input-batchingMaxAllowedSizeInBytes">
+        <input type="hidden" id="node-input-batchingMaxAllowedSizeInBytes-type">
+    </div>
 <!--    properties-->
     <div class="form-row">
         <label for="node-input-properties" style="width: 70%">
@@ -173,11 +191,19 @@
 <!--    encryptionKey-->
     <div class="form-row">
         <label for="node-input-encryptionKey" style="width: 40%">
-            <i class="fa fa-cogs"></i>
+            <i class="fa fa-key"></i>
             Encryption Key
         </label>
         <input type="text" id="node-input-encryptionKey" style="width: 52%">
         <input type="hidden" id="node-input-encryptionKey-type">
+    </div>
+<!--    encryptionKeys-->
+    <div class="form-row">
+        <label for="node-input-encryptionKeys" style="width: 40%">
+            <i class="fa fa-key"></i>
+            Encryption Keys
+        </label>
+        <input type="text" id="node-input-encryptionKeys" style="width: 52%" placeholder="key1;key2;key3">
     </div>
 <!--    cryptoFailureAction-->
     <div class="form-row">
@@ -236,9 +262,12 @@ Additional properties can be set for the message:
 - `Batching Enabled`: Whether batching is enabled for the producer.
 - `Batching Max Publish Delay`: The maximum delay for batching of messages.
 - `Batching Max Messages`: The maximum number of messages in a batch.
+- `Batching Type`: The type of batching strategy (`DefaultBatching` or `KeyBasedBatching`). Key-based batching groups messages by partition key.
+- `Batching Max Size`: The maximum size in bytes for a batch.
 - `Properties`: Additional properties for messages produced by the producer.
 - `Public Key Path`: If encryption is enabled, this is the path to the public key.
 - `Encryption Key`: The key used for message encryption.
+- `Encryption Keys`: Multiple encryption key names separated by semicolons for E2E encryption with multiple consumers.
 - `Crypto Failure Action`: The action to take if there is a failure in message encryption.
 - `Chunking Enabled`: Whether chunking is enabled for the producer.
 - `Access Mode`: The access mode for messages produced by the producer. This determines who can access the messages.

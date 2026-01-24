@@ -12,11 +12,14 @@ import {
   CompressionType,
   ConsumerConfig,
   ConsumerCryptoFailureAction,
+  ConsumerKeyShareMode,
   HashingScheme,
   InitialPosition,
+  KeySharedPolicy,
   MessageId,
   MessageRoutingMode,
   ProducerAccessMode,
+  ProducerBatchType,
   ProducerConfig,
   ProducerCryptoFailureAction,
   ReaderConfig,
@@ -226,6 +229,27 @@ export function clientConfig(
 }
 
 /**
+ * Builds a KeySharedPolicy object from configuration.
+ * @param config - The consumer configuration object.
+ */
+function buildKeySharedPolicy(config: PulsarConsumerConfig): KeySharedPolicy | undefined {
+  const keyShareMode = parseChoice<ConsumerKeyShareMode>(
+    ['AutoSplit', 'Sticky'],
+    config.keySharedMode,
+  );
+  const allowOutOfOrderDelivery = parseBoolean(config.keySharedAllowOutOfOrder);
+
+  // Only return policy if at least one option is set
+  if (keyShareMode !== undefined || allowOutOfOrderDelivery !== undefined) {
+    return {
+      keyShareMode,
+      allowOutOfOrderDelivery,
+    };
+  }
+  return undefined;
+}
+
+/**
  * Creates a new Pulsar consumer configuration object based on the provided configuration.
  * @param config - The configuration object.
  * @param EvaluateFunction - The function to evaluate the property.
@@ -236,15 +260,16 @@ export function consumerConfig(
 ): ConsumerConfig {
   const typedTopic = EvaluateFunction(config.topic, config.topicTypedInput);
   const topic = parseTopic(typedTopic);
+  const subscriptionType = parseMandatoryChoice<SubscriptionType>(
+    ['Exclusive', 'Shared', 'KeyShared', 'Failover'],
+    config.subscriptionType,
+  );
   return {
     topic: topic.single,
     topics: topic.list,
     topicsPattern: topic.pattern,
     subscription: config.subscription || 'consumer-' + uuidv4(),
-    subscriptionType: parseMandatoryChoice<SubscriptionType>(
-      ['Exclusive', 'Shared', 'KeyShared', 'Failover'],
-      config.subscriptionType,
-    ),
+    subscriptionType,
     subscriptionInitialPosition: parseChoice<InitialPosition>(
       ['Latest', 'Earliest'],
       config.subscriptionInitialPosition,
@@ -274,7 +299,20 @@ export function consumerConfig(
     ),
     deadLetterPolicy: undefined,
     batchReceivePolicy: undefined,
+    keySharedPolicy: subscriptionType === 'KeyShared' ? buildKeySharedPolicy(config) : undefined,
   };
+}
+
+/**
+ * Parses encryption keys from a semicolon-separated string.
+ * @param value - Semicolon-separated encryption key names.
+ */
+function parseEncryptionKeys(value?: string): string[] | undefined {
+  if (!value || value.trim() === '') {
+    return undefined;
+  }
+  const keys = value.split(';').map((k) => k.trim()).filter((k) => k !== '');
+  return keys.length > 0 ? keys : undefined;
 }
 
 /**
@@ -311,9 +349,15 @@ export function producerConfig(
     batchingEnabled: parseBoolean(config.batchingEnabled),
     batchingMaxPublishDelayMs: parseNumber(config.batchingMaxPublishDelayMs),
     batchingMaxMessages: parseNumber(config.batchingMaxMessages),
+    batchingType: parseChoice<ProducerBatchType>(
+      ['DefaultBatching', 'KeyBasedBatching'],
+      config.batchingType,
+    ),
+    batchingMaxAllowedSizeInBytes: parseNumber(config.batchingMaxAllowedSizeInBytes),
     properties: jsonStringToProperties(config.properties),
     publicKeyPath: parseNonEmptyString(config.publicKeyPath),
     encryptionKey: parseNonEmptyString(config.encryptionKey),
+    encryptionKeys: parseEncryptionKeys(config.encryptionKeys),
     cryptoFailureAction: parseChoice<ProducerCryptoFailureAction>(
       ['FAIL', 'SEND'],
       config.cryptoFailureAction,
