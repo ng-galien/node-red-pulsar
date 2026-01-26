@@ -70,7 +70,7 @@
     "chai-wait-for": "^2.0.2",
     "cpx": "^1.5.0",
     "cross-env": "^7.0.3",
-    "eslint": "8.57.1",
+    "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.5",
     "eslint-plugin-jsdoc": "50.7.1",
     "eslint-plugin-prettier": "5.4.1",
