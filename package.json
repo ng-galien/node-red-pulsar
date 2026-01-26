@@ -73,7 +73,7 @@
     "eslint": "8.57.1",
     "eslint-config-prettier": "10.1.5",
     "eslint-plugin-jsdoc": "50.7.1",
-    "eslint-plugin-prettier": "5.4.1",
+    "eslint-plugin-prettier": "5.5.5",
     "husky": "^8.0.0",
     "mocha": "^10.8.2",
     "node-red": "^3.1.11",
