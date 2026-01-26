@@ -81,7 +81,7 @@
     "prettier": "3.5.3",
     "sinon": "^18.0.1",
     "standard-version": "^9.5.0",
-    "testcontainers": "^10.28.0",
+    "testcontainers": "^11.11.0",
     "ts-mocha": "^10.1.0",
     "ts-node": "^10.9.2",
     "tslog": "^4.10.2",
